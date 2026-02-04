@@ -91,15 +91,16 @@ class MCPClient:
         )
 
         servers_cfg = self.config.get("mcp_servers", [])
-        self.server_configs = [
-            MCPServerConfig(
-                name=server.get("name", f"server_{i}"),
-                command=server.get("command", ""),
-                args=server.get("args", []),
-                env=server.get("env", {}),
-            )
-            for i, server in enumerate(servers_cfg)
-        ]
+        if servers_cfg is not None:
+            self.server_configs = [
+                MCPServerConfig(
+                    name=server.get("name", f"server_{i}"),
+                    command=server.get("command", ""),
+                    args=server.get("args", []),
+                    env=server.get("env", {}),
+                )
+                for i, server in enumerate(servers_cfg)
+            ]
 
     def _initialize_gemini(self) -> None:
         """Initialize the Gemini API client."""
