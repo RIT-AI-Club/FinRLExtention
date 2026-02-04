@@ -3,7 +3,7 @@
 # Gemini API Configuration
 gemini:
   # API key for Google Gemini - replace with your actual key
-  api_key: "ignore test"  # Set your API key here or use environment variable
+  api_key: "ignore"  # Set your API key here or use environment variable
 
   # Model to use (options: gemini-1.5-pro, gemini-1.5-flash, gemini-1.0-pro)
   model: "gemini-1.5-pro"
