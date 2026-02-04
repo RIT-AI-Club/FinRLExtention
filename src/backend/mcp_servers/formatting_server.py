@@ -7,7 +7,6 @@ import json
 import sys
 from playwright.async_api import async_playwright
 
-
 # Test API Key removed for security
 GOOGLE_API_KEY = "AIzaSyAPza0W2UAz15Cdnp154G0a1lX-yNw3sgY" 
 
