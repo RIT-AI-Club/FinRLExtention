@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "chart-server": {
+      "command": "uv",
+      "args": [
+        "run",
+        "python",
+        "server.py"
+      ]
+    }
+  }
+}
