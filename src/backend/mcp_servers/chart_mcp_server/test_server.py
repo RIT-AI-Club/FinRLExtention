@@ -25,7 +25,7 @@ def test_chart_generation():
         image_result = generate_pro_financial_chart(dates=dates, prices=prices, symbol="TEST-CO")
         
         # 3. Save the output to verify visual correctness
-        output_filename = "test_chart_output.png"
+        output_filename = "../../charts/test_chart_output.png"
         with open(output_filename, "wb") as f:
             f.write(image_result.data)
             
