@@ -55,3 +55,4 @@ async def format_report(text_blocks: list[str], images: list[Any]) -> str:
 
 if __name__ == "__main__":
     mcp.run()
+    

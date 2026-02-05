@@ -20,3 +20,4 @@ async def html_to_pdf(html_content: str, output_path: str = "report.pdf") -> Non
             await page.pdf(path=output_path)
         finally:
             await browser.close()
+            
