@@ -1,0 +1,15 @@
+# MCP Server Configurations
+# Add your MCP servers here
+
+mcp_servers:
+  # Example server configuration:
+  # - name: "example-server"
+  #   command: "python"
+  #   args: ["-m", "example_mcp_server"]
+  #   env:
+  #     SOME_VAR: "value"
+
+  # Filesystem server example:
+  # - name: "filesystem"
+  #   command: "npx"
+  #   args: ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/allowed/directory"]

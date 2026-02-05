@@ -49,14 +49,16 @@ class MCPClient:
     and uses Gemini to process user requests while handling tool calls.
     """
 
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: Optional[str] = None, mcp_servers_path: Optional[str] = None):
         """
         Initialize the MCP Client.
 
         Args:
             config_path: Path to the config.yml file. If None, uses default location.
+            mcp_servers_path: Path to the mcpservers.yml file. If None, uses default location.
         """
         self.config_path = Path(config_path) if config_path else self._get_default_config_path()
+        self.mcp_servers_path = Path(mcp_servers_path) if mcp_servers_path else self._get_default_mcp_servers_path()
         self.config: dict[str, Any] = {}
         self.gemini_config: Optional[GeminiConfig] = None
         self.server_configs: list[MCPServerConfig] = []
@@ -69,8 +71,12 @@ class MCPClient:
         """Get the default config path relative to this file."""
         return Path(__file__).parent.parent.parent / "config" / "config.yml"
 
+    def _get_default_mcp_servers_path(self) -> Path:
+        """Get the default MCP servers config path relative to this file."""
+        return Path(__file__).parent.parent.parent / "config" / "mcpservers.yml"
+
     def load_config(self) -> None:
-        """Load configuration from the YAML config file."""
+        """Load configuration from the YAML config files."""
         if not self.config_path.exists():
             raise FileNotFoundError(f"Config file not found: {self.config_path}")
 
@@ -90,7 +96,19 @@ class MCPClient:
             max_output_tokens=gemini_cfg.get("max_output_tokens", 8192),
         )
 
-        servers_cfg = self.config.get("mcp_servers", [])
+        self._load_mcp_servers_config()
+
+    def _load_mcp_servers_config(self) -> None:
+        """Load MCP servers configuration from the mcpservers.yml file."""
+        if not self.mcp_servers_path.exists():
+            logger.warning(f"MCP servers config file not found: {self.mcp_servers_path}")
+            self.server_configs = []
+            return
+
+        with open(self.mcp_servers_path, "r") as f:
+            mcp_config = yaml.safe_load(f) or {}
+
+        servers_cfg = mcp_config.get("mcp_servers", [])
         if servers_cfg is not None:
             self.server_configs = [
                 MCPServerConfig(
@@ -390,17 +408,21 @@ class MCPClient:
         self.tool_to_server.clear()
 
 
-async def create_mcp_client(config_path: Optional[str] = None) -> MCPClient:
+async def create_mcp_client(
+    config_path: Optional[str] = None,
+    mcp_servers_path: Optional[str] = None,
+) -> MCPClient:
     """
     Create and initialize an MCP client.
 
     Args:
         config_path: Optional path to config file.
+        mcp_servers_path: Optional path to MCP servers config file.
 
     Returns:
         Initialized MCPClient instance.
     """
-    client = MCPClient(config_path)
+    client = MCPClient(config_path, mcp_servers_path)
     client.load_config()
     await client.connect_all_servers()
     await client.discover_tools()
