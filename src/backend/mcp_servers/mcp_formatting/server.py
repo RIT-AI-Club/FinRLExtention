@@ -15,7 +15,7 @@ mcp = FastMCP("formatting")
 
 
 @mcp.tool()
-async def format_report(text_blocks: list[str], images: list[Any]) -> str:
+async def format_report(text_blocks: list[str], images: list[(str, str)]) -> str:
     """
     Format text and images into a professional HTML report.
     
