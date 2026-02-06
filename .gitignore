@@ -1,14 +1,4 @@
-# Ignor pycache files
-pycache/__pycache__/
-*.py[cod]
-
-# Ignore virtual environment folders
-venv/
-env/
-.virtualenv/
-
-# Ignore IDE specific files
-.vscode/
-
-# Ignore test output files
-*.html
+=======
+config/api_key.yml
+config/config.yml
+>>>>>>> bed0fe9dcf958fca2ce708dd9f804b2e0aad820e
