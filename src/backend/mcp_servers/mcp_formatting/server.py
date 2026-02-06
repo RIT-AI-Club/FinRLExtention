@@ -4,12 +4,19 @@ import json
 import sys
 from typing import Any
 from mcp.server.fastmcp import FastMCP
+import yaml
+from pathlib import Path
 
-from config import GOOGLE_API_KEY
-from gemini_client import initialize_client, generate_html
-from prompts import FORMATTING_PROMPT
+from .gemini_client import initialize_client, generate_html
+from .prompts import FORMATTING_PROMPT
 
-
+def load_yaml_config():
+    config_path = Path(__file__).parent / "config.yaml"
+    with open(config_path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)
+    
+config = load_yaml_config()
+GOOGLE_API_KEY = config["gemini"]["api_key"]
 # Initialize MCP server
 mcp = FastMCP("formatting")
 
@@ -45,6 +52,9 @@ async def format_report(text_blocks: list[str], images: list[(str, str)]) -> str
     try:
         # Generate HTML
         html = await generate_html(client, user_data, FORMATTING_PROMPT)
+        # Write HTML to a local file for debugging
+        with open("latest_report.html", "w", encoding="utf-8") as f:
+            f.write(html)
         return html
     
     except Exception as e:
