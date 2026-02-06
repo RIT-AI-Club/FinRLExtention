@@ -1,0 +1,14 @@
+# Ignor pycache files
+pycache/__pycache__/
+*.py[cod]
+
+# Ignore virtual environment folders
+venv/
+env/
+.virtualenv/
+
+# Ignore IDE specific files
+.vscode/
+
+# Ignore test output files
+*.html
