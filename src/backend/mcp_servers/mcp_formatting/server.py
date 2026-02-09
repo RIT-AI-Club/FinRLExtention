@@ -48,10 +48,18 @@ async def format_report(text_blocks: list[str], images: list[(str, str)]) -> str
         "text_blocks": text_blocks,
         "images": images or []
     }
+
+    # Prepare reference images
+    base_dir = Path(__file__).parent / "reference_images"
+
+    reference_images = [
+        str(p.resolve()) for p in base_dir.iterdir() 
+        if p.suffix.lower() == '.png'
+    ]
     
     try:
         # Generate HTML
-        html = await generate_html(client, user_data, FORMATTING_PROMPT)
+        html = await generate_html(client, user_data, FORMATTING_PROMPT, reference_images)
         # Write HTML to a local file for debugging
         with open("latest_report.html", "w", encoding="utf-8") as f:
             f.write(html)

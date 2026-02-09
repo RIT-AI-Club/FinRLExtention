@@ -6,6 +6,7 @@ import sys
 from google import genai
 from google.genai import types
 from typing import Any
+import json
 
 def load_yaml_config():
     config_path = Path(__file__).parent / "config.yml"
@@ -31,6 +32,7 @@ async def generate_html(
     client: genai.Client,
     user_data: dict[str, Any],
     system_prompt: str,
+    reference_image_paths: str = None,
     model: str = DEFAULT_MODEL,
     temperature: float = TEMPERATURE,
     max_output_tokens: int = MAX_OUTPUT_TOKENS) -> str:
@@ -52,13 +54,34 @@ async def generate_html(
     """
     sys.stderr.write("Sending request to Gemini...\n")
     sys.stderr.flush()
-    
+
+    # Turns user data into parts
+    user_parts = [types.Part(text=f"INPUT DATA: {json.dumps(user_data)}")]
+
+    # If there are reference images, turn the path into parts and add to user parts
+    if reference_image_paths:
+        for i, img_path in enumerate(reference_image_paths):
+            path = Path(img_path)
+            if path.exists():
+                image_bytes = path.read_bytes()
+                user_parts.append(
+                    types.Part(
+                        inline_data=types.Blob(
+                            mime_type="image/png", 
+                            data=image_bytes
+                        )
+                    )
+                )
+                user_parts.append(
+                    types.Part(text=f"REFERENCE IMAGE {i+1}: Use this for structural inspiration. DO NOT COPY EXACTLY AND DO NOT USE INFORMATION FROM THE IMAGES.")
+                )
+
     response = await client.aio.models.generate_content(
         model=model,
         contents=[
             types.Content(
                 role="user",
-                parts=[types.Part(text=str(user_data))]
+                parts=user_parts
             )
         ],
         config=types.GenerateContentConfig(

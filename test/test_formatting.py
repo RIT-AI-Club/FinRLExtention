@@ -35,10 +35,11 @@ async def test_same_text():
         return re.findall(r"[A-Za-z0-9]+", s)
 
     # Invoke: call tool
-    html_output = await format_report(text_blocks, images)
+    html_path = Path("latest_report.html")
+    html = html_path.read_text(encoding="utf-8")
 
     # Extract text from html
-    extracted_text = extract_text(html_output)
+    extracted_text = extract_text(html)
 
     # Tokenize text
     html_tokens = tokenize(extracted_text)
