@@ -56,10 +56,11 @@ async def generate_html(
     sys.stderr.flush()
 
     # Turns user data into parts
-    user_parts = [types.Part(text=f"INPUT DATA: {json.dumps(user_data)}")]
+    user_parts = [types.Part(text=f"PRIMARY DATA SOURCE (TRANSCRIPTION ONLY): {json.dumps(user_data)}")]
 
-    # If there are reference images, turn the path into parts and add to user parts
+    # Add reference images with specific intent
     if reference_image_paths:
+        user_parts.append(types.Part(text="### VISUAL REFERENCE GALLERY ###"))
         for i, img_path in enumerate(reference_image_paths):
             path = Path(img_path)
             if path.exists():
@@ -73,8 +74,16 @@ async def generate_html(
                     )
                 )
                 user_parts.append(
-                    types.Part(text=f"REFERENCE IMAGE {i+1}: Use this for structural inspiration. DO NOT COPY EXACTLY AND DO NOT USE INFORMATION FROM THE IMAGES.")
+                    types.Part(text=f"REFERENCE IMAGE {i+1}: Analyze the spatial rhythm and layout balance of this image. Use it to inform the 'Couture' editorial vibe of your HTML.")
                 )
+
+    # Add a final "Design Directive" at the end of the user parts. 
+    user_parts.append(types.Part(text=(
+        "DESIGN DIRECTIVE: Synthesize the data above into the visual style inspired by the references. "
+        "Prioritize the editorial spacing and geometric sophistication seen in the images. "
+        "Optimize HTML output for conversion to a pdf."
+        "Do not use default dashboard layouts. Begin HTML generation now."
+    )))
 
     response = await client.aio.models.generate_content(
         model=model,

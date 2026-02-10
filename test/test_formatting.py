@@ -11,15 +11,19 @@ def test_html_only():
 async def test_same_text():
     # Setup: input text
     text_blocks = [
-    "Equity Analysis: Apple Inc. (AAPL) Fiscal Performance & Market Position 2024-2026",
-    "As of Q1 2026, Apple Inc. maintains a dominant market capitalization, hovering between $3.2T and $3.5T. The primary growth levers have shifted from pure hardware sales to a robust integration of Services and high-margin AI-driven ecosystem features, internally branded as 'Apple Intelligence'.",
-    "Historical Price Action: In 2024, AAPL traded in a range of $165 to $198. Following the 2025 breakthrough in edge-computing chips, the stock broke past the $230 resistance level, establishing a new support floor at $215. Currently, technical indicators suggest a bullish consolidation phase.",
-    "Revenue Breakdown by Segment (FY 2025):\n* iPhone: 48% (Steady growth in Pro/Ultra models)\n* Services: 26% (All-time high including iCloud+, Music, and Arcade)\n* Wearables & Home: 10%\n* Mac & iPad: 16% (Boosted by the M5 chip transition)",
-    "Dividend and Buyback Program: Apple continues its aggressive capital return strategy. In the last four quarters, the company repurchased $90 billion in common stock and increased the quarterly dividend by 4%, signaling strong cash flow confidence despite regulatory pressures in the EU and US.",
-    "Strategic Risks: Investors should monitor the ongoing antitrust litigation regarding the App Store's 'walled garden' model. Additionally, supply chain diversification away from specific geographic hubs remains a capital-intensive priority for the 2026-2027 roadmap.",
-    "Technical Outlook: The 50-day Moving Average (MA) recently crossed above the 200-day MA, forming a 'Golden Cross' on the weekly chart. RSI levels remain healthy at 58, suggesting room for further upside before hitting overbought territory.",
-    "Summary: AAPL remains a cornerstone 'quality' play. Its ability to command premium pricing while expanding its recurring revenue moats through Services makes it a resilient asset in volatile macro environments."
-    ]
+    "Annual Insight: Horizon Pulse (HPX) - The Intersection of Quantum Compute and Low-Orbit Logistics",
+    "Market Position: As of Q2 2026, HPX has solidified its position as a Tier-1 defense and infrastructure provider. With a focus on 'Deep-Tech' integration, our valuation has surpassed the $2.8T mark, driven by a 400% increase in autonomous satellite deployment contracts.",
+    "The 'Aether' Network Status:\n* Total Satellites in Orbit: 12,400\n* Latency: <15ms Global Average\n* User Base: 45 Million (Commercial & Defense)\n* Projected Revenue (2027): $22 Billion",
+    "Segmented Earnings Analysis (Q1 2026):\n* Orbital Logistics: 42% (Leading via the Falcon-X Partner Program)\n* Quantum Computing (QaaS): 28% (Serving pharmaceutical and financial sectors)\n* Autonomous Defense: 18% (Focusing on non-kinetic interception)\n* Consumer Connectivity: 12% (The 'Aether' home terminal units)",
+    "Strategic Pivot: The transition from Silicon to Graphene-based processors has yielded a 30% reduction in thermal output across our server farms. This 'Cold-Compute' initiative is expected to save $400M in annual cooling costs while doubling the FLOPs-per-watt efficiency. We are currently scaling this to our Reykjavik and Singapore data hubs.",
+    "Executive Leadership & Governance: Following the appointment of Dr. Aris Thorne as CTO, HPX has pivoted toward 'Explainable AI' (XAI) architectures. This move is designed to satisfy the rigorous audit requirements of the 2025 AI Accountability Act, ensuring our autonomous systems remain transparent and legally defensible.",
+    "Global Logistics Footprint: Our 2026 roadmap includes the completion of 'Port Horizon' in the Atacama Desert. This site will serve as the world's first carbon-neutral spaceport, utilizing 100% solar-thermal energy to fuel hydrogen-based heavy-lift rockets. Construction is currently 74% complete.",
+    "Financial Risk Matrix:\nRegulatory: High (Ongoing EU antitrust probes regarding orbital spectrum hoarding)\nTechnical: Medium (Graphene yield stability at scale)\nGeopolitical: Low (Diversified manufacturing across 12 NATO-aligned nations)\nCurrency: Medium (Hedging against Euro/USD volatility)",
+    "The 2026 Dividend Outlook: The Board has authorized a 12% increase in the annual dividend, totaling $3.80 per share. This is supported by a free cash flow (FCF) margin of 22%, which remains top-of-class in the aerospace sector. We anticipate maintaining this payout ratio through the 2028 cycle.",
+    "Environmental, Social, and Governance (ESG): HPX has achieved its 'Plastic-Negative' status for the third consecutive year. Our hardware recycling program successfully reclaimed 92,000 metric tons of circuit-board grade copper in 2025. We are on track to become a 'Carbon-Sovereign' entity by 2029.",
+    "Technical Sentiment (Stock): HPX is currently trading at a P/E ratio of 34x, reflecting high growth expectations. The stock is holding above its 200-day EMA, with a significant accumulation zone identified between $310 and $325. Institutional ownership stands at a record 82%.",
+    "Summary Conclusion: Horizon Pulse is no longer just an aerospace company; it is a global utility. By owning the data (Quantum) and the delivery (Orbital), HPX has created an unbreakable recurring revenue moat. We remain overweight on HPX for the 2026-2030 decade."
+]
 
     images = []
 
