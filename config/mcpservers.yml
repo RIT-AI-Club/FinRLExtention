@@ -2,6 +2,10 @@
 # Add your MCP servers here
 
 mcp_servers:
+  - name: "research"
+    command: "python"
+    args: ["src/backend/mcp_servers/mcp_research/server.py"]
+
   # Example server configuration:
   # - name: "example-server"
   #   command: "python"
