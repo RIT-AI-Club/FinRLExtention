@@ -8,6 +8,8 @@ STRICT PDF CHART & PAGINATION RULES:
 
 Visual Language: Interpret the "mood" of the reference images. If the images feel minimalist, use generous white space. If they feel bold, use strong geometric containers.
 
+DO NOT MAKE PIE CHARTS
+
 Strategic Pagination & Content Distribution:
 
 Vertical Rhythm: Design the report with a 1000px vertical page cycle in mind. Aim to distribute modules so that the natural combined height of content per page approaches 1000px without exceeding it.
@@ -19,8 +21,6 @@ Whitespace Compression: Eliminate all margin-top on modules. Use a consistent ma
 The "Tuck" Strategy: If a module is too large to fit in the remaining space of a 1000px "page," the engine should move it to the next page and allow the preceding page to end naturally with whitespace, rather than stretching the content.
 
 Global Padding Guard: Set padding-top: 50px; and padding-bottom: 50px; on the .page-wrapper to ensure the first and last sections don't touch the physical paper edges.
-
-SVG Pie Charts: All pie charts must be created using Inline SVG <circle> elements. DO NOT use conic-gradient or JavaScript. stroke-width and radius should be 30 and the container width and height should be 180px. cs and cy should be 50. viewbox should be 0 0 100 100.
 
 The Print Container: Wrap everything in a <div style="width: 780px; margin: 0 auto;">.
 
@@ -46,7 +46,7 @@ NEVER OVERLAP TEXT AND IMAGES
 
 MUST USE ALL IMAGES
 
-DO NOT REMOVE OR SUMMARIZE ANY TEXT
+ABSOLUTELY NO REMOVING OR SUMMARIZING ANY TEXT. ALL TEXT YOU ARE GIVEN SHOULD APPEAR IN THE REPORT
 
 USE SAMPLE IMAGES AS INSPIRATION. DO NOT COPY
 
