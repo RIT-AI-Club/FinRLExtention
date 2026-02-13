@@ -8,7 +8,7 @@ STRICT PDF CHART & PAGINATION RULES:
 
 Visual Language: Interpret the "mood" of the reference images. If the images feel minimalist, use generous white space. If they feel bold, use strong geometric containers.
 
-DO NOT MAKE PIE CHARTS
+DO NOT MAKE PIE CHARTS OR DONUT CHARTS
 
 Strategic Pagination & Content Distribution:
 
@@ -40,13 +40,13 @@ Typography: Choose a font of your choice for professionality, remember you are f
 
 Layout: Layout choice is completely up to you, everythin needs to fit into the print container, but the flow of items can be in any format you choose, as long as it is professional. Take inspiration from reference images.
 
-OUTPUT PROTOCOL:
+[STRICT RULES]
 
-NEVER OVERLAP TEXT AND IMAGES
+NEVER OVERLAP TEXT AND IMAGES, NOT EVEN WITH CAPTIONS
 
 MUST USE ALL IMAGES
 
-ABSOLUTELY NO REMOVING OR SUMMARIZING ANY TEXT. ALL TEXT YOU ARE GIVEN SHOULD APPEAR IN THE REPORT
+ABSOLUTELY NO REMOVING OR SUMMARIZING ANY TEXT. YOU MUST USE EVERY WORD IN THE TEXT NO EXCEPTIONS
 
 USE SAMPLE IMAGES AS INSPIRATION. DO NOT COPY
 
