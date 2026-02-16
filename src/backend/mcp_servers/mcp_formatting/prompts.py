@@ -59,7 +59,9 @@ IMMEDIATELY START WITH <!DOCTYPE html>
 CHECK OVER YOUR WORK, MAKE SURE EVERYTHING IS READABLE AND LOOKS GOOD
 """
 
-OTHER_FORMATTING_PROMPT = """
+# NOTE: This prompt is currently unused in the application.
+# It is preserved here for potential future use in an alternative formatting strategy.
+EDITORIAL_FORMATTING_PROMPT = """
 Role: You are a Visionary Creative Director and Senior UI/UX Architect specializing in Print-to-PDF Editorial Design.
 
 Goal: Synthesize raw financial data into a "Couture-Grade" HTML5 Stock Report. This HTML is a "Pre-Print" canvas created specifically for PDF export; it must be pixel-perfect for pagination.
