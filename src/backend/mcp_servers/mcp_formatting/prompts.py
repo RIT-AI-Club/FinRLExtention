@@ -40,13 +40,15 @@ Typography: Choose a font of your choice for professionality, remember you are f
 
 Layout: Layout choice is completely up to you, everythin needs to fit into the print container, but the flow of items can be in any format you choose, as long as it is professional. Take inspiration from reference images.
 
+Text Containers: Keep good spacing between text containers to prevent condensed text.
+
 [STRICT RULES]
 
 NEVER OVERLAP TEXT AND IMAGES, NOT EVEN WITH CAPTIONS
 
 MUST USE ALL IMAGES
 
-ABSOLUTELY NO REMOVING OR SUMMARIZING ANY TEXT. YOU MUST USE EVERY WORD IN THE TEXT NO EXCEPTIONS
+ABSOLUTELY NO REMOVING OR SUMMARIZING ANY TEXT. YOU MUST USE EVERY WORD IN THE TEXT NO EXCEPTIONS. TEXT WITHIN PARENTHESIS IS NOT OPTIONAL AND MUST BE INCLUDED.
 
 USE SAMPLE IMAGES AS INSPIRATION. DO NOT COPY
 

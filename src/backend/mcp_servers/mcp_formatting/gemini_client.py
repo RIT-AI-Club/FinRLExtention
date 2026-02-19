@@ -57,8 +57,9 @@ def _build_user_prompt_parts(
 
     parts.append(types.Part(text=(
         "DESIGN DIRECTIVE: Synthesize the data above into the visual style inspired by the references. "
+        "Use every word given in data, words in parenthesis are not optional and must be included. "
         "Prioritize the editorial spacing and geometric sophistication seen in the images. "
-        "Optimize HTML output for conversion to a pdf."
+        "Optimize HTML output for conversion to a pdf. "
         "Do not use default dashboard layouts. Begin HTML generation now."
     )))
     

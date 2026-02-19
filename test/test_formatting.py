@@ -1,33 +1,84 @@
 from src.backend.mcp_servers.mcp_formatting.server import *
 import pytest
 import re
+from bs4 import BeautifulSoup, Comment, Doctype
+import tinycss2
 
 
 def test_html_only():
-    pass
+
+    path = Path("latest_report.html")
+
+    with open(path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    soup = BeautifulSoup(content, "html.parser")
+
+    # --- 1. Allow only HTML constructs at the top level ---
+    for node in soup.contents:
+        if isinstance(node, Doctype):
+            continue
+        if isinstance(node, Comment):
+            continue
+        if getattr(node, "name", None) == "html":
+            continue
+        if isinstance(node, str) and node.strip() == "":
+            continue
+
+        raise AssertionError(f"Illegal top-level content: {repr(node)}")
+
+    # --- 2. Reject <script> tags ---
+    if soup.find("script"):
+        raise AssertionError("JavaScript <script> tags are not allowed")
+
+    # --- 3. Reject inline JS event handlers (onclick, onload, etc.) ---
+    for tag in soup.find_all(True):
+        for attr in tag.attrs:
+            if attr.lower().startswith("on"):
+                raise AssertionError(f"Inline JS event handler found: {attr}")
+
+    # --- 4. Validate CSS inside <style> tags ---
+    for style_tag in soup.find_all("style"):
+        css = style_tag.string or ""
+        if not css.strip():
+            continue
+
+        rules = tinycss2.parse_stylesheet(
+            css,
+            skip_comments=False,
+            skip_whitespace=True,
+        )
+
+        # CSS comments appear as tokens with type "comment"
+        errors = [r for r in rules if r.type == "error"]
+        if errors:
+            raise AssertionError(f"Invalid CSS found: {errors}")
+
+    # --- 5. Reject stray text outside tags (comments allowed) ---
+    for node in soup.descendants:
+        if isinstance(node, Comment):
+            continue
+
+        if isinstance(node, str):
+            text = node.strip()
+            if not text:
+                continue
+
+            # Allow CSS text inside <style>
+            if node.parent and node.parent.name == "style":
+                continue
+
+            # Allow normal HTML text inside tags
+            if node.parent and node.parent.name not in ["style"]:
+                continue
+
+            raise AssertionError(f"Stray text found: {text}")
 
 
-@pytest.mark.asyncio
-async def test_same_text():
+
+def test_same_text():
     # Setup: input text
-    text_blocks = [
-    "Apex-Neuralis (APX): 2026 Global Intelligence & Infrastructure Sovereignty Report",
-    "Market Dominance Overview: APX has successfully integrated the 'Synapse-Cloud' protocol across 142 terrestrial data centers. As of Q1 2026, APX controls 62% of the world's 'Inference-as-a-Service' (IaaS) market share. With a market capitalization now exceeding $4.5T, APX is the world's first 'Intelligence Utility'.",
-    "Financial Efficiency & Margins (FY 2025-2026):\n* Gross Revenue: $182.4 Billion (+28% YoY)\n* Operating Margin: 44% (Driven by automated server maintenance)\n* Net Income: $68.2 Billion\n* Capital Expenditures: $42 Billion (Focusing on 'Deep-Frost' cooling units)",
-    "The 'Deep-Frost' Cooling Initiative: Our transition to liquid-nitrogen immersion for H1000-series clusters has yielded a 90% reduction in thermal throttle events. By sinking our server 'pods' 200 meters below the surface of the North Sea, we utilize consistent ambient temperatures to maintain a PUE of 1.008. This system is estimated to save the equivalent energy consumption of a small nation annually.",
-    "Intelligence Segment Breakdown:\n* Enterprise Inference: 42% (Fortune 500 decision-logic engines)\n* Sovereignty-Cloud: 28% (Localized AI models for 14 national governments)\n* Neural-Hardware: 18% (Consumer-grade 'Synapse' chips for smartphones)\n* Bio-Integrated Systems: 12% (Beta testing for neural-prosthetic interfaces)",
-    "Sovereignty and Regulation: The 2025 'AI Autonomy Act' has mandated that all Tier-1 providers maintain 100% data residency within national borders. APX has preempted this by deploying 'Border-Vault' clusters in every NATO-aligned country, ensuring that sensitive intelligence never leaves the sovereign territory of the user.",
-    "Technical Performance Metric Comparison:\n* Latency: APX (0.12ms) | Industry Avg (4.5ms)\n* Tokens-Per-Watt: APX (4,200) | Industry Avg (850)\n* Model Uptime: APX (99.999%) | Industry Avg (99.2%)\n* Security Hardening: APX (Quantum-Encrypted) | Industry Avg (Standard AES-256)",
-    "The 2026 Shareholder Directive: Following a record-breaking fiscal year, the Board of Directors has authorized the largest capital return program in tech history: a $60 Billion share buyback and a special dividend of $5.50 per share. This signals our conviction in the 'Synapse-Cloud' recurring revenue model, which currently has a 94% retention rate.",
-    "Strategic Risk & Vulnerability Matrix:\n1. Solar Interference: High (Potential for magnetospheric disruption of satellite-links)\n2. Regulatory Antitrust: Medium (Ongoing US DOJ investigation into IaaS monopoly)\n3. Hardware Scalability: Low (Diversified manufacturing across 4 continents)\n4. Energy Pricing: Medium (Hedging against European grid volatility)",
-    "Neuro-Prosthetics & Ethics: In partnership with the Global Health Alliance, APX has successfully piloted the 'Cortex-Bridge' for 500 patients with advanced spinal cord injuries. Using our 'Deep-Link' neural interface, patients achieved a 92% success rate in autonomous motor-control restoration. We remain committed to an 'Ethics-Gated' rollout for all bio-integrated technologies.",
-    "Global Logistics Footprint: To support our 2027 roadmap, APX is constructing 'Nexus One' in the Atacama Desert—a 10-Gigawatt solar-powered server farm. This facility will be entirely water-neutral, utilizing atmospheric water generators to maintain localized biodiversity while powering the next generation of global reasoning engines.",
-    "The 'Black-Box' Transparency Initiative: To counter the 'Hallucination Crisis,' APX has introduced 'Proof-of-Logic' (PoL) logging. Every output generated by our models is accompanied by a cryptographic chain showing the specific data weights and retrieval sources used, allowing for 100% auditability for legal and medical applications.",
-    "Technical Market Momentum: APX is the undisputed leader of the 'Intelligence Super-Cycle.' Technical indicators show the stock forming a massive 'Cup and Handle' pattern on the monthly chart, with a breakout target of $1,450. Institutional ownership is at a saturation point of 91%, with zero 'sell' ratings across 45 major analyst desks.",
-    "Summary Statement: Apex-Neuralis is the backbone of the 21st-century economy. We do not just process data; we generate the reasoning that drives civilization. APX remains the definitive 'Quality' play for the 2026-2035 era."
-    ]
-
-    images = []
+    text_blocks = []
 
     # Prepare html to be scanned
     def extract_text(html: str) -> str:
