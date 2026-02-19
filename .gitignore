@@ -1,2 +1,21 @@
 config/api_key.yml
-config/config.yml
+config.yml
+
+# Ignore practice file
+practice_formatting_server.py
+
+# Ignore pycache files
+pycache/__pycache__/
+*.py[cod]
+
+# Ignore virtual environment folders
+venv/
+env/
+.virtualenv/
+
+# Ignore IDE specific files
+.vscode/
+
+# Ignore test output files
+*.html
+*.pdf
