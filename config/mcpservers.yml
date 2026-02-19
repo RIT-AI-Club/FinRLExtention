@@ -2,12 +2,9 @@
 # Add your MCP servers here
 
 mcp_servers:
-  # Example server configuration:
-  # - name: "example-server"
-  #   command: "python"
-  #   args: ["-m", "example_mcp_server"]
-  #   env:
-  #     SOME_VAR: "value"
+  - name: "formatting"
+    command: "python"
+    args: ["src/backend/mcp_servers/mcp_formatting/server.py"]
 
   # Filesystem server example:
   # - name: "filesystem"
