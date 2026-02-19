@@ -14,6 +14,20 @@ gemini:
   # Maximum tokens in the response
   max_output_tokens: 8192
 
+# Perplexity API Configuration (for research tools)
+perplexity:
+  # API key for Perplexity - get yours at https://www.perplexity.ai/settings/api
+  api_key: ""
+
+  # Model to use: sonar | sonar-pro | sonar-reasoning
+  model: "sonar"
+
+  # Temperature for response generation (0.0 - 1.0)
+  temperature: 0.7
+
+  # Maximum tokens in the response
+  max_tokens: 4096
+
 # MCP Server Configurations
 # Add your MCP servers here
 mcp_servers:
