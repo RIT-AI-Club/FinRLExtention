@@ -18,7 +18,7 @@ COLORS = ["red", "limegreen", "royalblue"]
 # Initialize the server
 mcp = FastMCP("chart_generation")
 
-# @mcp.tool() # comment out for testing
+# @mcp.tool() # comment out for manual testing
 def generate_financial_line_chart(dates: list[str], prices: list[float], symbol: str = "STOCK") -> Image:
     """
     Generates a detailed financial line chart with a moving average and trend indicators.
@@ -72,14 +72,16 @@ def generate_financial_line_chart(dates: list[str], prices: list[float], symbol:
                     bbox=dict(boxstyle="round,pad=0.3", fc="yellow", ec="black", lw=1, alpha=0.8))
 
         # Formatting
+        ax.set_facecolor("white") # set chart background
+        fig.patch.set_alpha(0.0) # set transparent figure background
         ax.set_title(f"Financial Performance Analysis: {symbol}", fontsize=16, fontweight='bold', pad=20)
         ax.set_ylabel("Price (USD)", fontsize=12, labelpad=10)
         ax.set_xlabel("Trading Date", fontsize=12, labelpad=10)
-        if prices[-1] >= prices[0]:
+        if prices[-1] >= prices[0]: # determine legend placement
             ax.legend(loc="upper left")
         else:
             ax.legend(loc="upper right")
-        ax.grid(True, linestyle=':', alpha=0.6)
+        ax.grid(True, which="both", linestyle=':', alpha=0.75, color='#cccccc') # set grid and color
         
         # Auto-format date tick labels (rotates and skips labels to fit)
         fig.autofmt_xdate()
@@ -95,7 +97,7 @@ def generate_financial_line_chart(dates: list[str], prices: list[float], symbol:
 
     return Image(data=image_bytes, format="png")
 
-# @mcp.tool() # comment out for testing
+# @mcp.tool() # comment out for manual testing
 def generate_basic_line_chart(dates: list[str], prices: list[float], symbol: str = "STOCK") -> Image:
     """
     Generates a basic line chart to represent financial data.
@@ -132,7 +134,7 @@ def generate_basic_line_chart(dates: list[str], prices: list[float], symbol: str
 
         # Formatting
         ax.set_facecolor("white") # set chart background
-        fig.patch.set_alpha(0.0) # set figure background
+        fig.patch.set_alpha(0.0) # set transparent figure background
         ax.set_title(f"Financial Performance Analysis: {symbol}", fontsize=16, fontweight='bold', pad=20)
         ax.set_ylabel("Price (USD)", fontsize=12, labelpad=10)
         ax.set_xlabel("Trading Date", fontsize=12, labelpad=10)
