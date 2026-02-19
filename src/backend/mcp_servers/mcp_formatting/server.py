@@ -6,9 +6,9 @@ from typing import List, Tuple
 from pathlib import Path
 from mcp.server.fastmcp import FastMCP
 
-from .config import config
-from .gemini_client import get_gemini_client, generate_html
-from .prompts import FORMATTING_PROMPT
+from config import config
+from gemini_client import get_gemini_client, generate_html
+from prompts import FORMATTING_PROMPT
 
 # Get a logger for this module
 logger = logging.getLogger(__name__)
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 mcp = FastMCP("formatting")
 
 @mcp.tool()
-async def format_report(text_blocks: List[str], images: List[Tuple[str, str]]) -> str:
+async def format_report(text_blocks: List[str], images: List[List[str]]) -> str:
     """
     Formats text and images into a professional HTML report using an AI model.
     
