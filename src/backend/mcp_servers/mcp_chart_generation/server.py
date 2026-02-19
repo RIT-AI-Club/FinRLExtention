@@ -131,10 +131,13 @@ def generate_basic_line_chart(dates: list[str], prices: list[float], symbol: str
         ax.set_ylim(min_prices - price_range * 0.1) # padding for top and bottom
 
         # Formatting
+        ax.set_facecolor("white") # set chart background
+        fig.patch.set_alpha(0.0) # set figure background
         ax.set_title(f"Financial Performance Analysis: {symbol}", fontsize=16, fontweight='bold', pad=20)
         ax.set_ylabel("Price (USD)", fontsize=12)
         ax.set_xlabel("Trading Date", fontsize=12)
-        ax.grid(True, linestyle=':', alpha=0.6)
+        # ax.minorticks_on()
+        ax.grid(True, which="both", linestyle=':', alpha=0.75, color='#cccccc') # set grid and color
         
         # Auto-format date tick labels (rotates and skips labels to fit)
         fig.autofmt_xdate()
