@@ -1,8 +1,8 @@
-from server import generate_financial_line_chart
+from server import *
 from datetime import datetime, timedelta
 import random
 
-def test_chart_generation():
+def test_chart_generation(chart_generator):
     print("Starting local test of Stock Analyzer...")
 
     # 1. Simulate Data: Generate 30 days of dummy stock data
@@ -21,8 +21,8 @@ def test_chart_generation():
 
     # 2. Call the Tool Directly
     try:
-        print("calling generate_financial_line_chart()...")
-        image_result = generate_financial_line_chart(dates=dates, prices=prices, symbol="TEST-CO")
+        print("calling chart_generator()...")
+        image_result = chart_generator(dates=dates, prices=prices, symbol="TEST-CO")
         
         # 3. Save the output to verify visual correctness
         output_filename = "src/backend/charts/test_chart_output.png"
@@ -36,4 +36,11 @@ def test_chart_generation():
         print(f"Error during generation: {e}")
 
 if __name__ == "__main__":
-    test_chart_generation()
+    chart_generator = int(input("Please select which chart generator you want to test:" \
+                            "\n\t(1) generate_financial_line_chart\n\t(2) generate_basic_line_chart\n> "))
+    match chart_generator:
+        case 1:
+            test_chart_generation(generate_financial_line_chart)
+        case 2:
+            test_chart_generation(generate_basic_line_chart)
+    
