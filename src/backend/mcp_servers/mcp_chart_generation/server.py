@@ -134,10 +134,6 @@ def generate_basic_line_chart(dates: list[str], prices: list[float], symbol: str
         ax.set_title(f"Financial Performance Analysis: {symbol}", fontsize=16, fontweight='bold', pad=20)
         ax.set_ylabel("Price (USD)", fontsize=12)
         ax.set_xlabel("Trading Date", fontsize=12)
-        if prices[-1] >= prices[0]:
-            ax.legend(loc="upper left")
-        else:
-            ax.legend(loc="upper right")
         ax.grid(True, linestyle=':', alpha=0.6)
         
         # Auto-format date tick labels (rotates and skips labels to fit)
