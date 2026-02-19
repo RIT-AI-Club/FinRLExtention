@@ -18,10 +18,10 @@ COLORS = ["red", "limegreen", "royalblue"]
 # Initialize the server
 mcp = FastMCP("Stock Analyzer")
 
-# @mcp.tool()
-def generate_pro_financial_chart(dates: list[str], prices: list[float], symbol: str = "STOCK") -> Image:
+# @mcp.tool() # comment out for testing
+def generate_financial_line_chart(dates: list[str], prices: list[float], symbol: str = "STOCK") -> Image:
     """
-    Generates a professional-grade area chart with a moving average and trend indicators.
+    Generates a financial line chart with a moving average and trend indicators.
     """
     # Validation: Ensure data lengths match
     if len(dates) != len(prices):
@@ -30,31 +30,30 @@ def generate_pro_financial_chart(dates: list[str], prices: list[float], symbol: 
     if not dates:
         raise ValueError("Data empty: No dates or prices provided.")
 
-    # 1. Parse Dates
-    # Converting strings to datetime objects allows Matplotlib to handle axis formatting smartly.
+    # Format dates
+    # Convert strings to datetime objects allows Matplotlib to handle axis formatting smartly.
     try:
-        # Assuming ISO format (YYYY-MM-DD), adjust format string if inputs differ
-        dt_dates = [datetime.fromisoformat(d) for d in dates]
+        # Assuming dates are in ISO format (YYYY-MM-DD)
+        dt_dates = [datetime.fromisoformat(d) for d in dates] 
     except ValueError:
-        # Fallback if standard parsing fails, though explicit parsing is better
+        # Fallback if standard parsing fails
         dt_dates = dates 
 
-    # 2. Calculate SMA (Simple Moving Average)
+    # Calculate SMA (Simple Moving Average)
     sma = [sum(prices[max(0, i-2):i+1]) / len(prices[max(0, i-2):i+1]) for i in range(len(prices))]
 
-    # 3. Setup Plot (Context Manager recommended for thread safety)
-    # Using the context manager ensures styles don't leak to other threads
+    # Setup plot
+    # Context manager ensures styles don't leak to other threads
     with plt.style.context('ggplot'):
         fig, ax = plt.subplots(figsize=(12, 7))
         
-        # 4. Create the Area Chart
-        # ax.fill_between(dt_dates, prices, color="skyblue", alpha=0.4, label="Price Area")
-        ax.plot(dt_dates, prices, color=random.choice(COLORS), marker='o', linewidth=2.5, label=f"{symbol} Close")
+        # Plot the Line Graph
+        ax.plot(dt_dates, prices, color=random.choice(COLORS), marker='o', linewidth=2, label=f"{symbol} Close")
         
-        # 5. Add the Trend Line
+        # Add the Trend Line
         ax.plot(dt_dates, sma, color="gold", linestyle="--", linewidth=1.5, label="3-Day Trend")
 
-        # 6. Highlight the Latest Price
+        # Highlight the Latest Price
         latest_price = prices[-1]
         latest_date = dt_dates[-1]
         
@@ -66,21 +65,24 @@ def generate_pro_financial_chart(dates: list[str], prices: list[float], symbol: 
                     arrowprops=dict(arrowstyle='->', color='black'),
                     bbox=dict(boxstyle="round,pad=0.3", fc="yellow", ec="black", lw=1, alpha=0.8))
 
-        # 7. Formatting
+        # Formatting
         ax.set_title(f"Financial Performance Analysis: {symbol}", fontsize=16, fontweight='bold', pad=20)
         ax.set_ylabel("Price (USD)", fontsize=12)
         ax.set_xlabel("Trading Date", fontsize=12)
-        ax.legend(loc="upper left")
+        if prices[-1] >= prices[0]:
+            ax.legend(loc="upper left")
+        else:
+            ax.legend(loc="upper right")
         ax.grid(True, linestyle=':', alpha=0.6)
         
         # Auto-format date tick labels (rotates and skips labels to fit)
         fig.autofmt_xdate()
 
-        # 8. Save to Buffer
-        buf = io.BytesIO()
-        plt.savefig(buf, format='png', dpi=120)
-        buf.seek(0)
-        image_bytes = buf.getvalue()
+        # Save to Buffer
+        buffer = io.BytesIO()
+        plt.savefig(buffer, format='png', dpi=120)
+        buffer.seek(0)
+        image_bytes = buffer.getvalue()
         
         # Explicitly close the figure to free memory
         plt.close(fig)

@@ -1,4 +1,4 @@
-from server import generate_pro_financial_chart
+from server import generate_financial_line_chart
 from datetime import datetime, timedelta
 import random
 
@@ -21,11 +21,11 @@ def test_chart_generation():
 
     # 2. Call the Tool Directly
     try:
-        print("calling generate_pro_financial_chart()...")
-        image_result = generate_pro_financial_chart(dates=dates, prices=prices, symbol="TEST-CO")
+        print("calling generate_financial_line_chart()...")
+        image_result = generate_financial_line_chart(dates=dates, prices=prices, symbol="TEST-CO")
         
         # 3. Save the output to verify visual correctness
-        output_filename = "../../charts/test_chart_output.png"
+        output_filename = "src/backend/charts/test_chart_output.png"
         with open(output_filename, "wb") as f:
             f.write(image_result.data)
             
