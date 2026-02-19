@@ -6,6 +6,11 @@ mcp_servers:
     command: "python"
     args: ["src/backend/mcp_servers/mcp_research/server.py"]
 
+  # THIS IS THE FORMATTING SERVER (COMMENTED BECAUSE OF ERRORS THAT WILL NEED TO BE FIXED)
+  # - name: "formatting"
+  #   command: "python"
+  #   args: ["src/backend/mcp_servers/mcp_formatting/server.py"]
+
   # Example server configuration:
   # - name: "example-server"
   #   command: "python"
