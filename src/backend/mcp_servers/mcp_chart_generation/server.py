@@ -73,8 +73,8 @@ def generate_financial_line_chart(dates: list[str], prices: list[float], symbol:
 
         # Formatting
         ax.set_title(f"Financial Performance Analysis: {symbol}", fontsize=16, fontweight='bold', pad=20)
-        ax.set_ylabel("Price (USD)", fontsize=12)
-        ax.set_xlabel("Trading Date", fontsize=12)
+        ax.set_ylabel("Price (USD)", fontsize=12, labelpad=10)
+        ax.set_xlabel("Trading Date", fontsize=12, labelpad=10)
         if prices[-1] >= prices[0]:
             ax.legend(loc="upper left")
         else:
@@ -134,8 +134,8 @@ def generate_basic_line_chart(dates: list[str], prices: list[float], symbol: str
         ax.set_facecolor("white") # set chart background
         fig.patch.set_alpha(0.0) # set figure background
         ax.set_title(f"Financial Performance Analysis: {symbol}", fontsize=16, fontweight='bold', pad=20)
-        ax.set_ylabel("Price (USD)", fontsize=12)
-        ax.set_xlabel("Trading Date", fontsize=12)
+        ax.set_ylabel("Price (USD)", fontsize=12, labelpad=10)
+        ax.set_xlabel("Trading Date", fontsize=12, labelpad=10)
         # ax.minorticks_on()
         ax.grid(True, which="both", linestyle=':', alpha=0.75, color='#cccccc') # set grid and color
         
