@@ -6,6 +6,7 @@ import matplotlib
 # This prevents the server from trying to open a GUI window, which would crash it.
 matplotlib.use('Agg')
 
+from matplotlib.ticker import MultipleLocator
 import matplotlib.pyplot as plt
 import io
 from datetime import datetime
@@ -14,6 +15,7 @@ from fastmcp.utilities.types import Image
 import random
 
 COLORS = ["red", "limegreen", "royalblue"]
+COLOR = random.choice(COLORS)
 
 # Initialize the server
 mcp = FastMCP("chart_generation")
@@ -54,7 +56,7 @@ def generate_financial_line_chart(dates: list[str], prices: list[float], symbol:
         min_prices = min(prices)
         max_prices = max(prices)
         price_range = max_prices - min_prices
-        ax.set_ylim(min_prices - price_range * 0.1, max_prices + price_range * 0.2) # padding for bottom and padding for legend at top
+        ax.set_ylim(min_prices - price_range * 0.5, max_prices + price_range * 0.2) # padding for bottom and padding for legend at top
         
         # Add the Trend Line
         ax.plot(dt_dates, sma, color="gold", linestyle="--", linewidth=1.5, label="3-Day Trend")
@@ -81,7 +83,8 @@ def generate_financial_line_chart(dates: list[str], prices: list[float], symbol:
             ax.legend(loc="upper left")
         else:
             ax.legend(loc="upper right")
-        ax.grid(True, which="both", linestyle=':', alpha=0.75, color='#cccccc') # set grid and color
+        ax.yaxis.set_minor_locator(MultipleLocator(5)) # minor gridline every 5 units
+        ax.yaxis.grid(True, which="both", linestyle=':', alpha=0.75, color='#cccccc') # set horizontal grid style and color
         
         # Auto-format date tick labels (rotates and skips labels to fit)
         fig.autofmt_xdate()
@@ -124,13 +127,13 @@ def generate_basic_line_chart(dates: list[str], prices: list[float], symbol: str
         fig, ax = plt.subplots(figsize=(12, 7))
         
         # Plot the Line Graph
-        ax.plot(dt_dates, prices, color=random.choice(COLORS), marker='.', linewidth=2)
+        ax.plot(dt_dates, prices, color=COLOR, marker='.', linewidth=2)
 
         # Add padding on vertical axis so that legend never covers the graph
         min_prices = min(prices)
         max_prices = max(prices)
         price_range = max_prices - min_prices
-        ax.set_ylim(min_prices - price_range * 0.1) # padding for top and bottom
+        ax.set_ylim(min_prices - price_range * 0.5, max_prices + price_range * 0.2) # padding for top and bottom
 
         # Formatting
         ax.set_facecolor("white") # set chart background
@@ -138,8 +141,8 @@ def generate_basic_line_chart(dates: list[str], prices: list[float], symbol: str
         ax.set_title(f"Financial Performance Analysis: {symbol}", fontsize=16, fontweight='bold', pad=20)
         ax.set_ylabel("Price (USD)", fontsize=12, labelpad=10)
         ax.set_xlabel("Trading Date", fontsize=12, labelpad=10)
-        # ax.minorticks_on()
-        ax.grid(True, which="both", linestyle=':', alpha=0.75, color='#cccccc') # set grid and color
+        ax.yaxis.set_minor_locator(MultipleLocator(5)) # minor gridline every 5 units
+        ax.yaxis.grid(True, which="both", linestyle=':', alpha=0.75, color='#cccccc') # set grid style and color
         
         # Auto-format date tick labels (rotates and skips labels to fit)
         fig.autofmt_xdate()
