@@ -9,6 +9,7 @@ handling tool calls.
 import asyncio
 import json
 import logging
+from contextlib import AsyncExitStack
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional
@@ -66,6 +67,7 @@ class MCPClient:
         self.tools: dict[str, dict[str, Any]] = {}
         self.tool_to_server: dict[str, str] = {}
         self._model: Optional[genai.GenerativeModel] = None
+        self._exit_stack = AsyncExitStack()
 
     def _get_default_config_path(self) -> Path:
         """Get the default config path relative to this file."""
@@ -153,11 +155,13 @@ class MCPClient:
             env=server_config.env if server_config.env else None,
         )
 
-        stdio_transport = await stdio_client(server_params).__aenter__()
-        read_stream, write_stream = stdio_transport
+        read_stream, write_stream = await self._exit_stack.enter_async_context(
+            stdio_client(server_params)
+        )
 
-        session = ClientSession(read_stream, write_stream)
-        await session.__aenter__()
+        session = await self._exit_stack.enter_async_context(
+            ClientSession(read_stream, write_stream)
+        )
         await session.initialize()
 
         self.sessions[server_config.name] = session
@@ -396,13 +400,7 @@ class MCPClient:
 
     async def close(self) -> None:
         """Close all server connections."""
-        for server_name, session in self.sessions.items():
-            try:
-                await session.__aexit__(None, None, None)
-                logger.info(f"Closed connection to {server_name}")
-            except Exception as e:
-                logger.error(f"Error closing connection to {server_name}: {e}")
-
+        await self._exit_stack.aclose()
         self.sessions.clear()
         self.tools.clear()
         self.tool_to_server.clear()
