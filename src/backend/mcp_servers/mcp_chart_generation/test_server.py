@@ -2,7 +2,7 @@ from server import *
 from datetime import datetime, timedelta
 import random
 
-def test_chart_generation(chart_generator):
+def test_chart_generation(advanced):
     print("Starting local test of Stock Analyzer...")
 
     # 1. Simulate Data: Generate 30 days of dummy stock data
@@ -22,7 +22,7 @@ def test_chart_generation(chart_generator):
     # 2. Call the Tool Directly
     try:
         print("calling chart_generator()...")
-        image_result = chart_generator(dates=dates, prices=prices, symbol="TEST-CO")
+        image_result = generate_line_chart(dates=dates, prices=prices, symbol="TEST-CO", advanced=advanced)
         
         # 3. Save the output to verify visual correctness
         output_filename = "src/backend/charts/test_chart_output.png"
@@ -36,11 +36,11 @@ def test_chart_generation(chart_generator):
         print(f"Error during generation: {e}")
 
 if __name__ == "__main__":
-    chart_generator = int(input("Please select which chart generator you want to test:" \
-                            "\n\t(1) generate_financial_line_chart\n\t(2) generate_basic_line_chart\n> "))
+    chart_generator = int(input("Please select which chart you want to test:" \
+                            "\n\t(1) basic line chart\n\t(2) advanced line chart\n> "))
     match chart_generator:
         case 1:
-            test_chart_generation(generate_financial_line_chart)
+            test_chart_generation(advanced=False)
         case 2:
-            test_chart_generation(generate_basic_line_chart)
+            test_chart_generation(advanced=True)
     
