@@ -22,6 +22,7 @@ def test_chart_generation(advanced):
     # 2. Call the Tool Directly
     try:
         print("calling chart_generator()...")
+        print("first date actual: " + dates[0])
         image_result = generate_line_chart(dates=dates, prices=prices, symbol="TEST-CO", advanced=advanced)
         
         # 3. Save the output to verify visual correctness
