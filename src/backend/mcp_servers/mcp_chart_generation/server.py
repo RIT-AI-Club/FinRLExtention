@@ -2,9 +2,9 @@
 MCP server for chart generation
 """
 import matplotlib
-# CRITICAL: Set the backend to 'Agg' before importing pyplot.
+# CRITICAL: Set the backend to "Agg" before importing pyplot.
 # This prevents the server from trying to open a GUI window, which would crash it.
-matplotlib.use('Agg')
+matplotlib.use("Agg")
 
 from matplotlib.ticker import MultipleLocator
 import matplotlib.pyplot as plt
@@ -21,7 +21,7 @@ COLOR = random.choice(COLORS)
 mcp = FastMCP("chart_generation")
 
 # @mcp.tool() # comment out for manual testing
-def generate_financial_line_chart(dates: list[str], prices: list[float], symbol: str = "STOCK") -> Image:
+def generate_financial_line_chart(dates: list[str], prices: list[float], symbol: str = "STOCK", text_color: str = "dimgrey") -> Image:
     """
     Generates a detailed financial line chart with a moving average and trend indicators.
     """
@@ -45,12 +45,12 @@ def generate_financial_line_chart(dates: list[str], prices: list[float], symbol:
     sma = [sum(prices[max(0, i-2):i+1]) / len(prices[max(0, i-2):i+1]) for i in range(len(prices))]
 
     # Setup plot
-    # Context manager ensures styles don't leak to other threads
-    with plt.style.context('ggplot'):
+    # Context manager ensures styles don"t leak to other threads
+    with plt.style.context("ggplot"):
         fig, ax = plt.subplots(figsize=(12, 7))
         
         # Plot the Line Graph
-        ax.plot(dt_dates, prices, color=random.choice(COLORS), marker='.', linewidth=2, label=f"{symbol} Close")
+        ax.plot(dt_dates, prices, color=random.choice(COLORS), marker=".", linewidth=2, label=f"{symbol} Close")
 
         # Add padding on vertical axis so that legend never covers the graph
         min_prices = min(prices)
@@ -65,33 +65,35 @@ def generate_financial_line_chart(dates: list[str], prices: list[float], symbol:
         latest_price = prices[-1]
         latest_date = dt_dates[-1]
         
-        # Note: 'dates[-1]' used in annotation needs to match the axis type (dt_dates)
-        ax.annotate(f'${latest_price:.2f}', 
+        # Note: "dates[-1]" used in annotation needs to match the axis type (dt_dates)
+        ax.annotate(f"${latest_price:.2f}", 
                     xy=(latest_date, latest_price), 
                     xytext=(10, 10), 
-                    textcoords='offset points',
-                    arrowprops=dict(arrowstyle='->', color='black'),
-                    bbox=dict(boxstyle="round,pad=0.3", fc="yellow", ec="black", lw=1, alpha=0.8))
+                    textcoords="offset points",
+                    arrowprops=dict(arrowstyle="->", color="black"),
+                    bbox=dict(boxstyle="round,pad=0.3", fc="yellow", ec="black", lw=1, alpha=0.8),
+                    color="black")
 
         # Formatting
         ax.set_facecolor("white") # set chart background
         fig.patch.set_alpha(0.0) # set transparent figure background
-        ax.set_title(f"Financial Performance Analysis: {symbol}", fontsize=16, fontweight='bold', pad=20)
-        ax.set_ylabel("Price (USD)", fontsize=12, labelpad=10)
-        ax.set_xlabel("Trading Date", fontsize=12, labelpad=10)
+        ax.set_title(f"Financial Performance Analysis: {symbol}", fontsize=16, fontweight="bold", pad=20)
+        ax.set_ylabel("Price (USD)", fontsize=12, labelpad=10, fontweight="bold", color=text_color)
+        ax.set_xlabel("Trading Date", fontsize=12, labelpad=10, fontweight="bold", color=text_color)
+        ax.tick_params(axis='both', labelcolor=text_color)
         if prices[-1] >= prices[0]: # determine legend placement
             ax.legend(loc="upper left")
         else:
             ax.legend(loc="upper right")
         ax.yaxis.set_minor_locator(MultipleLocator(5)) # minor gridline every 5 units
-        ax.yaxis.grid(True, which="both", linestyle=':', alpha=0.75, color='#cccccc') # set horizontal grid style and color
+        ax.yaxis.grid(True, which="both", linestyle=":", alpha=0.75, color="#cccccc") # set horizontal grid style and color
         
         # Auto-format date tick labels (rotates and skips labels to fit)
         fig.autofmt_xdate()
 
         # Save to Buffer
         buffer = io.BytesIO()
-        plt.savefig(buffer, format='png', dpi=120)
+        plt.savefig(buffer, format="png", dpi=120)
         buffer.seek(0)
         image_bytes = buffer.getvalue()
         
@@ -101,7 +103,7 @@ def generate_financial_line_chart(dates: list[str], prices: list[float], symbol:
     return Image(data=image_bytes, format="png")
 
 # @mcp.tool() # comment out for manual testing
-def generate_basic_line_chart(dates: list[str], prices: list[float], symbol: str = "STOCK") -> Image:
+def generate_basic_line_chart(dates: list[str], prices: list[float], symbol: str = "STOCK", text_color: str = "dimgrey") -> Image:
     """
     Generates a basic line chart to represent financial data.
     """
@@ -122,12 +124,12 @@ def generate_basic_line_chart(dates: list[str], prices: list[float], symbol: str
         dt_dates = dates 
 
     # Setup plot
-    # Context manager ensures styles don't leak to other threads
-    with plt.style.context('ggplot'):
+    # Context manager ensures styles don"t leak to other threads
+    with plt.style.context("ggplot"):
         fig, ax = plt.subplots(figsize=(12, 7))
         
         # Plot the Line Graph
-        ax.plot(dt_dates, prices, color=COLOR, marker='.', linewidth=2)
+        ax.plot(dt_dates, prices, color=COLOR, marker=".", linewidth=2)
 
         # Add padding on vertical axis so that legend never covers the graph
         min_prices = min(prices)
@@ -138,18 +140,19 @@ def generate_basic_line_chart(dates: list[str], prices: list[float], symbol: str
         # Formatting
         ax.set_facecolor("white") # set chart background
         fig.patch.set_alpha(0.0) # set transparent figure background
-        ax.set_title(f"Financial Performance Analysis: {symbol}", fontsize=16, fontweight='bold', pad=20)
-        ax.set_ylabel("Price (USD)", fontsize=12, labelpad=10)
-        ax.set_xlabel("Trading Date", fontsize=12, labelpad=10)
+        ax.set_title(f"Financial Performance Analysis: {symbol}", fontsize=16, fontweight="bold", pad=20)
+        ax.set_ylabel("Price (USD)", fontsize=12, labelpad=10, fontweight="bold", color=text_color)
+        ax.set_xlabel("Trading Date", fontsize=12, labelpad=10, fontweight="bold", color=text_color)
+        ax.tick_params(axis='both', labelcolor=text_color)
         ax.yaxis.set_minor_locator(MultipleLocator(5)) # minor gridline every 5 units
-        ax.yaxis.grid(True, which="both", linestyle=':', alpha=0.75, color='#cccccc') # set grid style and color
+        ax.yaxis.grid(True, which="both", linestyle=":", alpha=0.75, color="#cccccc") # set grid style and color
         
         # Auto-format date tick labels (rotates and skips labels to fit)
         fig.autofmt_xdate()
 
         # Save to Buffer
         buffer = io.BytesIO()
-        plt.savefig(buffer, format='png', dpi=120)
+        plt.savefig(buffer, format="png", dpi=120)
         buffer.seek(0)
         image_bytes = buffer.getvalue()
         
