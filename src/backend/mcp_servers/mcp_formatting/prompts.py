@@ -37,29 +37,12 @@ Before writing any code, choose a complete visual identity for this specific rep
 
 ## 4. Document Structure
 
-```html
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Report Title</title>
-  <!-- Google Fonts import -->
-  <style>
-    /* All CSS here */
-  </style>
-</head>
-<body>
-  <!-- All content here as one flowing document -->
-</body>
-</html>
-```
-
 Use a fixed document width of **794px** so content maps cleanly to PDF page width.
 
 ```css
 @page {
   background: #your-color; /* makes PDF margins match your background — not white */
-  margin: 40px;            /* controls the margin around content on each PDF page */
+  margin: 40px;
 }
 
 body {
@@ -67,22 +50,19 @@ body {
   margin: 0 auto;
   padding: 0;
   background: #your-color; /* must match @page background */
-  -webkit-print-color-adjust: exact; /* required — prevents Chromium stripping background colors */
+  -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
   font-family: 'Your Font', sans-serif;
 }
 ```
 
-`@page` controls the PDF page itself — background color and margins. `body` controls the content area. **Both must use the same background color** or you'll see a color mismatch at the edges. The `print-color-adjust: exact` lines are required — without them Chromium strips background colors even with `printBackground: true`.
+Both `@page` and `body` must use the same background color or you'll see a mismatch at page edges. The `print-color-adjust: exact` lines are required — without them Chromium strips background colors.
 
 ---
 
 ## 5. Preventing Elements From Splitting Across Pages
 
-Apply `break-inside: avoid` to every meaningful element so Chromium never slices content in half at a page boundary. It will push the whole element to the next page instead, leaving whitespace at the bottom of the previous page.
-
 ```css
-/* Add this to your CSS — also add any custom class names you use */
 p, h1, h2, h3, h4, h5, h6,
 img, figure, table, thead, tbody, tr,
 ul, ol, li,
@@ -91,34 +71,68 @@ ul, ol, li,
 }
 ```
 
-This is required on every report. Do not omit it.
+Required on every report. Do not omit it.
 
 ---
 
-## 6. Images
+## 6. ⚠️ Images — Critical Rules, No Exceptions
 
-Control image size using `width` only — set a specific pixel width directly on the `<img>` tag and let height scale naturally.
+> **Every chart image must be at least 500px wide. This is non-negotiable. A chart smaller than 500px will have illegible axis labels, unreadable legends, and invisible annotations — making it completely useless in the final PDF. When in doubt, go wider.**
 
-**Never set an explicit height on chart images** — doing so forces the image into a fixed box and `object-fit: contain` will letterbox it with empty space above and below, making the container appear far larger than the chart inside it.
+Set width directly on the `<img>` tag. Let height scale naturally.
 
-**Never set width on a wrapper div instead of the `<img>` tag** — the image will stay its natural size and the div will just add empty space around it.
 ```html
-<!-- ❌ Wrong — height creates a letterboxed empty box around the chart -->
-<img src="http://localhost:8000/revenue_growth.png" style="width: 550px; height: 350px; object-fit: contain;">
-
-<!-- ❌ Wrong — width on wrapper div, img stays its natural size -->
-<div style="width: 550px;">
-  <img src="http://localhost:8000/revenue_growth.png">
-</div>
-
-<!-- ❌ Wrong — height in a CSS class has the same letterboxing problem -->
-.chart-container img { width: 550px; height: 350px; object-fit: contain; }
-
-<!-- ✅ Correct — width only, directly on the img tag, height scales naturally -->
+<!-- ✅ The only correct pattern -->
 <img src="http://localhost:8000/revenue_growth.png" style="width: 550px; height: auto; display: block;">
 ```
 
-Charts must be at least 500px wide to keep axis labels, legends, and annotations legible.
+**These three patterns are always wrong and must never appear:**
+
+```html
+<!-- ❌ WRONG — explicit height letterboxes the chart leaving empty space above and below -->
+<img src="..." style="width: 550px; height: 350px; object-fit: contain;">
+
+<!-- ❌ WRONG — width on a wrapper div does nothing to the actual image size -->
+<div style="width: 550px;">
+  <img src="...">
+</div>
+
+<!-- ❌ WRONG — height set in a CSS class has the same letterboxing problem -->
+.chart-container img { width: 550px; height: 350px; }
+```
+
+**Before outputting, find every `<img>` tag and verify:**
+1. Width is set as an inline style directly on the `<img>` — minimum 500px
+2. Height is `auto` — never a fixed pixel value
+3. No parent wrapper div is controlling the size instead
+
+---
+
+## 6b. ⚠️ Chart Image Containers — Critical Layout Rules
+
+Chart images must NEVER be placed inside a grid column, flex child, or any container that is narrower than the image's width. A chart image placed in a container too small to hold it will overflow, clip, or be forced to shrink — making axis labels and data unreadable. This is a critical failure.
+
+**Rules for every chart image, no exceptions:**
+
+1. Charts must always live in a full-width container spanning the entire 794px document width.
+2. If a section uses a multi-column grid layout, charts must break out of it entirely — place them outside the grid wrapper, in their own full-width block.
+3. Never place a chart image as a grid-column child, sidebar item, or inside any container with a constrained width.
+4. If a section must show both a chart and accompanying text, stack them vertically (chart on top, text below) — never side by side in columns.
+
+```html
+<!-- ✅ Correct — chart in its own full-width block, outside any grid -->
+<div style="width: 794px;">
+  <img src="http://localhost:8000/revenue_growth.png" style="width: 550px; height: auto; display: block;">
+</div>
+
+<!-- ❌ WRONG — chart trapped inside a narrow grid column -->
+<div style="display: grid; grid-template-columns: 1fr 1fr;">
+  <div>
+    <img src="http://localhost:8000/revenue_growth.png" style="width: 550px; height: auto;">
+  </div>
+  <div>Some text...</div>
+</div>
+```
 
 ---
 
@@ -128,19 +142,17 @@ All font sizes in `px` only. No `rem`, `em`, or `%`.
 
 ---
 
-## 9. Playwright Configuration
+## 8. Playwright Configuration
 
 ```python
 page.pdf(
     width="794px",
     print_background=True,
-    # margins are set in CSS via @page, not here
+    # margins controlled by @page in CSS, not here
 )
 ```
 
-No `height`, `format`, or `margin` parameter — page count is determined automatically from content length, and margins are controlled by the `@page` CSS rule in the HTML so they match your background color.
-
-Images are served from a local HTTP server running on `http://localhost:8000`. Use image URLs exactly as provided in the `images` list — do not modify them. Playwright can reach localhost URLs when rendering.
+Images are served from a local HTTP server at `http://localhost:8000`. Use image URLs exactly as provided — do not modify them.
 """
 
 # NOTE: This prompt is currently unused in the application.
