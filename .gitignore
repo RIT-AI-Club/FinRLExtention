@@ -3,6 +3,7 @@ config.yml
 
 # Ignore practice file
 practice_formatting_server.py
+test_images/
 
 # Ignore pycache files
 pycache/__pycache__/
@@ -19,3 +20,4 @@ env/
 # Ignore test output files
 *.html
 *.pdf
+

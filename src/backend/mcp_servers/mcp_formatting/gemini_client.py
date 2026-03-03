@@ -56,11 +56,11 @@ def _build_user_prompt_parts(
             ])
 
     parts.append(types.Part(text=(
-        "DESIGN DIRECTIVE: Synthesize the data above into the visual style inspired by the references. "
-        "Use every word given in data, words in parenthesis are not optional and must be included. "
-        "Prioritize the editorial spacing and geometric sophistication seen in the images. "
-        "Optimize HTML output for conversion to a pdf. "
-        "Do not use default dashboard layouts. Begin HTML generation now."
+        "Generate a complete HTML document with embedded CSS for a multi-page A4 PDF financial report using the data and image assets I provide below."
+        "Use only the provided data and preserve all values exactly as given (no rounding, no estimating, no invented content). Use all provided chart/image assets as real <img> elements with the exact src values I provide. Do not create placeholders."
+        "Design and structure the report as multiple fixed-size A4 pages using .report-page containers, and make sure the content is allocated across pages so each page remains readable and fits within the page. If a page becomes too dense, move content to a new page instead of forcing overflow."
+        "Do not use JavaScript. Do not use inline styles. Put all CSS in a single <style> block in the <head>. Return only the final HTML document."
+        "This page will ONLY be viewed in pdf format, do NOT design for browser viewing."
     )))
     
     return parts

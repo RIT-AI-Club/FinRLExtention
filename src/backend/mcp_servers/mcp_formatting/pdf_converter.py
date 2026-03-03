@@ -29,8 +29,9 @@ async def html_to_pdf(html_content: str, output_path: str = "report.pdf") -> Non
             # Generate the PDF with specific options for print quality
             await page.pdf(
                 path=output_path,
-                format="A4",
+                width='794px',
                 print_background=True,
+                prefer_css_page_size=True,
                 margin={"top": "0px", "right": "0px", "bottom": "0px", "left": "0px"}
             )
             logger.info(f"Successfully converted HTML to PDF: '{output_path}'")
