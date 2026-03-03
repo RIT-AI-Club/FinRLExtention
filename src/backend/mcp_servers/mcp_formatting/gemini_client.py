@@ -1,23 +1,30 @@
-"""Gemini API client."""
+"""
+Gemini API client for report generation.
+This module handles communication with the Google Gemini API, including
+constructing prompts with data and reference images.
+"""
 
 import logging
+import json
 from pathlib import Path
+from typing import Any, Optional, List
 from google import genai
 from google.genai import types
-from typing import Any, Optional, List
-import json
 
 from config import config
 
-# Get a logger
+# Get a logger for this module
 logger = logging.getLogger(__name__)
 
 def get_gemini_client() -> genai.Client:
     """
     Initialize and return the Gemini client using the configured API key.
     
+    Returns:
+        genai.Client: An initialized Gemini API client.
+        
     Raises:
-        ValueError: If the Google API key is not configured.
+        ValueError: If the Google API key is not configured or is the default placeholder.
     """
     if not config.google_api_key or config.google_api_key == "YOUR_API_KEY_HERE":
         logger.error("Google API key is not configured. Please set it in config.yml or as a GOOGLE_API_KEY environment variable.")
@@ -32,8 +39,16 @@ def _build_user_prompt_parts(
     user_data: dict[str, Any],
     reference_image_paths: Optional[List[str]] = None
 ) -> List[types.Part]:
-    """Constructs the list of 'parts' for the Gemini API request payload."""
+    """
+    Constructs the list of 'parts' for the Gemini API request payload.
     
+    Args:
+        user_data: Dictionary containing text blocks and processed image URLs.
+        reference_image_paths: Optional list of file paths to styling reference images.
+        
+    Returns:
+        List[types.Part]: A list of parts to be sent to the Gemini model.
+    """
     parts = [types.Part(text=f"PRIMARY DATA SOURCE (TRANSCRIPTION ONLY): {json.dumps(user_data)}")]
 
     if reference_image_paths:
@@ -56,10 +71,10 @@ def _build_user_prompt_parts(
             ])
 
     parts.append(types.Part(text=(
-        "Generate a complete HTML document with embedded CSS for a multi-page A4 PDF financial report using the data and image assets I provide below."
-        "Use only the provided data and preserve all values exactly as given (no rounding, no estimating, no invented content). Use all provided chart/image assets as real <img> elements with the exact src values I provide. Do not create placeholders."
-        "Design and structure the report as multiple fixed-size A4 pages using .report-page containers, and make sure the content is allocated across pages so each page remains readable and fits within the page. If a page becomes too dense, move content to a new page instead of forcing overflow."
-        "Do not use JavaScript. Do not use inline styles. Put all CSS in a single <style> block in the <head>. Return only the final HTML document."
+        "Generate a complete HTML document with embedded CSS for a multi-page A4 PDF financial report using the data and image assets I provide below.\n"
+        "Use only the provided data and preserve all values exactly as given (no rounding, no estimating, no invented content). Use all provided chart/image assets as real <img> elements with the exact src values I provide. Do not create placeholders.\n"
+        "Design and structure the report as multiple fixed-size A4 pages using .report-page containers, and make sure the content is allocated across pages so each page remains readable and fits within the page. If a page becomes too dense, move content to a new page instead of forcing overflow.\n"
+        "Do not use JavaScript. Do not use inline styles. Put all CSS in a single <style> block in the <head>. Return only the final HTML document.\n"
         "This page will ONLY be viewed in pdf format, do NOT design for browser viewing."
     )))
     
@@ -81,16 +96,16 @@ async def generate_html(
         client: Initialized Gemini client.
         user_data: Dictionary with text_blocks and images.
         system_prompt: System instruction for the AI.
-        reference_image_paths: Optional list of paths to reference images.
+        reference_image_paths: Optional list of paths to reference images for style.
         model: Gemini model to use (overrides config if provided).
         temperature: Generation temperature (overrides config if provided).
         max_output_tokens: Max output tokens (overrides config if provided).
     
     Returns:
-        Generated HTML string.
+        str: Generated HTML document string.
     
     Raises:
-        ValueError: If the API response cannot be parsed.
+        ValueError: If the API response cannot be parsed or is empty.
         Exception: For other API call failures.
     """
     logger.info("Building request for Gemini API.")
@@ -120,8 +135,14 @@ async def generate_html(
     try:
         if response.text:
             return response.text
+        
         # Fallback for cases where the response is structured differently
-        return "".join(part.text for part in response.candidates[0].content.parts if hasattr(part, "text"))
+        text_parts = [part.text for part in response.candidates[0].content.parts if hasattr(part, "text")]
+        if text_parts:
+            return "".join(text_parts)
+            
+        raise ValueError("Empty response text from Gemini API.")
+        
     except (IndexError, AttributeError, ValueError) as e:
         logger.error(f"Failed to extract text from Gemini response: {e}", exc_info=True)
         logger.debug(f"Full Gemini response object for debugging: {response}")

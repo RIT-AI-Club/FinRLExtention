@@ -72,48 +72,23 @@ async def format_report(text_blocks: List[str], images: List[List[str]]) -> str:
         reference_images = []
 
     try:
-        # Generate HTML content
+        # Generate HTML content using the Gemini client
         report = await generate_html(
             client=client, 
             user_data=user_data, 
             system_prompt=REPORT_PROMPT
         )
+        
+        # Save the latest report for debugging/review purposes
         with open("latest_report.html", "w", encoding="utf-8") as file:
             file.write(report)
+            
+        return report
     
     except Exception as e:
-        # This will catch exceptions from generate_html (API errors, parsing errors, etc.)
+        # Catch exceptions from generate_html (API errors, parsing errors, etc.)
         logger.error(f"An unexpected error occurred during report formatting: {e}", exc_info=True)
         return json.dumps({"error": f"Failed to format HTML: {e}"})
-    
-    return report
-    
-    # Attempted to generate css and html separately
-    # try:
-    #     # Generate CSS content
-    #     css_content = await generate_css(
-    #         client=client,
-    #         system_prompt=CSS_PROMPT,
-    #         html_output=html_content
-    #     )
-    
-    # except Exception as e:
-    #     # This will catch exceptions from generate_html (API errors, parsing errors, etc.)
-    #     logger.error(f"An unexpected error occurred during report formatting: {e}", exc_info=True)
-    #     return json.dumps({"error": f"Failed to format CSS: {e}"})
-
-
-    # try:
-    #     # Inject CSS to HTML
-    #     final_report = inject_css(html_content, css_content)
-    #     with open("latest_report.html", "w", encoding="utf-8") as file:
-    #         file.write(final_report)
-    # except Exception as e:
-    #     logger.error(f"An unexpected error occurred during report formatting: {e}", exc_info=True)
-    #     return json.dumps({"error": f"Failed to inject CSS: {e}"})
-    
-    # return final_report
-    
 
 
 if __name__ == "__main__":
