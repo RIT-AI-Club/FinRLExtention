@@ -5,24 +5,31 @@ import random
 def test_chart_generation(advanced):
     print("Starting local test of Stock Analyzer...")
 
-    # 1. Simulate Data: Generate 30 days of dummy stock data
+    # # 1. Simulate Data: Generate 30 days of dummy stock data
+    # # This mimics the JSON arguments Gemini would pass to the tool
+    # base_date = datetime.now()
+    # dates = [(base_date - timedelta(hours=i)).date().isoformat() for i in range(7)]
+    # dates.reverse() # Sort chronologically
+
+    # 1.5 Simulate Data: Generate 60 minutes of dummy stock data
     # This mimics the JSON arguments Gemini would pass to the tool
     base_date = datetime.now()
-    dates = [(base_date - timedelta(days=i)).date().isoformat() for i in range(30)]
+    dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(72)]
     dates.reverse() # Sort chronologically
+    print(dates)
 
-    # create a random walk for prices
-    prices = [150.0]
-    for _ in range(29):
-        change = random.uniform(-5, 5)
+    # create a random walk for price
+    prices = [150.0] # start price
+    for _ in range(71):
+        change = random.randrange(-10, 10) * random.random()
         prices.append(prices[-1] + change)
+    print(prices)
 
     print(f"Generated {len(dates)} days of sample data.")
 
     # 2. Call the Tool Directly
     try:
         print("calling chart_generator()...")
-        print("first date actual: " + dates[0])
         image_result = generate_line_chart(dates=dates, prices=prices, symbol="TEST-CO", advanced=advanced)
         
         # 3. Save the output to verify visual correctness

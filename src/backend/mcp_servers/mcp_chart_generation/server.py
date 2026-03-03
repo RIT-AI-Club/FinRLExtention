@@ -10,14 +10,44 @@ matplotlib.use("Agg")
 from matplotlib import dates
 import matplotlib.ticker as ticker
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import io
 from datetime import datetime
 from fastmcp import FastMCP
 from fastmcp.utilities.types import Image
 import random
 
+# Line colors for generated chart
 COLORS = ["red", "limegreen", "royalblue"]
+
+# Control the gridline interval
 GRIDLINE_INTERVAL = 30
+
+# Common datetime formats (date + time) to try
+DATETIME_FORMATS = [
+    "%Y-%m-%d %H:%M:%S.%f",   # 2025-03-03 14:30:15.123456
+    "%Y-%m-%d %H:%M:%S",       # 2025-03-03 14:30:15
+    "%Y-%m-%d %H:%M",          # 2025-03-03 14:30
+    "%Y/%m/%d %H:%M:%S.%f",    # 2025/03/03 14:30:15.123456
+    "%Y/%m/%d %H:%M:%S",       # 2025/03/03 14:30:15
+    "%Y/%m/%d %H:%M",          # 2025/03/03 14:30
+    "%m/%d/%Y %H:%M:%S.%f",    # 03/03/2025 14:30:15.123456
+    "%m/%d/%Y %H:%M:%S",       # 03/03/2025 14:30:15
+    "%m/%d/%Y %H:%M",          # 03/03/2025 14:30
+    "%d-%m-%Y %H:%M:%S.%f",    # 03-03-2025 14:30:15.123456
+    "%d-%m-%Y %H:%M:%S",       # 03-03-2025 14:30:15
+    "%d-%m-%Y %H:%M",          # 03-03-2025 14:30
+]
+
+# Common time-only formats (to be combined with a dummy date)
+TIME_FORMATS = [
+    "%H:%M:%S.%f",   # 14:30:15.123456
+    "%H:%M:%S",      # 14:30:15
+    "%H:%M",         # 14:30
+]
+
+# Dummy date for time‑only inputs
+DUMMY_DATE = datetime(2000, 1, 1)
 
 # Initialize the server
 mcp = FastMCP("chart_generation")
@@ -43,14 +73,20 @@ def _build_base_chart(
     y_min = math.floor((min_price - price_range * 0.3) / GRIDLINE_INTERVAL) * GRIDLINE_INTERVAL # calculates the minimum y of the graph and makes it land on a grid interval
     y_max = math.ceil((max_price + price_range * 0.2) / GRIDLINE_INTERVAL) * GRIDLINE_INTERVAL # calculates the maximum y of the graph and makes it land on a grid interval
     ax.set_ylim(y_min, y_max)
-    ax.set_xlim(dt_dates[0], dt_dates[-1])
+    ax.set_xlim(dt_dates[0], dt_dates[-1]) # align data points to start on y-axis (x=0)
 
     ax.set_facecolor("white")
     fig.patch.set_alpha(0.0)
     ax.set_title(f"Financial Performance Analysis: {symbol}", fontsize=16, fontweight="bold", pad=20)
     ax.set_ylabel("Price (USD)", fontsize=12, labelpad=10, fontweight="bold", color=text_color)
     ax.set_xlabel("Trading Date", fontsize=12, labelpad=10, fontweight="bold", color=text_color)
-    ax.xaxis.set_major_formatter(dates.DateFormatter("%m-%d-%Y"))  # e.g. "01-01-2024"
+    locator = mdates.AutoDateLocator()
+    formatter = mdates.AutoDateFormatter(locator)
+    # formatter.scaled[1/24] = '%H:%M'          # < 1 day: show hours
+    # formatter.scaled[1.0]   = '%Y-%m-%d'      # 1 day: show date
+    # formatter.scaled[30.0]  = '%Y-%m'         # > 30 days: show year-month
+    ax.xaxis.set_major_locator(locator)
+    ax.xaxis.set_major_formatter(formatter)
     ax.tick_params(axis="both", labelcolor=text_color)
     ax.yaxis.grid(True, which="both", linestyle=":", alpha=0.75, color="#cccccc")
     fig.autofmt_xdate()
@@ -66,12 +102,56 @@ def _render_chart_to_image(fig: plt.Figure) -> Image:
     plt.close(fig)
     return Image(data=image_bytes, format="png")
 
-def _parse_dates(dates: list[str]) -> list:
-    """Converts ISO date strings to datetime objects, with a graceful fallback."""
-    try:
-        return [datetime.fromisoformat(d) for d in dates]
-    except ValueError:
-        return dates
+def _parse_dates(dates: list[str]) -> list[datetime]:
+    """
+    Convert a list of date/time strings to datetime objects.
+
+    Supports:
+      - ISO format (via fromisoformat)
+      - Common datetime formats listed in DATETIME_FORMATS
+      - Time‑only formats (combined with DUMMY_DATE)
+
+    Raises ValueError if a string cannot be parsed.
+    """
+    parsed = []
+    for d in dates:
+        dt = None
+
+        # 1. Try Python's built‑in ISO parser (handles both 'T' and space)
+        try:
+            dt = datetime.fromisoformat(d)
+            parsed.append(dt)
+            continue
+        except ValueError:
+            pass
+
+        # 2. Try each full datetime format
+        for fmt in DATETIME_FORMATS:
+            try:
+                dt = datetime.strptime(d, fmt)
+                parsed.append(dt)
+                break
+            except ValueError:
+                continue
+        if dt is not None:
+            continue
+
+        # 3. Try each time‑only format (combine with dummy date)
+        for fmt in TIME_FORMATS:
+            try:
+                time_part = datetime.strptime(d, fmt).time()
+                dt = datetime.combine(DUMMY_DATE, time_part)
+                parsed.append(dt)
+                break
+            except ValueError:
+                continue
+        if dt is not None:
+            continue
+
+        # 4. No format matched
+        raise ValueError(f"Unrecognized date/time format: {d}")
+
+    return parsed
 
 def _validate_inputs(dates: list, prices: list[float]) -> None:
     """Raises ValueError for mismatched or empty inputs."""
@@ -92,7 +172,7 @@ def generate_line_chart(
     Generates a financial line chart.
 
     Args:
-        dates:      List of ISO-format date strings (YYYY-MM-DD).
+        dates:      List of ISO-format date strings (YYYY-MM-DD) OR time strings (HH:MM:SS).
         prices:     List of closing prices corresponding to each date.
         symbol:     Ticker symbol shown in the chart title and legend.
         text_color: Color used for axis labels and tick labels.
@@ -101,6 +181,7 @@ def generate_line_chart(
     """
     _validate_inputs(dates, prices)
     dt_dates = _parse_dates(dates)
+    # print(dt_dates)
     color = random.choice(COLORS)
 
     with plt.style.context("ggplot"):
