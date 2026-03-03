@@ -2,28 +2,32 @@ from server import *
 from datetime import datetime, timedelta
 import random
 
+START_PRICE = 100.0 # start price for dummy prices
+NUMBER_DATA_POINTS = 52 # number of price points (corresponds with date/time points)
+
+
 def test_chart_generation(advanced):
     print("Starting local test of Stock Analyzer...")
 
-    # # 1. Simulate Data: Generate 30 days of dummy stock data
-    # # This mimics the JSON arguments Gemini would pass to the tool
-    # base_date = datetime.now()
-    # dates = [(base_date - timedelta(hours=i)).date().isoformat() for i in range(7)]
-    # dates.reverse() # Sort chronologically
-
-    # 1.5 Simulate Data: Generate 60 minutes of dummy stock data
+    # 1. Simulate Data: Generate dummy stock data
     # This mimics the JSON arguments Gemini would pass to the tool
     base_date = datetime.now()
-    dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(72)]
+    dates = [(base_date - timedelta(weeks=i)).isoformat() for i in range(52)] # 1-YEAR weekly trend
+    # dates = [(base_date - timedelta(days=i)).isoformat() for i in range(30)] # 1-MONTH daily trend
+    # dates = [(base_date - timedelta(days=i)).isoformat() for i in range(14)] # 2-WEEK daily trend
+    # dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(72)] #  3-DAY hourly trend
+    # dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(24)] # 1-DAY hourly trend
+    # dates = [(base_date - timedelta(minutes=i)).isoformat() for i in range(60)] # 1-HOUR minutely trend
     dates.reverse() # Sort chronologically
-    print(dates)
+    # print(dates)
+    print(dates[0], dates[-1])
 
     # create a random walk for price
-    prices = [150.0] # start price
-    for _ in range(71):
+    prices = [START_PRICE] # start price
+    for _ in range(NUMBER_DATA_POINTS - 1):
         change = random.randrange(-10, 10) * random.random()
         prices.append(prices[-1] + change)
-    print(prices)
+    # print(prices)
 
     print(f"Generated {len(dates)} days of sample data.")
 

@@ -73,22 +73,64 @@ def _build_base_chart(
     y_min = math.floor((min_price - price_range * 0.3) / GRIDLINE_INTERVAL) * GRIDLINE_INTERVAL # calculates the minimum y of the graph and makes it land on a grid interval
     y_max = math.ceil((max_price + price_range * 0.2) / GRIDLINE_INTERVAL) * GRIDLINE_INTERVAL # calculates the maximum y of the graph and makes it land on a grid interval
     ax.set_ylim(y_min, y_max)
-    ax.set_xlim(dt_dates[0], dt_dates[-1]) # align data points to start on y-axis (x=0)
+
+    # Align data points to start on y-axis (x=0)
+    ax.set_xlim(dt_dates[0], dt_dates[-1]) 
 
     ax.set_facecolor("white")
     fig.patch.set_alpha(0.0)
     ax.set_title(f"Financial Performance Analysis: {symbol}", fontsize=16, fontweight="bold", pad=20)
     ax.set_ylabel("Price (USD)", fontsize=12, labelpad=10, fontweight="bold", color=text_color)
     ax.set_xlabel("Trading Date", fontsize=12, labelpad=10, fontweight="bold", color=text_color)
-    locator = mdates.AutoDateLocator()
-    formatter = mdates.AutoDateFormatter(locator)
-    # formatter.scaled[1/24] = '%H:%M'          # < 1 day: show hours
-    # formatter.scaled[1.0]   = '%Y-%m-%d'      # 1 day: show date
-    # formatter.scaled[30.0]  = '%Y-%m'         # > 30 days: show year-month
+
+    # Determine total time spanned
+    span = dt_dates[-1] - dt_dates[0]
+    total_hours = span.total_seconds() / 3600.0
+    total_days = span.days + span.seconds / 86400.0
+
+    # Choose locator and formatter based on the table
+    if total_hours <= 1:                     # ≤1 hour → 5‑minute ticks
+        locator = mdates.MinuteLocator(interval=5)
+        fmt = '%H:%M'
+    elif total_hours <= 2:                   # 1–2 hours → 15‑minute ticks
+        locator = mdates.MinuteLocator(interval=15)
+        fmt = '%H:%M'
+    elif total_hours <= 6:                   # 2–6 hours → 30‑minute ticks
+        locator = mdates.MinuteLocator(interval=30)
+        fmt = '%H:%M'
+    elif total_hours <= 12:                  # 6–12 hours → 1‑hour ticks
+        locator = mdates.HourLocator(interval=1)
+        fmt = '%H:%M'
+    elif total_hours <= 24:                  # 12–24 hours → 2‑hour ticks
+        locator = mdates.HourLocator(interval=2)
+        fmt = '%H:%M'
+    elif total_days <= 3:                    # 1–3 days → 6‑hour ticks
+        locator = mdates.HourLocator(interval=6)
+        fmt = '%m/%d %H:%M'
+    elif total_days <= 7:                    # 3–7 days → 1‑day ticks
+        locator = mdates.DayLocator(interval=1)
+        fmt = '%m/%d'
+    elif total_days <= 28:                   # 1–4 weeks → 2‑day ticks
+        locator = mdates.DayLocator(interval=2)
+        fmt = '%m/%d'
+    elif total_days <= 90:                   # 1–3 months → 1‑week ticks
+        locator = mdates.WeekdayLocator(interval=1)
+        fmt = '%m/%d'
+    elif total_days <= 365:                  # 3–12 months → 1‑month ticks
+        locator = mdates.MonthLocator(interval=1)
+        fmt = '%Y-%m'
+    else:                                    # >1 year → quarterly ticks
+        locator = mdates.MonthLocator(interval=3)
+        fmt = '%Y'
+
+    # Apply locator and formatter
     ax.xaxis.set_major_locator(locator)
-    ax.xaxis.set_major_formatter(formatter)
+    ax.xaxis.set_major_formatter(mdates.DateFormatter(fmt))
+
+    # Set tick paramaters, gridlines
     ax.tick_params(axis="both", labelcolor=text_color)
     ax.yaxis.grid(True, which="both", linestyle=":", alpha=0.75, color="#cccccc")
+
     fig.autofmt_xdate()
 
     return fig, ax
