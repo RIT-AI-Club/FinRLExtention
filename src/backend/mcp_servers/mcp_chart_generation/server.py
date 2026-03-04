@@ -68,8 +68,7 @@ def _build_base_chart(
     ax.plot(dt_dates, prices, color=color, marker=".", linewidth=2, label=f"{symbol} Close", clip_on=False)
 
     # Format y-axis ticks to two decimal places if prices are within 100
-    if max(prices) < 25:
-        ax.yaxis.set_major_formatter(plt.FormatStrFormatter('%.2f'))
+    ax.yaxis.set_major_formatter(plt.FormatStrFormatter('%.2f'))
     
     # Align data points to start on y-axis (x=0)
     ax.set_xlim(dt_dates[0], dt_dates[-1]) 

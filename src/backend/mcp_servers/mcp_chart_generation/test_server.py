@@ -2,7 +2,7 @@ from server import *
 from datetime import datetime, timedelta
 import random
 
-START_PRICE = 10.00 # start price for dummy prices
+START_PRICE = 67.71 # start price for dummy prices
 PRICE_DEVIATION = 3 # how far a new price may deviate from the last price
 NUMBER_OF_POINTS = 30 # number of price points (corresponds with date/time points)
 
