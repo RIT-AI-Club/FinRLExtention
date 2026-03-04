@@ -2,7 +2,7 @@
 
 import json
 import logging
-from typing import List
+from typing import List, Optional
 from pathlib import Path
 from mcp.server.fastmcp import FastMCP
 
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 mcp = FastMCP("formatting")
 
 @mcp.tool()
-async def format_report(text_blocks: List[str], images: List[List[str]], color_scheme: str = None) -> str:
+async def format_report(text_blocks: List[str], images: Optional[List[List[str]]], color_scheme: Optional[str] = None) -> str:
     """
     Formats text and images into a professional HTML report using an AI model.
     

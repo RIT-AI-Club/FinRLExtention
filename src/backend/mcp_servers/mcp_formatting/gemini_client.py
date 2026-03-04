@@ -75,11 +75,13 @@ def _build_user_prompt_parts(
         "Generate a complete HTML document with embedded CSS for a multi-page A4 PDF financial report using the data and image assets I provide above.\n"
         "Use only the provided data and preserve all values exactly as given (no rounding, no estimating, no invented content). Use all provided chart/image assets as real <img> elements with the exact src values I provide. Do not create placeholders.\n"
         "Do not use JavaScript. Do not use inline styles. Put all CSS in a single <style> block in the <head>. Return only the final HTML document.\n"
-        "If given a color below, create a color scheme based on the color given. Make the background a slighlty lighter, opaque version of the color and make containers a darker opaque version of the color. Include any other colors you would like to add but keep it all similar to the color given."
     )))
 
     if color_scheme:
         parts.append(types.Part(text=color_scheme))
+        parts.append(types.Part(text="Create a color scheme based on the color given. Make the background a slighlty lighter, opaque version of the color and make containers a darker opaque version of the color. Include any other colors you would like to add but keep it all similar to the color given."))
+    else: 
+        parts.append(types.Part(text="Create your own color scheme based on the company given in the data above."))
     
     return parts
 
