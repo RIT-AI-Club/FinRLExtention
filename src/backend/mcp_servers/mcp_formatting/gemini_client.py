@@ -37,7 +37,8 @@ def get_gemini_client() -> genai.Client:
 
 def _build_user_prompt_parts(
     user_data: dict[str, Any],
-    reference_image_paths: Optional[List[str]] = None
+    reference_image_paths: Optional[List[str]] = None,
+    color_scheme: str = None
 ) -> List[types.Part]:
     """
     Constructs the list of 'parts' for the Gemini API request payload.
@@ -71,12 +72,14 @@ def _build_user_prompt_parts(
             ])
 
     parts.append(types.Part(text=(
-        "Generate a complete HTML document with embedded CSS for a multi-page A4 PDF financial report using the data and image assets I provide below.\n"
+        "Generate a complete HTML document with embedded CSS for a multi-page A4 PDF financial report using the data and image assets I provide above.\n"
         "Use only the provided data and preserve all values exactly as given (no rounding, no estimating, no invented content). Use all provided chart/image assets as real <img> elements with the exact src values I provide. Do not create placeholders.\n"
-        "Design and structure the report as multiple fixed-size A4 pages using .report-page containers, and make sure the content is allocated across pages so each page remains readable and fits within the page. If a page becomes too dense, move content to a new page instead of forcing overflow.\n"
         "Do not use JavaScript. Do not use inline styles. Put all CSS in a single <style> block in the <head>. Return only the final HTML document.\n"
-        "This page will ONLY be viewed in pdf format, do NOT design for browser viewing."
+        "If given a color below, create a color scheme based on the color given. Make the background a slighlty lighter, opaque version of the color and make containers a darker opaque version of the color. Include any other colors you would like to add but keep it all similar to the color given."
     )))
+
+    if color_scheme:
+        parts.append(types.Part(text=color_scheme))
     
     return parts
 
@@ -87,7 +90,8 @@ async def generate_html(
     reference_image_paths: Optional[List[str]] = None,
     model: Optional[str] = None,
     temperature: Optional[float] = None,
-    max_output_tokens: Optional[int] = None
+    max_output_tokens: Optional[int] = None,
+    color_scheme: str = None
 ) -> str:
     """
     Generate HTML content using the Gemini API.
@@ -109,7 +113,7 @@ async def generate_html(
         Exception: For other API call failures.
     """
     logger.info("Building request for Gemini API.")
-    user_parts = _build_user_prompt_parts(user_data, reference_image_paths)
+    user_parts = _build_user_prompt_parts(user_data, reference_image_paths, color_scheme)
 
     # Use parameters if provided, otherwise fall back to config values
     final_model = model or config.default_model

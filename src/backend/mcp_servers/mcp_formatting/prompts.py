@@ -28,7 +28,7 @@ Produce a single, long-scrolling HTML document. Do not think about pages or page
 
 Before writing any code, choose a complete visual identity for this specific report:
 
-- **Color palette** — One dominant background, one strong accent, one text color. Bold and intentional.
+- **Color palette** — Utilize color given to you by the user prompt, and create a color scheme around that. YOU ARE NOT LIMITED TO ONLY USING THAT COLOR. If you are not given a color, come up with a color scheme on your own.
 - **Fonts** — Import two distinctive Google Fonts. One for headings, one for body/data. Never use Inter, Roboto, Arial, or system fonts.
 - **Layout** — Use CSS grid and flexbox freely. Asymmetric columns, large hero numbers, full-width image bands, color-blocked sections — all encouraged.
 - **Data visualization** — Represent numbers visually with pure CSS wherever possible: bar charts from div widths, large typographic metrics, progress fills.
