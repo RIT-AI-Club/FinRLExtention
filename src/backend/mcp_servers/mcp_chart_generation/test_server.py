@@ -19,17 +19,14 @@ def test_chart_generation(advanced):
     # dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(24)] # 1-DAY hourly trend
     # dates = [(base_date - timedelta(minutes=i)).isoformat() for i in range(60)] # 1-HOUR minutely trend
     dates.reverse() # Sort chronologically
-    # print(dates)
-    print(dates[0], dates[-1])
 
     # create a random walk for price
     prices = [START_PRICE] # start price
     for _ in range(NUMBER_DATA_POINTS - 1):
         change = random.randrange(-10, 10) * random.random()
         prices.append(prices[-1] + change)
-    # print(prices)
 
-    print(f"Generated {len(dates)} days of sample data.")
+    print(f"Generated {len(dates)} pieces of sample data.")
 
     # 2. Call the Tool Directly
     try:
