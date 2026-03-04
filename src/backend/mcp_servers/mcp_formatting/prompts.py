@@ -32,6 +32,7 @@ Before writing any code, choose a complete visual identity for this specific rep
 - **Fonts** — Import two distinctive Google Fonts. One for headings, one for body/data. Never use Inter, Roboto, Arial, or system fonts.
 - **Layout** — Use CSS grid and flexbox freely. Asymmetric columns, large hero numbers, full-width image bands, color-blocked sections — all encouraged.
 - **Data visualization** — Represent numbers visually with pure CSS wherever possible: bar charts from div widths, large typographic metrics, progress fills.
+- **Footers** — If creating a footer, do NOT use copyright symbols or imply any type of copyright.
 
 ---
 
@@ -66,7 +67,7 @@ Both `@page` and `body` must use the same background color or you'll see a misma
 p, h1, h2, h3, h4, h5, h6,
 img, figure, table, thead, tbody, tr,
 ul, ol, li,
-.card, .section, .block, .metric, .chart, .row, .chart-block, .chart-container {
+.card, .section, .block, .metric, .chart, .row, .chart-block, .chart-container, .summary-statement, .full-width-chart {
   break-inside: avoid;
 }
 ```
@@ -83,22 +84,22 @@ Set width directly on the `<img>` tag. Let height scale naturally.
 
 ```html
 <!-- ✅ The only correct pattern -->
-<img src="http://localhost:8000/revenue_growth.png" style="width: 550px; height: auto; display: block;">
+<img src="http://localhost:8000/revenue_growth.png" style="width: 650px; height: auto; display: block;">
 ```
 
 **These three patterns are always wrong and must never appear:**
 
 ```html
 <!-- ❌ WRONG — explicit height letterboxes the chart leaving empty space above and below -->
-<img src="..." style="width: 550px; height: 350px; object-fit: contain;">
+<img src="..." style="width: 650px; height: 350px; object-fit: contain;">
 
 <!-- ❌ WRONG — width on a wrapper div does nothing to the actual image size -->
-<div style="width: 550px;">
+<div style="width: 650px;">
   <img src="...">
 </div>
 
 <!-- ❌ WRONG — height set in a CSS class has the same letterboxing problem -->
-.chart-container img { width: 550px; height: 350px; }
+.chart-container img { width: 650px; height: 350px; }
 ```
 
 **Before outputting, find every `<img>` tag and verify:**
