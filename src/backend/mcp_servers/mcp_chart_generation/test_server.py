@@ -2,8 +2,9 @@ from server import *
 from datetime import datetime, timedelta
 import random
 
-START_PRICE = 100.0 # start price for dummy prices
-NUMBER_DATA_POINTS = 52 # number of price points (corresponds with date/time points)
+START_PRICE = 10.00 # start price for dummy prices
+PRICE_DEVIATION = 3 # how far a new price may deviate from the last price
+NUMBER_OF_POINTS = 30 # number of price points (corresponds with date/time points)
 
 
 def test_chart_generation(advanced):
@@ -12,8 +13,8 @@ def test_chart_generation(advanced):
     # 1. Simulate Data: Generate dummy stock data
     # This mimics the JSON arguments Gemini would pass to the tool
     base_date = datetime.now()
-    dates = [(base_date - timedelta(weeks=i)).isoformat() for i in range(52)] # 1-YEAR weekly trend
-    # dates = [(base_date - timedelta(days=i)).isoformat() for i in range(30)] # 1-MONTH daily trend
+    # dates = [(base_date - timedelta(weeks=i)).isoformat() for i in range(52)] # 1-YEAR weekly trend
+    dates = [(base_date - timedelta(days=i)).isoformat() for i in range(30)] # 1-MONTH daily trend
     # dates = [(base_date - timedelta(days=i)).isoformat() for i in range(14)] # 2-WEEK daily trend
     # dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(72)] #  3-DAY hourly trend
     # dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(24)] # 1-DAY hourly trend
@@ -22,8 +23,8 @@ def test_chart_generation(advanced):
 
     # create a random walk for price
     prices = [START_PRICE] # start price
-    for _ in range(NUMBER_DATA_POINTS - 1):
-        change = random.randrange(-10, 10) * random.random()
+    for _ in range(NUMBER_OF_POINTS - 1):
+        change = random.uniform(-PRICE_DEVIATION, PRICE_DEVIATION) * random.random()
         prices.append(prices[-1] + change)
 
     print(f"Generated {len(dates)} pieces of sample data.")

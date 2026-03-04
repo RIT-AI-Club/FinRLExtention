@@ -67,13 +67,10 @@ def _build_base_chart(
 
     ax.plot(dt_dates, prices, color=color, marker=".", linewidth=2, label=f"{symbol} Close", clip_on=False)
 
-    min_price = min(prices)
-    max_price = max(prices)
-    price_range = max_price - min_price
-    y_min = math.floor((min_price - price_range * 0.3) / GRIDLINE_INTERVAL) * GRIDLINE_INTERVAL # calculates the minimum y of the graph and makes it land on a grid interval
-    y_max = math.ceil((max_price + price_range * 0.2) / GRIDLINE_INTERVAL) * GRIDLINE_INTERVAL # calculates the maximum y of the graph and makes it land on a grid interval
-    ax.set_ylim(y_min, y_max)
-
+    # Format y-axis ticks to two decimal places if prices are within 100
+    if max(prices) < 25:
+        ax.yaxis.set_major_formatter(plt.FormatStrFormatter('%.2f'))
+    
     # Align data points to start on y-axis (x=0)
     ax.set_xlim(dt_dates[0], dt_dates[-1]) 
 
@@ -130,6 +127,10 @@ def _build_base_chart(
     # Set tick paramaters, gridlines
     ax.tick_params(axis="both", labelcolor=text_color)
     ax.yaxis.grid(True, which="both", linestyle=":", alpha=0.75, color="#cccccc")
+
+    # Apply legend
+    legend_loc = "upper left" if prices[-1] >= prices[0] else "upper right"
+    ax.legend(loc=legend_loc)
 
     fig.autofmt_xdate()
 
@@ -223,7 +224,6 @@ def generate_line_chart(
     """
     _validate_inputs(dates, prices)
     dt_dates = _parse_dates(dates)
-    # print(dt_dates)
     color = random.choice(COLORS)
 
     with plt.style.context("ggplot"):
@@ -247,9 +247,6 @@ def generate_line_chart(
                 bbox=dict(boxstyle="round,pad=0.3", fc="yellow", ec="black", lw=1, alpha=0.8),
                 color="black",
             )
-
-            legend_loc = "upper left" if prices[-1] >= prices[0] else "upper right"
-            ax.legend(loc=legend_loc)
 
         return _render_chart_to_image(fig)
 
