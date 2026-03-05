@@ -278,7 +278,6 @@ def generate_line_chart(
     dates: list[str],
     prices: list[float],
     symbol: str = "STOCK",
-    text_color: str = "dimgrey",
     theme: dict = None,
     advanced: bool = False,
 ) -> Image:
@@ -291,8 +290,14 @@ def generate_line_chart(
                         (e.g., "14:30", "14:30:15") which are plotted on a dummy date.
         prices:     List of closing prices.
         symbol:     Ticker symbol shown in the chart.
-        text_color: Color for axis labels and tick labels (overrides theme["text"] if provided).
-        theme:      Optional dictionary with color/style overrides (see DEFAULT_THEME).
+        theme: Optional style overrides. Supported keys:
+                - "line"          (str)   : Main line color. Default: random from red/green/blue.
+                - "text"          (str)   : Axis labels, tick labels, title color. Default: "dimgrey".
+                - "grid"          (str)   : Grid line color. Default: "#cccccc".
+                - "background"    (str)   : Axes background. Default: "white".
+                - "trend_line"    (str)   : SMA line color (advanced only). Default: "gold".
+                - "line_width"    (float) : Main line width. Default: 2.
+                - "marker"        (str)   : Line marker style. Default: ".".
         advanced:   When True, overlays a 3-day SMA trend line and annotates the latest price.
     """
     _validate_inputs(dates, prices)
@@ -303,7 +308,7 @@ def generate_line_chart(
     if theme:
         effective_theme.update(theme)
     # text_color argument overrides theme's text color
-    effective_theme["text"] = text_color
+    effective_theme["text"] = theme.get("text", "dimgrey")
 
     # Create base chart with the theme
     fig, ax = _build_base_chart(dt_dates, prices, symbol, effective_theme)
