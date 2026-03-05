@@ -6,8 +6,8 @@ from typing import List, Optional
 from pathlib import Path
 from mcp.server.fastmcp import FastMCP
 
-from config import geminiConfig
-from gemini_client import get_gemini_client, generate_html
+from config import claudeConfig
+from claude_client import get_claude_client, generate_html
 from prompts import REPORT_PROMPT
 from image_loader import start_image_server, prepare_image_urls
 
@@ -45,16 +45,17 @@ async def format_report(text_blocks: List[str], images: Optional[List[List[str]]
     
     try:
         # Initialize client, raises ValueError if the key is missing
-        client = get_gemini_client()
+        client = get_claude_client()
     except ValueError as e:
-        logger.error(f"Failed to initialize Gemini client: {e}", exc_info=True)
+        logger.error(f"Failed to initialize Claude client: {e}", exc_info=True)
         return json.dumps({"error": str(e)})
     
     # Prepare data structure for the AI
-    user_data = {
-        "text_blocks": text_blocks,
-        "images": processed_images
-    }
+    user_data = [{
+        "type": "text", "text": text_blocks,
+        "type": "text", "text": "Below are image urls.",
+        "type": "text", "text": processed_images
+    }]
 
     # Load reference images for style guidance
     try:

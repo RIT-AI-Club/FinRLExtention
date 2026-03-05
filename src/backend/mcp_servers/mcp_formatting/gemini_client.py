@@ -11,7 +11,7 @@ from typing import Any, Optional, List
 from google import genai
 from google.genai import types
 
-from config import config
+from config import geminiConfig
 
 # Get a logger for this module
 logger = logging.getLogger(__name__)
@@ -26,12 +26,12 @@ def get_gemini_client() -> genai.Client:
     Raises:
         ValueError: If the Google API key is not configured or is the default placeholder.
     """
-    if not config.google_api_key or config.google_api_key == "YOUR_API_KEY_HERE":
+    if not geminiConfig.google_api_key or geminiConfig.google_api_key == "YOUR_API_KEY_HERE":
         logger.error("Google API key is not configured. Please set it in config.yml or as a GOOGLE_API_KEY environment variable.")
         raise ValueError("Google API key is not configured.")
     
     return genai.Client(
-        api_key=config.google_api_key,
+        api_key=geminiConfig.google_api_key,
         http_options=types.HttpOptions(api_version='v1beta') 
     )
 
@@ -118,10 +118,10 @@ async def generate_html(
     user_parts = _build_user_prompt_parts(user_data, reference_image_paths, color_scheme)
 
     # Use parameters if provided, otherwise fall back to config values
-    final_model = model or config.default_model
+    final_model = model or geminiConfig.default_model
     generation_config = types.GenerateContentConfig(
-        temperature=temperature if temperature is not None else config.temperature,
-        max_output_tokens=max_output_tokens if max_output_tokens is not None else config.max_output_tokens,
+        temperature=temperature if temperature is not None else geminiConfig.temperature,
+        max_output_tokens=max_output_tokens if max_output_tokens is not None else geminiConfig.max_output_tokens,
         system_instruction=types.Content(parts=[types.Part(text=system_prompt)]),
     )
 
