@@ -18,7 +18,23 @@ from fastmcp import FastMCP
 from fastmcp.utilities.types import Image
 import random
 
-# Line colors for generated chart
+# Default theme for graph
+DEFAULT_THEME = {
+    "line": None,                     # if None, a random color from COLORS will be used
+    "text": "dimgrey",                 # axis labels, tick labels, title
+    "grid": "#cccccc",                  # grid line color
+    "background": "white",              # axes background color
+    "figure_background": "none",        # figure background (set via alpha=0 in your code)
+    "trend_line": "gold",                # SMA line color (advanced chart)
+    "trend_line_style": "--",            # SMA line style
+    "annotation_background": "yellow",   # annotation box fill
+    "annotation_edge": "black",          # annotation box edge
+    "annotation_text": "black",          # annotation text color
+    "marker": ".",                       # line marker style
+    "line_width": 2,                      # main line width
+}
+
+# Default colors
 COLORS = ["red", "limegreen", "royalblue"]
 
 # Control the gridline interval
@@ -57,8 +73,7 @@ def _build_base_chart(
     dt_dates: list,
     prices: list[float],
     symbol: str,
-    text_color: str,
-    color: str,
+    theme: dict,
 ) -> tuple[plt.Figure, plt.Axes]:
     """
     Creates and returns a base (fig, ax) with shared formatting applied.
@@ -66,7 +81,17 @@ def _build_base_chart(
     """
     fig, ax = plt.subplots(figsize=(12, 7))
 
-    ax.plot(dt_dates, prices, color=color, marker=".", linewidth=2, label=f"{symbol} Close", clip_on=False)
+    # Use theme for line color, width, and marker
+    line_color = theme["line"] if theme["line"] is not None else random.choice(COLORS)
+    ax.plot(
+        dt_dates, prices,
+        color=line_color,
+        marker=theme.get("marker", "."),
+        linewidth=theme.get("line_width", 2),
+        label=f"{symbol} Close",
+        clip_on=False,
+        zorder=5
+    )
 
     # Format y-axis ticks to two decimal places if prices are within 100
     ax.yaxis.set_major_formatter(plt.FormatStrFormatter('%.2f'))
@@ -78,7 +103,7 @@ def _build_base_chart(
     y_min = min(prices)
     y_max = max(prices)
     y_range = y_max - y_min
-    padding_factor = 0.05          # 5% padding
+    padding_factor = 0.05 # 5% padding
 
     if y_range == 0:
         # If all prices are the same, use a small absolute padding
@@ -86,16 +111,22 @@ def _build_base_chart(
     else:
         y_pad = padding_factor * y_range
 
-    print(y_min - y_pad)
-
     if (y_min - y_pad) < 0: 
         ax.set_ylim(y_min, y_max + y_pad) # do not datalabels
     else:
         ax.set_ylim(y_min - y_pad, y_max + y_pad)
 
-    ax.set_facecolor("white")
+    # Axes colors
+    ax.set_facecolor(theme.get("background", "white"))
     fig.patch.set_alpha(0.0)
-    ax.set_title(f"Financial Performance Analysis: {symbol}", fontsize=16, fontweight="bold", pad=20)
+
+    # Title and labels with theme text color
+    text_color = theme["text"]
+    ax.set_title(
+        f"Financial Performance Analysis: {symbol}",
+        fontsize=16, fontweight="bold", pad=20,
+        color=text_color
+    )
     ax.set_ylabel("Price (USD)", fontsize=12, labelpad=10, fontweight="bold", color=text_color)
     ax.set_xlabel("Trading Date", fontsize=12, labelpad=10, fontweight="bold", color=text_color)
 
@@ -144,7 +175,7 @@ def _build_base_chart(
     ax.xaxis.set_major_formatter(mdates.DateFormatter(fmt))
 
     # Force ticks to be evenly spaced while keeping first and last
-    num_xticks = 6   # 6 ticks including both ends
+    num_xticks = 6 # 6 ticks including both ends
     num_yticks = 6
 
     # X-axis: generate equally spaced positions in the float coordinate
@@ -157,18 +188,23 @@ def _build_base_chart(
     yticks = np.linspace(ymin, ymax, num_yticks)
     ax.set_yticks(yticks)
 
-    # Set tick paramaters, gridlines
+    # Grid and tick parameters using theme
     ax.tick_params(axis="both", labelcolor=text_color)
-    ax.yaxis.grid(True, which="both", linestyle=":", alpha=0.75, color="#cccccc")
+    ax.yaxis.grid(
+        True, which="both",
+        linestyle=":", alpha=0.75,
+        color=theme.get("grid", "#cccccc")
+    )
 
-    # Apply legend
+    # Legend logic
     legend_loc = "upper left" if prices[-1] >= prices[0] else "upper right"
     ax.legend(loc=legend_loc)
 
-    # Format datalabels
+    # Format x‑axis labels
     fig.autofmt_xdate(rotation=0, ha="center")
     labels = ax.get_xticklabels()
-    labels[0].set_horizontalalignment("left")
+    if labels:
+        labels[0].set_horizontalalignment("left")
 
     return fig, ax
     
@@ -245,46 +281,65 @@ def generate_line_chart(
     prices: list[float],
     symbol: str = "STOCK",
     text_color: str = "dimgrey",
+    theme: dict = None,
     advanced: bool = False,
 ) -> Image:
     """
     Generates a financial line chart.
 
     Args:
-        dates:      List of ISO-format date strings (YYYY-MM-DD) OR time strings (HH:MM:SS).
-        prices:     List of closing prices corresponding to each date.
-        symbol:     Ticker symbol shown in the chart title and legend.
-        text_color: Color used for axis labels and tick labels.
-        advanced:   When True, overlays a 3-day SMA trend line and annotates
-                    the latest price. When False, produces a clean basic chart.
+        dates:      List of ISO-format date strings or time strings.
+        prices:     List of closing prices.
+        symbol:     Ticker symbol shown in the chart.
+        text_color: Color for axis labels and tick labels (overrides theme["text"] if provided).
+        theme:      Optional dictionary with color/style overrides (see DEFAULT_THEME).
+        advanced:   When True, overlays a 3-day SMA trend line and annotates the latest price.
     """
     _validate_inputs(dates, prices)
     dt_dates = _parse_dates(dates)
-    color = random.choice(COLORS)
 
-    with plt.style.context("ggplot"):
-        fig, ax = _build_base_chart(dt_dates, prices, symbol, text_color, color)
+    # Build effective theme
+    effective_theme = DEFAULT_THEME.copy()
+    if theme:
+        effective_theme.update(theme)
+    # text_color argument overrides theme's text color
+    effective_theme["text"] = text_color
 
-        if advanced:
-            # 3-day Simple Moving Average
-            sma = [
-                sum(prices[max(0, i - 2) : i + 1]) / len(prices[max(0, i - 2) : i + 1])
-                for i in range(len(prices))
-            ]
-            ax.plot(dt_dates, sma, color="gold", linestyle="--", linewidth=1.5, label="3-Day Trend")
+    # Create base chart with the theme
+    fig, ax = _build_base_chart(dt_dates, prices, symbol, effective_theme)
 
-            # Annotate the latest price
-            ax.annotate(
-                f"${prices[-1]:.2f}",
-                xy=(dt_dates[-1], prices[-1]),
-                xytext=(10, 10),
-                textcoords="offset points",
-                arrowprops=dict(arrowstyle="->", color="black"),
-                bbox=dict(boxstyle="round,pad=0.3", fc="yellow", ec="black", lw=1, alpha=0.8),
-                color="black",
-            )
+    if advanced:
+        # 3-day Simple Moving Average
+        sma = [
+            sum(prices[max(0, i - 2) : i + 1]) / len(prices[max(0, i - 2) : i + 1])
+            for i in range(len(prices))
+        ]
+        ax.plot(
+            dt_dates, sma,
+            color=effective_theme.get("trend_line", "gold"),
+            linestyle=effective_theme.get("trend_line_style", "--"),
+            linewidth=1.5,
+            label="3-Day Trend"
+        )
 
-        return _render_chart_to_image(fig)
+        # Annotate the latest price
+        ax.annotate(
+            f"${prices[-1]:.2f}",
+            xy=(dt_dates[-1], prices[-1]),
+            xytext=(10, 10),
+            textcoords="offset points",
+            arrowprops=dict(arrowstyle="->", color=effective_theme.get("annotation_edge", "black")),
+            bbox=dict(
+                boxstyle="round,pad=0.3",
+                fc=effective_theme.get("annotation_background", "yellow"),
+                ec=effective_theme.get("annotation_edge", "black"),
+                lw=1,
+                alpha=0.8
+            ),
+            color=effective_theme.get("annotation_text", "black"),
+        )
+
+    return _render_chart_to_image(fig)
 
 if __name__ == "__main__":
     mcp.run()
