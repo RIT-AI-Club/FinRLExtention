@@ -115,7 +115,7 @@ THEMES = [NVIDIA_THEME, AMD_THEME, META_THEME, X_THEME]
 
 START_PRICE = 76.12 # start price for dummy prices
 PRICE_DEVIATION = 2.5 # how far a new price may deviate from the last price
-NUMBER_OF_POINTS = 24 # number of price points (corresponds with date/time points)
+NUMBER_OF_POINTS = 14 # number of price points (corresponds with date/time points)
 
 def test_chart_generation(advanced):
     print("Starting local test of Stock Analyzer...")
@@ -123,11 +123,11 @@ def test_chart_generation(advanced):
     # 1. Simulate Data: Generate dummy stock data
     # This mimics the JSON arguments Gemini would pass to the tool
     base_date = datetime.now()
-    # dates = [(base_date - timedelta(weeks=i)).isoformat() for i in range(52)] # 1-YEAR weekly trend
+    dates = [(base_date - timedelta(weeks=i)).isoformat() for i in range(52)] # 1-YEAR weekly trend
     # dates = [(base_date - timedelta(days=i)).isoformat() for i in range(30)] # 1-MONTH daily trend
-    # dates = [(base_date - timedelta(days=i)).isoformat() for i in range(14)] # 2-WEEK daily trend
+    dates = [(base_date - timedelta(days=i)).isoformat() for i in range(14)] # 2-WEEK daily trend
     # dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(72)] #  3-DAY hourly trend
-    dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(24)] # 1-DAY hourly trend
+    # dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(24)] # 1-DAY hourly trend
     # dates = [(base_date - timedelta(minutes=i)).isoformat() for i in range(60)] # 1-HOUR minutely trend
     dates.reverse() # Sort chronologically
 
