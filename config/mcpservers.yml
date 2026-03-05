@@ -1,0 +1,10 @@
+# MCP Server Configurations
+
+mcp_servers:
+  - name: "formatting"
+    command: "python"
+    args: ["src/backend/mcp_servers/mcp_formatting/server.py"]
+
+  - name: "research"
+    command: "python"
+    args: ["src/backend/mcp_servers/mcp_research/server.py"]
