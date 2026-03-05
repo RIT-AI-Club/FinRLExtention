@@ -4,6 +4,7 @@ MCP server for chart generation
 
 import math
 import matplotlib
+import numpy as np
 # CRITICAL: Set the backend to "Agg" before importing pyplot.
 # This prevents the server from trying to open a GUI window, which would crash it.
 matplotlib.use("Agg")
@@ -70,8 +71,27 @@ def _build_base_chart(
     # Format y-axis ticks to two decimal places if prices are within 100
     ax.yaxis.set_major_formatter(plt.FormatStrFormatter('%.2f'))
     
-    # Align data points to start on y-axis (x=0)
+    # Set x-axis limit exactly to data range
     ax.set_xlim(dt_dates[0], dt_dates[-1]) 
+    
+    # Calculate y-axis limits with a small amount of padding (5% on each side)
+    y_min = min(prices)
+    y_max = max(prices)
+    y_range = y_max - y_min
+    padding_factor = 0.05          # 5% padding
+
+    if y_range == 0:
+        # If all prices are the same, use a small absolute padding
+        y_pad = abs(y_min) * 0.01 if y_min != 0 else 1.0
+    else:
+        y_pad = padding_factor * y_range
+
+    print(y_min - y_pad)
+
+    if (y_min - y_pad) < 0: 
+        ax.set_ylim(y_min, y_max + y_pad) # do not datalabels
+    else:
+        ax.set_ylim(y_min - y_pad, y_max + y_pad)
 
     ax.set_facecolor("white")
     fig.patch.set_alpha(0.0)
@@ -87,22 +107,22 @@ def _build_base_chart(
     # Choose locator and formatter based on the table
     if total_hours <= 1:                     # ≤1 hour → 5‑minute ticks
         locator = mdates.MinuteLocator(interval=5)
-        fmt = '%H:%M'
+        fmt = '%I:%M %p'
     elif total_hours <= 2:                   # 1–2 hours → 15‑minute ticks
         locator = mdates.MinuteLocator(interval=15)
-        fmt = '%H:%M'
+        fmt = '%I:%M %p'
     elif total_hours <= 6:                   # 2–6 hours → 30‑minute ticks
         locator = mdates.MinuteLocator(interval=30)
-        fmt = '%H:%M'
+        fmt = '%I:%M %p'
     elif total_hours <= 12:                  # 6–12 hours → 1‑hour ticks
         locator = mdates.HourLocator(interval=1)
-        fmt = '%H:%M'
+        fmt = '%I:%M %p'
     elif total_hours <= 24:                  # 12–24 hours → 2‑hour ticks
         locator = mdates.HourLocator(interval=2)
-        fmt = '%H:%M'
+        fmt = '%I:%M %p'
     elif total_days <= 3:                    # 1–3 days → 6‑hour ticks
         locator = mdates.HourLocator(interval=6)
-        fmt = '%m/%d %H:%M'
+        fmt = '%m/%d %I:%M %p'
     elif total_days <= 7:                    # 3–7 days → 1‑day ticks
         locator = mdates.DayLocator(interval=1)
         fmt = '%m/%d'
@@ -123,6 +143,20 @@ def _build_base_chart(
     ax.xaxis.set_major_locator(locator)
     ax.xaxis.set_major_formatter(mdates.DateFormatter(fmt))
 
+    # Force ticks to be evenly spaced while keeping first and last
+    num_xticks = 6   # 6 ticks including both ends
+    num_yticks = 6
+
+    # X-axis: generate equally spaced positions in the float coordinate
+    xmin, xmax = ax.get_xlim()
+    xticks = np.linspace(xmin, xmax, num_xticks)   # evenly spaced
+    ax.set_xticks(xticks)
+
+    # Y-axis: generate equally spaced price values
+    ymin, ymax = ax.get_ylim()
+    yticks = np.linspace(ymin, ymax, num_yticks)
+    ax.set_yticks(yticks)
+
     # Set tick paramaters, gridlines
     ax.tick_params(axis="both", labelcolor=text_color)
     ax.yaxis.grid(True, which="both", linestyle=":", alpha=0.75, color="#cccccc")
@@ -131,7 +165,10 @@ def _build_base_chart(
     legend_loc = "upper left" if prices[-1] >= prices[0] else "upper right"
     ax.legend(loc=legend_loc)
 
-    fig.autofmt_xdate()
+    # Format datalabels
+    fig.autofmt_xdate(rotation=0, ha="center")
+    labels = ax.get_xticklabels()
+    labels[0].set_horizontalalignment("left")
 
     return fig, ax
     

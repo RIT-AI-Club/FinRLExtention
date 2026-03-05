@@ -2,9 +2,9 @@ from server import *
 from datetime import datetime, timedelta
 import random
 
-START_PRICE = 67.71 # start price for dummy prices
-PRICE_DEVIATION = 3 # how far a new price may deviate from the last price
-NUMBER_OF_POINTS = 30 # number of price points (corresponds with date/time points)
+START_PRICE = 0.69 # start price for dummy prices
+PRICE_DEVIATION = 0.25 # how far a new price may deviate from the last price
+NUMBER_OF_POINTS = 52 # number of price points (corresponds with date/time points)
 
 
 def test_chart_generation(advanced):
@@ -13,8 +13,8 @@ def test_chart_generation(advanced):
     # 1. Simulate Data: Generate dummy stock data
     # This mimics the JSON arguments Gemini would pass to the tool
     base_date = datetime.now()
-    # dates = [(base_date - timedelta(weeks=i)).isoformat() for i in range(52)] # 1-YEAR weekly trend
-    dates = [(base_date - timedelta(days=i)).isoformat() for i in range(30)] # 1-MONTH daily trend
+    dates = [(base_date - timedelta(weeks=i)).isoformat() for i in range(52)] # 1-YEAR weekly trend
+    # dates = [(base_date - timedelta(days=i)).isoformat() for i in range(30)] # 1-MONTH daily trend
     # dates = [(base_date - timedelta(days=i)).isoformat() for i in range(14)] # 2-WEEK daily trend
     # dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(72)] #  3-DAY hourly trend
     # dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(24)] # 1-DAY hourly trend
@@ -24,8 +24,11 @@ def test_chart_generation(advanced):
     # create a random walk for price
     prices = [START_PRICE] # start price
     for _ in range(NUMBER_OF_POINTS - 1):
-        change = random.uniform(-PRICE_DEVIATION, PRICE_DEVIATION) * random.random()
-        prices.append(prices[-1] + change)
+        change = random.uniform(-PRICE_DEVIATION, PRICE_DEVIATION)
+        new_price = prices[-1] + change
+        if new_price < 0:
+            new_price = 0
+        prices.append(new_price)
 
     print(f"Generated {len(dates)} pieces of sample data.")
 
