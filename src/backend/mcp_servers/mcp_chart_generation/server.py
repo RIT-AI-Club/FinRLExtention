@@ -2,14 +2,10 @@
 MCP server for chart generation
 """
 
-import math
 import matplotlib
-import numpy as np
 # CRITICAL: Set the backend to "Agg" before importing pyplot.
 # This prevents the server from trying to open a GUI window, which would crash it.
 matplotlib.use("Agg")
-from matplotlib import dates
-import matplotlib.ticker as ticker
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import io
@@ -17,6 +13,7 @@ from datetime import datetime
 from fastmcp import FastMCP
 from fastmcp.utilities.types import Image
 import random
+import numpy as np
 
 # Default theme for graph
 DEFAULT_THEME = {
@@ -37,8 +34,8 @@ DEFAULT_THEME = {
 # Default colors
 COLORS = ["red", "limegreen", "royalblue"]
 
-# Control the gridline interval
-GRIDLINE_INTERVAL = 30
+# Control the number of ticks
+TICK_NUMBER = 6
 
 # Common datetime formats (date + time) to try
 DATETIME_FORMATS = [
@@ -103,7 +100,7 @@ def _build_base_chart(
     y_min = min(prices)
     y_max = max(prices)
     y_range = y_max - y_min
-    padding_factor = 0.05 # 5% padding
+    padding_factor = 0.05   # 5% padding
 
     if y_range == 0:
         # If all prices are the same, use a small absolute padding
@@ -111,8 +108,9 @@ def _build_base_chart(
     else:
         y_pad = padding_factor * y_range
 
-    if (y_min - y_pad) < 0: 
-        ax.set_ylim(y_min, y_max + y_pad) # do not datalabels
+    # Avoid extending below zero (prices can't be negative)
+    if y_min - y_pad < 0:
+        ax.set_ylim(y_min, y_max + y_pad)   # pad only the top
     else:
         ax.set_ylim(y_min - y_pad, y_max + y_pad)
 
@@ -175,8 +173,8 @@ def _build_base_chart(
     ax.xaxis.set_major_formatter(mdates.DateFormatter(fmt))
 
     # Force ticks to be evenly spaced while keeping first and last
-    num_xticks = 6 # 6 ticks including both ends
-    num_yticks = 6
+    num_xticks = TICK_NUMBER
+    num_yticks = TICK_NUMBER
 
     # X-axis: generate equally spaced positions in the float coordinate
     xmin, xmax = ax.get_xlim()
@@ -288,7 +286,9 @@ def generate_line_chart(
     Generates a financial line chart.
 
     Args:
-        dates:      List of ISO-format date strings or time strings.
+        dates:      List of date/time strings. Supports ISO format, common datetime patterns
+                        (e.g., "2025-03-03 14:30", "03/03/2025 14:30:15"), and time-only strings
+                        (e.g., "14:30", "14:30:15") which are plotted on a dummy date.
         prices:     List of closing prices.
         symbol:     Ticker symbol shown in the chart.
         text_color: Color for axis labels and tick labels (overrides theme["text"] if provided).
