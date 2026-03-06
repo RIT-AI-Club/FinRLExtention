@@ -35,7 +35,7 @@ def get_claude_client() -> AsyncAnthropic:
     )
 
 def _build_user_prompt_parts(
-    user_data: dict[str, Any],
+    user_data: List[Dict[str, Any]],
     reference_image_paths: Optional[List[str]] = None,
     color_scheme: str = None
 ) -> List[Dict[str, Any]]:
@@ -43,7 +43,7 @@ def _build_user_prompt_parts(
     Constructs the list of 'parts' for the Claude API request payload.
     
     Args:
-        user_data: Dictionary containing text blocks and processed image URLs.
+        user_data: List of dictionaries containing text blocks and processed image URLs.
         reference_image_paths: Optional list of file paths to styling reference images.
         
     Returns:
@@ -82,7 +82,7 @@ def _build_user_prompt_parts(
 
 async def generate_html(
     client: AsyncAnthropic,
-    user_data: dict[str, Any],
+    user_data: List[Dict[str, Any]],
     system_prompt: str,
     reference_image_paths: Optional[List[str]] = None,
     model: Optional[str] = None,
@@ -95,7 +95,7 @@ async def generate_html(
     
     Args:
         client: Initialized Claude client.
-        user_data: Dictionary with text_blocks and images.
+        user_data: List of dictionaries with text_blocks and images.
         system_prompt: System instruction for the AI.
         reference_image_paths: Optional list of paths to reference images for style.
         model: Claude model to use (overrides config if provided).

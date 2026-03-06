@@ -14,11 +14,11 @@ from image_loader import start_image_server, prepare_image_urls
 # Get a logger for this module
 logger = logging.getLogger(__name__)
 
-# Initialize MCP server
+# Initialize MCP server for formatting task
 mcp = FastMCP("formatting")
 
 @mcp.tool()
-async def format_report(text_blocks: List[str], images: Optional[List[List[str]]], color_scheme: Optional[str] = None) -> str:
+async def format_report(text_blocks: List[str], images: Optional[List[List[str, str]]], color_scheme: Optional[str] = None) -> str:
     """
     Formats text and images into a professional HTML report using an AI model.
     
