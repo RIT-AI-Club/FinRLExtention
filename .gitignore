@@ -4,7 +4,6 @@ config.yml
 # Ignore practice file
 
 practice_claude_server.py
-test_images/
 test.py
 
 # Ignore pycache files
