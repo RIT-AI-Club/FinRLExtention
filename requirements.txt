@@ -5,9 +5,13 @@ google-generativeai>=0.8.0
 
 # MCP (Model Context Protocol) SDK
 mcp>=1.0.0
+fastmcp
 
 # Configuration
 pyyaml>=6.0
+
+# OpenAI SDK (used for Perplexity API compatibility)
+openai>=1.0.0
 
 # Async support
 anyio>=4.0.0
