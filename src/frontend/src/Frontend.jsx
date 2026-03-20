@@ -93,3 +93,5 @@ const Frontend = () => {
         </div>
     )
 }
+
+export default Frontend;
