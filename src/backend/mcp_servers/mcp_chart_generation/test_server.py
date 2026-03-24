@@ -1,3 +1,7 @@
+"""
+Run this program to test the chart generation MCP server
+"""
+
 from server import *
 from datetime import datetime, timedelta
 import random
