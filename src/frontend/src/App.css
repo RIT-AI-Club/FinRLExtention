@@ -182,3 +182,51 @@
     border-right-color: var(--border);
   }
 }
+
+/* Container holding everything */
+.app-wrapper {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  position: relative;
+}
+
+/* The Sidebar Base Styles */
+.sidebar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 250px;
+  background-color: #1e1e2f; /* Dark theme color */
+  color: white;
+  transition: transform 0.3s ease-in-out; /* Smooth sliding animation */
+  z-index: 10;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+}
+
+/* The Toggle Logic */
+.sidebar.closed {
+  transform: translateX(-100%); /* Hides it off-screen to the left */
+}
+
+.sidebar.open {
+  transform: translateX(0); /* Brings it back on-screen */
+}
+
+/* Main Chat Area */
+.main-chat-area {
+  flex-grow: 1;
+  padding: 20px;
+  background-color: #ffffff;
+}
+
+/* The Hamburger Button */
+.hamburger-btn {
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+}

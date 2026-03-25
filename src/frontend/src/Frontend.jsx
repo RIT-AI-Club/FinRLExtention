@@ -12,12 +12,18 @@ This is the main file for the User interface
  */
 
 import React, {useState} from 'react';
+import './Frontend.css';
 
 const Frontend = () => {
     // State setup
     const [inputText, setInputText] = useState('');
     const [messages, setMessages] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isSideBarOpen, setIsSideBarOpen] = useState(false);
+
+    const toggleSideBar = () => {
+        setIsSideBarOpen(!isSideBarOpen);
+    };
 
     // the function that runs when you click "Send"
     const handleSendMessage = async () => {
@@ -53,42 +59,60 @@ const Frontend = () => {
     }; 
 
     return (
-        <div style={{maxWidth: '600px', margin: '0 auto', padding: '20px', fontFamily: 'sans-serif'}}>
-            <h2>FinRL Assistant</h2>
-            {/* Chat History Window */}
-            <div style={{height: '400px', border: '1px solid #ccc', overflowY: 'scroll', padding: '10px', marginBottom: '10px'}}> 
-                {messages.map((msg, index) => (
-                    <div key={index} style={{
-                        textAlign: msg.role === 'user' ? 'right' : 'left', 
-                        margin: '10px 0'
-                    }}>
-                        <strong style={{color: msg.role === 'user' ? 'blue' : 'green' }}>
-                            {msg.role === 'user' ? 'You' : 'AI: '}
-                        </strong>
-                        <span>{msg.content}</span>
-                    </div>
-                ))}
-                {isLoading && <div style={{ color: 'gray', fontStyle: 'italic'}}> AI is thinking about your portfolio...</div>}
+        <div className='app-wrapper'>
+            {/* 1. The Sidebar */}
+            <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
+                <div className="sidebar-header">
+                <h2>Past Reports</h2>
+                <button onClick={toggleSidebar}>✕</button> {/* Close button */}
+                </div>
+                <div className="sidebar-content">
+                {/* We will populate this with actual reports later! */}
+                <p>AAPL - March 15</p>
+                <p>TSLA - March 18</p>
+                </div>
             </div>
-            
 
-            {/* Input Area */}
-            <div style={{display: 'flex', gap: '10px' }}>
-                <input 
-                    type="text"
-                    value={inputText}
-                    onChange={(e) => setInputText(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                    placeholder="Ask about your FinRL model..."
-                    style={{flexGrow: 1, padding: '10px'}}
-                />
-                <button
-                    onClick={handleSendMessage}
-                    disabled={isLoading}
-                    style={{padding: '10px 20px', cursor: 'pointer'}}
-                >
-                    Send
+            <div style={{maxWidth: '600px', margin: '0 auto', padding: '20px', fontFamily: 'sans-serif'}}>
+                <button className='hamburger-btn' onClick={toggleSideBar}>
+                    ☰
                 </button>
+                <h2>FinRL Assistant</h2>
+                {/* Chat History Window */}
+                <div style={{height: '400px', border: '1px solid #ccc', overflowY: 'scroll', padding: '10px', marginBottom: '10px'}}> 
+                    {messages.map((msg, index) => (
+                        <div key={index} style={{
+                            textAlign: msg.role === 'user' ? 'right' : 'left', 
+                            margin: '10px 0'
+                        }}>
+                            <strong style={{color: msg.role === 'user' ? 'blue' : 'green' }}>
+                                {msg.role === 'user' ? 'You' : 'AI: '}
+                            </strong>
+                            <span>{msg.content}</span>
+                        </div>
+                    ))}
+                    {isLoading && <div style={{ color: 'gray', fontStyle: 'italic'}}> AI is thinking about your portfolio...</div>}
+                </div>
+                
+
+                {/* Input Area */}
+                <div style={{display: 'flex', gap: '10px' }}>
+                    <input 
+                        type="text"
+                        value={inputText}
+                        onChange={(e) => setInputText(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                        placeholder="Ask about your FinRL model..."
+                        style={{flexGrow: 1, padding: '10px'}}
+                    />
+                    <button
+                        onClick={handleSendMessage}
+                        disabled={isLoading}
+                        style={{padding: '10px 20px', cursor: 'pointer'}}
+                    >
+                        Send
+                    </button>
+                </div>
             </div>
         </div>
     )
