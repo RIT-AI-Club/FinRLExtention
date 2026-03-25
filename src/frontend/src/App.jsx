@@ -1,12 +1,9 @@
 import React from 'react';
-import Frontend from './Frontend'; // This imports your chatbox file!
+import Frontend from './Frontend';
 
 function App() {
   return (
-    <div>
-      {/* This renders your chatbox on the screen */}
-      <Frontend /> 
-    </div>
+    <Frontend />
   );
 }
 
