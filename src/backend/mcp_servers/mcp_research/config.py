@@ -31,7 +31,7 @@ def _load_config() -> dict:
 
 _config = _load_config()
 
-PERPLEXITY_API_KEY: str = _config.get("api_key", "")
+PERPLEXITY_API_KEY: str = _config.get("api_key")
 PERPLEXITY_MODEL: str = _config.get("model", "sonar")
 PERPLEXITY_TEMPERATURE: float = _config.get("temperature", 0.7)
 PERPLEXITY_MAX_TOKENS: int = _config.get("max_tokens", 4096)

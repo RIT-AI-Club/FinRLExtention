@@ -465,9 +465,12 @@ async def main():
 
     try:
         print("Available tools:", list(client.tools.keys()))
-
+        
         response = await client.process_message("Hello! What tools do you have available? Do not call any tools")
         print("Response:", response)
+        while (inp:=input(">> ")) != "bye":
+            response = await client.process_message(inp)
+            print(">",response)
 
     finally:
         await client.close()

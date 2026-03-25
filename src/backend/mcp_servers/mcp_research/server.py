@@ -2,6 +2,7 @@
 
 import json
 import sys
+import asyncio
 
 from mcp.server.fastmcp import FastMCP
 
@@ -128,5 +129,10 @@ async def research_news(ticker: str) -> str:
         return json.dumps({"error": str(e)})
 
 
+async def main():
+    output = await research_stock("MSFT")
+    print(output)
+
 if __name__ == "__main__":
+    # asyncio.run(main())
     mcp.run()
