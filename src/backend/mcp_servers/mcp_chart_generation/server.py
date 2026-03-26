@@ -70,17 +70,16 @@ def generate_line_chart(
     fig, ax = build_base_chart(dt_dates, prices, symbol, effective_theme)
 
     if advanced:
-        # 3-day Simple Moving Average
-        sma = [
-            sum(prices[max(0, i - 2) : i + 1]) / len(prices[max(0, i - 2) : i + 1])
-            for i in range(len(prices))
-        ]
+        # Calculate and plot SMA 
+        period = get_sma_period(dt_dates)
+        sma = calculate_sma(dt_dates, period)
+
         ax.plot(
             dt_dates, sma,
             color=effective_theme.get("trend_line", "gold"),
             linestyle=effective_theme.get("trend_line_style", "--"),
             linewidth=1.5,
-            label="3-Day Trend"
+            label=f"{period}-Day Trend"
         )
 
         # Annotate the latest price
@@ -99,6 +98,10 @@ def generate_line_chart(
             ),
             color=effective_theme.get("annotation_text", "black"),
         )
+
+    # Legend logic
+    legend_loc = "upper left" if prices[-1] >= prices[0] else "upper right"
+    ax.legend(loc=legend_loc)
 
     return render_chart_to_image(fig)
 
@@ -141,6 +144,42 @@ def generate_candlestick_chart(
     fig, ax = build_candlestick_chart(
         dt_dates, opens, highs, lows, closes, symbol, effective_theme
     )
+
+    # Calculate and plot SMA 
+    midpoints = [(o + c) / 2 for o, c in zip(opens, closes)]
+    period = get_sma_period(dt_dates)
+    sma = calculate_sma(midpoints, period)
+
+    ax.plot(
+        dt_dates, sma,
+        color=effective_theme.get("trend_line", "gold"),
+        linestyle=effective_theme.get("trend_line_style", "--"),
+        linewidth=1.5,
+        label=f"{period}-Day SMA",
+        zorder = 5
+    )
+
+    # Annotate the latest price
+    ax.annotate(
+        f"${(opens[-1] + closes[-1])/2:.2f}",
+        xy=(dt_dates[-1], (opens[-1] + closes[-1])/2),
+        xytext=(10, 10),
+        textcoords="offset points",
+        arrowprops=dict(arrowstyle="->", color=effective_theme.get("annotation_edge", "black")),
+        bbox=dict(
+            boxstyle="round,pad=0.3",
+            fc=effective_theme.get("annotation_background", "yellow"),
+            ec=effective_theme.get("annotation_edge", "black"),
+            lw=1,
+            alpha=0.8
+        ),
+        color=effective_theme.get("annotation_text", "black"),
+        zorder = 5
+    )
+
+    # Legend logic
+    legend_loc = "upper left" if closes[-1] >= opens[0] else "upper right"
+    ax.legend(loc=legend_loc)
     
     return render_chart_to_image(fig)
 

@@ -131,10 +131,6 @@ def build_base_chart(
         color=theme.get("grid", "#cccccc")
     )
 
-    # Legend logic
-    legend_loc = "upper left" if prices[-1] >= prices[0] else "upper right"
-    ax.legend(loc=legend_loc)
-
     # Format x‑axis labels
     fig.autofmt_xdate(rotation=0, ha="center")
     labels = ax.get_xticklabels()
@@ -344,6 +340,7 @@ def build_candlestick_chart(
         mdates.date2num(dt_dates[-1]) + half_width,
     )
 
+    # Calculate and apply locator and formatter
     locator, formatter = get_date_locator_and_formatter(dt_dates)
     ax.xaxis.set_major_locator(locator)
     ax.xaxis.set_major_formatter(formatter)
@@ -357,6 +354,7 @@ def build_candlestick_chart(
     yticks = np.linspace(ymin, ymax, TICK_NUMBER)
     ax.set_yticks(yticks)
 
+    # Format x‑axis labels
     fig.autofmt_xdate(rotation=0, ha="center")
     labels = ax.get_xticklabels()
     if labels:
@@ -419,3 +417,27 @@ def get_date_locator_and_formatter(dt_dates: list) -> tuple[mdates.DateLocator, 
         fmt = "%Y"
 
     return locator, mdates.DateFormatter(fmt)
+
+def calculate_sma(prices: list[float], period: int = 3) -> list[float]:
+    """
+    Returns a list of SMA values aligned with the input prices.
+    The first (period - 1) values are None (not enough data yet).
+    """
+    sma = []
+    for i in range(len(prices)):
+        window = prices[max(0, i - period + 1) : i + 1]
+        sma.append(sum(window) / len(window))
+    return sma
+
+def get_sma_period(dt_dates):
+    span = dt_dates[-1] - dt_dates[0]
+    total_days = span.total_seconds() / 86400
+
+    if total_days <= 1:    # intraday
+        return 9
+    elif total_days <= 30: # days/weeks
+        return 10
+    elif total_days <= 365: # months
+        return 20
+    else:                  # years
+        return 50
