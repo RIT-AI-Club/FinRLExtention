@@ -253,3 +253,170 @@ def validate_inputs(dates: list, prices: list[float]) -> None:
         raise ValueError("Data empty: No dates or prices provided.")
     if len(dates) != len(prices):
         raise ValueError(f"Data mismatch: Received {len(dates)} dates and {len(prices)} prices.")
+
+def validate_ohlc(
+    dates: list,
+    opens: list[float],
+    highs: list[float],
+    lows: list[float],
+    closes: list[float],
+) -> None:
+    """Raises ValueError for invalid or mismatched OHLC inputs.
+
+    Checks that:
+    - No list is empty.
+    - All five lists share the same length.
+    - For every candle, high >= low.
+    """
+    if not dates:
+        raise ValueError("Data empty: No dates or prices provided.")
+
+    lengths = {"opens": len(opens), "highs": len(highs), "lows": len(lows), "closes": len(closes)}
+    for name, length in lengths.items():
+        if length != len(dates):
+            raise ValueError(
+                f"Data mismatch: Received {len(dates)} dates but {length} {name}."
+            )
+
+    for i, (h, l) in enumerate(zip(highs, lows)):
+        if h < l:
+            raise ValueError(
+                f"Invalid OHLC data at index {i}: high ({h}) is less than low ({l})."
+            )
+        
+def build_candlestick_chart(
+    dt_dates: list,
+    opens: list[float],
+    highs: list[float],
+    lows: list[float],
+    closes: list[float],
+    symbol: str,
+    theme: dict,
+) -> tuple[plt.Figure, plt.Axes]:
+    """Builds and returns a candlestick (fig, ax) with shared formatting applied.
+
+    Each candle is drawn with:
+    - A thin vertical line (wick) from low to high using ax.vlines().
+    - A filled rectangle (body) from open to close using ax.bar().
+      Green when close >= open, red otherwise.
+
+    Args:
+        dt_dates: Parsed datetime objects, one per candle.
+        opens:    Opening prices.
+        highs:    High prices.
+        lows:     Low prices.
+        closes:   Closing prices.
+        symbol:   Ticker symbol shown in the chart title.
+        theme:    Style dictionary (same schema as line chart themes).
+
+    Returns:
+        A (fig, ax) tuple ready to be rendered or further annotated.
+    """
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    # Compute a sensible candle width (80% of the smallest gap between dates)
+    if len(dt_dates) > 1:
+        gaps = [(dt_dates[i + 1] - dt_dates[i]).total_seconds() for i in range(len(dt_dates) - 1)]
+        min_gap_days = min(gaps) / 86400.0
+        candle_width = min_gap_days * 0.8
+    else:
+        candle_width = 0.6  # fallback for a single candle
+
+    bull_color = theme.get("candle_up", "#26a69a")    # teal-green default
+    bear_color = theme.get("candle_down", "#ef5350")  # red default
+    wick_color = theme.get("wick", None)              # None → match body color
+
+    # Draw wicks and bodies for each candle
+    for i, (date, open_, high, low, close) in enumerate(
+        zip(dt_dates, opens, highs, lows, closes)
+    ):
+        is_bull = close >= open_
+        body_color = bull_color if is_bull else bear_color
+        wc = wick_color if wick_color else body_color
+
+        # Wick: thin line from low to high
+        ax.vlines(date, low, high, color=wc, linewidth=1, zorder=4)
+
+        # Body: rectangle from open to close
+        body_bottom = min(open_, close)
+        body_height = abs(close - open_)
+        ax.bar(
+            date,
+            body_height,
+            bottom=body_bottom,
+            width=candle_width,
+            color=body_color,
+            edgecolor=wc,
+            linewidth=0.5,
+            zorder=5,
+        )
+
+    # --- Shared formatting (mirrors build_base_chart) ---
+    text_color = theme["text"]
+
+    ax.set_facecolor(theme.get("background", "white"))
+    fig.patch.set_alpha(0.0)
+
+    ax.set_title(
+        f"Financial Performance Analysis: {symbol}",
+        fontsize=16, fontweight="bold", pad=20, color=text_color,
+    )
+    ax.set_ylabel("Price (USD)", fontsize=12, labelpad=10, fontweight="bold", color=text_color)
+    ax.set_xlabel("Trading Date", fontsize=12, labelpad=10, fontweight="bold", color=text_color)
+    ax.tick_params(axis="both", labelcolor=text_color)
+    ax.yaxis.set_major_formatter(plt.FormatStrFormatter("%.2f"))
+    ax.yaxis.grid(
+        True, which="both",
+        linestyle=":", alpha=0.75,
+        color=theme.get("grid", "#cccccc"),
+    )
+
+    # Y-axis limits with 5% padding
+    y_min = min(lows)
+    y_max = max(highs)
+    y_range = y_max - y_min
+    y_pad = (0.05 * y_range) if y_range != 0 else (abs(y_min) * 0.01 or 1.0)
+    ax.set_ylim(
+        y_min - y_pad if y_min - y_pad >= 0 else y_min,
+        y_max + y_pad,
+    )
+
+    # X-axis limits: half a candle width of breathing room on each side
+    half_width = candle_width / 2.0
+    ax.set_xlim(
+        mdates.date2num(dt_dates[0]) - half_width,
+        mdates.date2num(dt_dates[-1]) + half_width,
+    )
+
+    # Evenly spaced ticks
+    xmin, xmax = ax.get_xlim()
+    ax.set_xticks(np.linspace(xmin, xmax, TICK_NUMBER))
+    ymin, ymax = ax.get_ylim()
+    ax.set_yticks(np.linspace(ymin, ymax, TICK_NUMBER))
+
+    # Date formatter based on time span
+    span = dt_dates[-1] - dt_dates[0]
+    total_hours = span.total_seconds() / 3600.0
+    total_days = span.days + span.seconds / 86400.0
+
+    if total_hours <= 24:
+        fmt = "%I:%M %p"
+    elif total_days <= 7:
+        fmt = "%m/%d"
+    elif total_days <= 365:
+        fmt = "%Y-%m"
+    else:
+        fmt = "%Y"
+
+    ax.xaxis.set_major_formatter(mdates.DateFormatter(fmt))
+    fig.autofmt_xdate(rotation=0, ha="center")
+    labels = ax.get_xticklabels()
+    if labels:
+        labels[0].set_horizontalalignment("left")
+
+    # Legend — two proxy patches for bull/bear
+    bull_patch = plt.Rectangle((0, 0), 1, 1, color=bull_color, label="Bullish")
+    bear_patch = plt.Rectangle((0, 0), 1, 1, color=bear_color, label="Bearish")
+    ax.legend(handles=[bull_patch, bear_patch], loc="upper left")
+
+    return fig, ax

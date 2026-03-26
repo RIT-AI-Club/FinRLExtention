@@ -103,17 +103,46 @@ def generate_line_chart(
     return render_chart_to_image(fig)
 
 # @mcp.tool() # comment out for manual testing
-# def generate_candlestick_chart(
-#     dates: list[str],
-#     opens: list[float],
-#     highs: list[float],
-#     lows: list[float],  
-#     closes: list[float],
-#     symbol: str = "STOCK",
-#     theme: dict = None
-# ) -> Image:
+def generate_candlestick_chart(
+    dates: list[str],
+    opens: list[float],
+    highs: list[float],
+    lows: list[float],  
+    closes: list[float],
+    symbol: str = "STOCK",
+    theme: dict = None
+) -> Image:
+    """
+    Generates a financial candlestick chart.
+
+    Each candle shows the open, high, low, and close price for a period.
+    Green candles indicate the price closed higher than it opened (bullish).
+    Red candles indicate the price closed lower than it opened (bearish).
+
+    Args:
+        dates:   List of date/time strings (same formats as generate_line_chart).
+        opens:   Opening prices.
+        highs:   High prices for the period.
+        lows:    Low prices for the period.
+        closes:  Closing prices.
+        symbol:  Ticker symbol shown in the chart title.
+        theme:   Optional style overrides. Supports all keys from generate_line_chart, plus:
+                    - "candle_up"   (str) : Bullish candle color. Default: "#26a69a" (teal-green).
+                    - "candle_down" (str) : Bearish candle color. Default: "#ef5350" (red).
+                    - "wick"        (str) : Wick color. Default: matches body color.
+    """
+    validate_ohlc(dates, opens, highs, lows, closes)
+    dt_dates = parse_dates(dates)
+
+    effective_theme = DEFAULT_THEME.copy()
+    if theme:
+        effective_theme.update(theme)
+
+    fig, ax = build_candlestick_chart(
+        dt_dates, opens, highs, lows, closes, symbol, effective_theme
+    )
     
-#     return render_chart_to_image(fig)
+    return render_chart_to_image(fig)
 
 if __name__ == "__main__":
     mcp.run()
