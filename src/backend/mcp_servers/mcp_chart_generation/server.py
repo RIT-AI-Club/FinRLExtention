@@ -102,5 +102,18 @@ def generate_line_chart(
 
     return render_chart_to_image(fig)
 
+# @mcp.tool() # comment out for manual testing
+# def generate_candlestick_chart(
+#     dates: list[str],
+#     opens: list[float],
+#     highs: list[float],
+#     lows: list[float],  
+#     closes: list[float],
+#     symbol: str = "STOCK",
+#     theme: dict = None
+# ) -> Image:
+    
+#     return render_chart_to_image(fig)
+
 if __name__ == "__main__":
     mcp.run()
