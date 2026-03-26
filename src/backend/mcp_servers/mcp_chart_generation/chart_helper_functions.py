@@ -109,62 +109,18 @@ def build_base_chart(
     ax.set_ylabel("Price (USD)", fontsize=12, labelpad=10, fontweight="bold", color=text_color)
     ax.set_xlabel("Trading Date", fontsize=12, labelpad=10, fontweight="bold", color=text_color)
 
-    # Determine total time spanned
-    span = dt_dates[-1] - dt_dates[0]
-    total_hours = span.total_seconds() / 3600.0
-    total_days = span.days + span.seconds / 86400.0
-
-    # Choose locator and formatter based on the table
-    if total_hours <= 1:                     # ≤1 hour → 5‑minute ticks
-        locator = mdates.MinuteLocator(interval=5)
-        fmt = '%I:%M %p'
-    elif total_hours <= 2:                   # 1–2 hours → 15‑minute ticks
-        locator = mdates.MinuteLocator(interval=15)
-        fmt = '%I:%M %p'
-    elif total_hours <= 6:                   # 2–6 hours → 30‑minute ticks
-        locator = mdates.MinuteLocator(interval=30)
-        fmt = '%I:%M %p'
-    elif total_hours <= 12:                  # 6–12 hours → 1‑hour ticks
-        locator = mdates.HourLocator(interval=1)
-        fmt = '%I:%M %p'
-    elif total_hours <= 24:                  # 12–24 hours → 2‑hour ticks
-        locator = mdates.HourLocator(interval=2)
-        fmt = '%I:%M %p'
-    elif total_days <= 3:                    # 1–3 days → 6‑hour ticks
-        locator = mdates.HourLocator(interval=6)
-        fmt = '%m/%d %I:%M %p'
-    elif total_days <= 7:                    # 3–7 days → 1‑day ticks
-        locator = mdates.DayLocator(interval=1)
-        fmt = '%m/%d'
-    elif total_days <= 28:                   # 1–4 weeks → 2‑day ticks
-        locator = mdates.DayLocator(interval=2)
-        fmt = '%m/%d'
-    elif total_days <= 90:                   # 1–3 months → 1‑week ticks
-        locator = mdates.WeekdayLocator(interval=1)
-        fmt = '%m/%d'
-    elif total_days <= 365:                  # 3–12 months → 1‑month ticks
-        locator = mdates.MonthLocator(interval=1)
-        fmt = '%Y-%m'
-    else:                                    # >1 year → quarterly ticks
-        locator = mdates.MonthLocator(interval=3)
-        fmt = '%Y'
-
-    # Apply locator and formatter
+    # Calculate and apply locator and formatter to axis
+    locator, formatter = get_date_locator_and_formatter(dt_dates)
     ax.xaxis.set_major_locator(locator)
-    ax.xaxis.set_major_formatter(mdates.DateFormatter(fmt))
+    ax.xaxis.set_major_formatter(formatter)
 
-    # Force ticks to be evenly spaced while keeping first and last
-    num_xticks = TICK_NUMBER
-    num_yticks = TICK_NUMBER
-
-    # X-axis: generate equally spaced positions in the float coordinate
+    # Evenly space X and Y ticks
     xmin, xmax = ax.get_xlim()
-    xticks = np.linspace(xmin, xmax, num_xticks)   # evenly spaced
+    xticks = np.linspace(xmin, xmax, TICK_NUMBER)   # evenly spaced
     ax.set_xticks(xticks)
 
-    # Y-axis: generate equally spaced price values
     ymin, ymax = ax.get_ylim()
-    yticks = np.linspace(ymin, ymax, num_yticks)
+    yticks = np.linspace(ymin, ymax, TICK_NUMBER)
     ax.set_yticks(yticks)
 
     # Grid and tick parameters using theme
@@ -322,15 +278,15 @@ def build_candlestick_chart(
     else:
         candle_width = 0.6  # fallback for a single candle
 
-    bull_color = theme.get("candle_up", "#26a69a")    # teal-green default
-    bear_color = theme.get("candle_down", "#ef5350")  # red default
+    bull_color = theme.get("candle_up", "#109246")    # green default
+    bear_color = theme.get("candle_down", "#ec413e")  # red default
     wick_color = theme.get("wick", None)              # None → match body color
 
     # Draw wicks and bodies for each candle
-    for i, (date, open_, high, low, close) in enumerate(
+    for i, (date, open, high, low, close) in enumerate(
         zip(dt_dates, opens, highs, lows, closes)
     ):
-        is_bull = close >= open_
+        is_bull = close >= open
         body_color = bull_color if is_bull else bear_color
         wc = wick_color if wick_color else body_color
 
@@ -338,8 +294,8 @@ def build_candlestick_chart(
         ax.vlines(date, low, high, color=wc, linewidth=1, zorder=4)
 
         # Body: rectangle from open to close
-        body_bottom = min(open_, close)
-        body_height = abs(close - open_)
+        body_bottom = min(open, close)
+        body_height = abs(close - open)
         ax.bar(
             date,
             body_height,
@@ -388,35 +344,78 @@ def build_candlestick_chart(
         mdates.date2num(dt_dates[-1]) + half_width,
     )
 
-    # Evenly spaced ticks
+    locator, formatter = get_date_locator_and_formatter(dt_dates)
+    ax.xaxis.set_major_locator(locator)
+    ax.xaxis.set_major_formatter(formatter)
+    
+    # Evenly space X and Y ticks
     xmin, xmax = ax.get_xlim()
-    ax.set_xticks(np.linspace(xmin, xmax, TICK_NUMBER))
+    xticks = np.linspace(xmin, xmax, TICK_NUMBER)   # evenly spaced
+    ax.set_xticks(xticks)
+
     ymin, ymax = ax.get_ylim()
-    ax.set_yticks(np.linspace(ymin, ymax, TICK_NUMBER))
+    yticks = np.linspace(ymin, ymax, TICK_NUMBER)
+    ax.set_yticks(yticks)
 
-    # Date formatter based on time span
-    span = dt_dates[-1] - dt_dates[0]
-    total_hours = span.total_seconds() / 3600.0
-    total_days = span.days + span.seconds / 86400.0
-
-    if total_hours <= 24:
-        fmt = "%I:%M %p"
-    elif total_days <= 7:
-        fmt = "%m/%d"
-    elif total_days <= 365:
-        fmt = "%Y-%m"
-    else:
-        fmt = "%Y"
-
-    ax.xaxis.set_major_formatter(mdates.DateFormatter(fmt))
     fig.autofmt_xdate(rotation=0, ha="center")
     labels = ax.get_xticklabels()
     if labels:
         labels[0].set_horizontalalignment("left")
 
-    # Legend — two proxy patches for bull/bear
-    bull_patch = plt.Rectangle((0, 0), 1, 1, color=bull_color, label="Bullish")
-    bear_patch = plt.Rectangle((0, 0), 1, 1, color=bear_color, label="Bearish")
-    ax.legend(handles=[bull_patch, bear_patch], loc="upper left")
-
     return fig, ax
+
+def get_date_locator_and_formatter(dt_dates: list) -> tuple[mdates.DateLocator, mdates.DateFormatter]:
+    """
+    Selects an appropriate x-axis tick locator and date formatter based on
+    the total time span of the provided datetime list.
+
+    Intended as an internal helper for build_base_chart and
+    build_candlestick_chart — call it instead of duplicating this logic.
+
+    Args:
+        dt_dates: A list of parsed datetime objects in chronological order.
+
+    Returns:
+        A (locator, formatter) tuple ready to be passed to:
+            ax.xaxis.set_major_locator(locator)
+            ax.xaxis.set_major_formatter(formatter)
+    """
+    span = dt_dates[-1] - dt_dates[0]
+    total_hours = span.total_seconds() / 3600.0
+    total_days  = span.days + span.seconds / 86400.0
+
+    if total_hours <= 1:                     # ≤1 hour       → 5-minute ticks
+        locator = mdates.MinuteLocator(interval=5)
+        fmt = "%I:%M %p"
+    elif total_hours <= 2:                   # 1–2 hours     → 15-minute ticks
+        locator = mdates.MinuteLocator(interval=15)
+        fmt = "%I:%M %p"
+    elif total_hours <= 6:                   # 2–6 hours     → 30-minute ticks
+        locator = mdates.MinuteLocator(interval=30)
+        fmt = "%I:%M %p"
+    elif total_hours <= 12:                  # 6–12 hours    → 1-hour ticks
+        locator = mdates.HourLocator(interval=1)
+        fmt = "%I:%M %p"
+    elif total_hours <= 24:                  # 12–24 hours   → 2-hour ticks
+        locator = mdates.HourLocator(interval=2)
+        fmt = "%I:%M %p"
+    elif total_days <= 3:                    # 1–3 days      → 6-hour ticks
+        locator = mdates.HourLocator(interval=6)
+        fmt = "%m/%d %I:%M %p"
+    elif total_days <= 7:                    # 3–7 days      → 1-day ticks
+        locator = mdates.DayLocator(interval=1)
+        fmt = "%m/%d"
+    elif total_days <= 28:                   # 1–4 weeks     → 2-day ticks
+        locator = mdates.DayLocator(interval=2)
+        fmt = "%m/%d"
+    elif total_days <= 90:                   # 1–3 months    → 1-week ticks
+        locator = mdates.WeekdayLocator(interval=1)
+        fmt = "%m/%d"
+    elif total_days <= 365:                  # 3–12 months   → 1-month ticks
+        locator = mdates.MonthLocator(interval=1)
+        fmt = "%Y-%m"
+    else:                                    # >1 year       → quarterly ticks
+        locator = mdates.MonthLocator(interval=3)
+        fmt = "%Y"
+
+    return locator, mdates.DateFormatter(fmt)

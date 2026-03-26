@@ -127,8 +127,8 @@ def generate_candlestick_chart(
         closes:  Closing prices.
         symbol:  Ticker symbol shown in the chart title.
         theme:   Optional style overrides. Supports all keys from generate_line_chart, plus:
-                    - "candle_up"   (str) : Bullish candle color. Default: "#26a69a" (teal-green).
-                    - "candle_down" (str) : Bearish candle color. Default: "#ef5350" (red).
+                    - "candle_up"   (str) : Bullish candle color. Default: "#109246" (green).
+                    - "candle_down" (str) : Bearish candle color. Default: "#ec413e" (red).
                     - "wick"        (str) : Wick color. Default: matches body color.
     """
     validate_ohlc(dates, opens, highs, lows, closes)
