@@ -11,23 +11,12 @@ THEMES = [NVIDIA_THEME, AMD_THEME, META_THEME, X_THEME]
 
 START_PRICE = 76.12 # start price for dummy prices
 PRICE_DEVIATION = 2.5 # how far a new price may deviate from the last price
-NUMBER_OF_POINTS = 60 # number of price points (corresponds with date/time points)
+NUMBER_OF_POINTS = 24 # number of price points (corresponds with date/time points)
 
 WICK_EXTENSION = 1.5 # max extra range beyond open/close for high/low wicks
 
-def test_chart_generation(advanced):
+def test_chart_generation(advanced, dates):
     print("Starting local test of Stock Analyzer...")
-
-    # 1. Simulate Data: Generate dummy stock data
-    # This mimics the JSON arguments Gemini would pass to the tool
-    base_date = datetime.now()
-    dates = [(base_date - timedelta(weeks=i)).isoformat() for i in range(52)] # 1-YEAR weekly trend
-    # dates = [(base_date - timedelta(days=i)).isoformat() for i in range(30)] # 1-MONTH daily trend
-    # dates = [(base_date - timedelta(days=i)).isoformat() for i in range(14)] # 2-WEEK daily trend
-    # dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(72)] #  3-DAY hourly trend
-    # dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(24)] # 1-DAY hourly trend
-    # dates = [(base_date - timedelta(minutes=i)).isoformat() for i in range(60)] # 1-HOUR minutely trend
-    dates.reverse() # Sort chronologically
 
     # create a random walk for price
     prices = [START_PRICE] # start price
@@ -56,18 +45,8 @@ def test_chart_generation(advanced):
     except Exception as e:
         print(f"Error during generation: {e}")
 
-def test_candlestick_generation():
+def test_candlestick_generation(dates):
     print("Starting local test of Candlestick Chart...")
- 
-    # 1. Simulate Data: Generate dummy OHLC stock data
-    base_date = datetime.now()
-    # dates = [(base_date - timedelta(weeks=i)).isoformat() for i in range(52)] # 1-YEAR weekly trend
-    # dates = [(base_date - timedelta(days=i)).isoformat() for i in range(30)] # 1-MONTH daily trend
-    # dates = [(base_date - timedelta(days=i)).isoformat() for i in range(14)] # 2-WEEK daily trend
-    # dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(72)] #  3-DAY hourly trend
-    # dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(24)] # 1-DAY hourly trend
-    dates = [(base_date - timedelta(minutes=i)).isoformat() for i in range(60)] # 1-HOUR minutely trend
-    dates.reverse() # Sort chronologically
  
     # Generate OHLC data via a random walk.
     # Each candle's open is the previous candle's close, keeping the series continuous.
@@ -125,12 +104,22 @@ def test_candlestick_generation():
  
  
 if __name__ == "__main__":
+    # Simulate Data: Generate dummy stock data
+    base_date = datetime.now()
+    # dates = [(base_date - timedelta(weeks=i)).isoformat() for i in range(52)] # 1-YEAR weekly trend
+    # dates = [(base_date - timedelta(days=i)).isoformat() for i in range(30)] # 1-MONTH daily trend
+    # dates = [(base_date - timedelta(days=i)).isoformat() for i in range(14)] # 2-WEEK daily trend
+    # dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(72)] #  3-DAY hourly trend
+    dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(24)] # 1-DAY hourly trend
+    # dates = [(base_date - timedelta(minutes=i)).isoformat() for i in range(60)] # 1-HOUR minutely trend
+    dates.reverse() # Sort chronologically
+
     chart_generator = int(input("Please select which chart you want to test:" \
                             "\n\t(1) basic line chart\n\t(2) advanced line chart\n\t(3) candlestick chart\n> "))
     match chart_generator:
         case 1:
-            test_chart_generation(advanced=False)
+            test_chart_generation(False, dates)
         case 2:
-            test_chart_generation(advanced=True)
+            test_chart_generation(True, dates)
         case 3:
-            test_candlestick_generation()
+            test_candlestick_generation(dates)

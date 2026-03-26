@@ -59,7 +59,7 @@ META_THEME = {
     "line_width": 2.2,
     "marker": "o",                       # circles – friendly and approachable
     "marker_size": 6,
-    "text": "#1C1E21",                    # dark grey for readability on white
+    "text": "#292B2E",                    # dark grey for readability on white
     "title_font": "Helvetica Neue",       # clean sans-serif
     "label_font": "Helvetica",
     # Background: clean white with faint blue gradient
@@ -75,7 +75,7 @@ META_THEME = {
     # Annotation: subtle blue box
     "annotation_background": "#E7F0FF",
     "annotation_edge": "#1877F2",
-    "annotation_text": "#1C1E21",
+    "annotation_text": "#292B2E",
     "annotation_font": "Helvetica",
     "arrowprops": dict(arrowstyle="->", color="#1877F2", lw=1),
 }
