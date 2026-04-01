@@ -1,8 +1,10 @@
 """MCP server for financial research using Perplexity API."""
 
 import json
-import sys
+import logging
 import asyncio
+
+logger = logging.getLogger(__name__)
 
 from mcp.server.fastmcp import FastMCP
 
@@ -53,8 +55,7 @@ async def research_stock(ticker: str) -> str:
         )
         return result
     except Exception as e:
-        sys.stderr.write(f"API Error: {e}\n")
-        sys.stderr.flush()
+        logger.error(f"API Error: {e}")
         return json.dumps({"error": str(e)})
 
 
@@ -89,8 +90,7 @@ async def research_topic(query: str) -> str:
         )
         return result
     except Exception as e:
-        sys.stderr.write(f"API Error: {e}\n")
-        sys.stderr.flush()
+        logger.error(f"API Error: {e}")
         return json.dumps({"error": str(e)})
 
 
@@ -124,8 +124,7 @@ async def research_news(ticker: str) -> str:
         )
         return result
     except Exception as e:
-        sys.stderr.write(f"API Error: {e}\n")
-        sys.stderr.flush()
+        logger.error(f"API Error: {e}")
         return json.dumps({"error": str(e)})
 
 

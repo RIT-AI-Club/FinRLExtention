@@ -5,7 +5,6 @@ This module provides an MCP (Model Context Protocol) client that uses
 Google's Gemini API as the underlying LLM for processing requests and
 handling tool calls.
 """
-
 import asyncio
 import json
 import logging
@@ -465,7 +464,7 @@ async def main():
 
     try:
         print("Available tools:", list(client.tools.keys()))
-        
+
         response = await client.process_message("Hello! What tools do you have available? Do not call any tools")
         print("Response:", response)
         while (inp:=input(">> ")) != "bye":

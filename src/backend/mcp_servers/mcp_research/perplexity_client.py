@@ -1,10 +1,12 @@
 """Perplexity API client using OpenAI-compatible interface."""
 
-import sys
+import logging
 
 from openai import AsyncOpenAI
 
 from config import PERPLEXITY_API_KEY
+
+logger = logging.getLogger(__name__)
 
 
 def initialize_client() -> AsyncOpenAI:
@@ -40,8 +42,7 @@ async def research(
     Raises:
         Exception: If API call fails
     """
-    sys.stderr.write(f"Sending request to Perplexity ({model})...\n")
-    sys.stderr.flush()
+    logger.info(f"Sending request to Perplexity ({model})...")
 
     response = await client.chat.completions.create(
         model=model,
@@ -53,7 +54,6 @@ async def research(
         max_tokens=max_tokens,
     )
 
-    sys.stderr.write("Received response from Perplexity\n")
-    sys.stderr.flush()
+    logger.info("Received response from Perplexity")
 
     return response.choices[0].message.content
