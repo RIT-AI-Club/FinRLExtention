@@ -7,7 +7,7 @@ from google.genai import types
 from typing import Any, Optional, List
 import json
 
-from .config import config
+from config import config
 
 # Get a logger
 logger = logging.getLogger(__name__)
