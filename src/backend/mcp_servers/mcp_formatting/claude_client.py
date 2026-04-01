@@ -67,9 +67,9 @@ def _build_user_prompt_parts(
             ])
 
     parts.append({"type": "text", "text": (
-        "Generate a complete HTML document with embedded CSS for a multi-page A4 PDF financial report using the data and image assets I provide above.\n"
-        "Use only the provided data and preserve all values exactly as given (no rounding, no estimating, no invented content). Use all provided chart/image assets as real <img> elements with the exact src values I provide. Do not create placeholders.\n"
-        "Do not use JavaScript. Do not use inline styles. Put all CSS in a single <style> block in the <head>. Return only the final HTML document.\n"
+        "Generate a complete HTML document with embedded CSS for a multi-page A4 PDF financial report using the data and image assets I provide above.\n\
+        Use only the provided data and preserve all values exactly as given (no rounding, no estimating, no invented content). Use all provided chart/image assets as real <img> elements with the exact src values I provide. Do not create placeholders.\n\
+        Do not use JavaScript. Do not use inline styles. Put all CSS in a single <style> block in the <head>. Return only the final HTML document.\n"
     )})
 
     if color_scheme:
@@ -124,10 +124,7 @@ async def generate_html(
             max_tokens=max_output_tokens if max_output_tokens is not None else claudeConfig.max_output_tokens,
             system=system_prompt
         ) as stream:
-            response = ""
-            async for message in stream:
-                if message.text:
-                    response += message.text
+            response = await stream.get_final_text()
         logger.info("Received response from Claude.")
     except Exception as e:
         logger.error(f"Claude API call failed: {e}", exc_info=True)
