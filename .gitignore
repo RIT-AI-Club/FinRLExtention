@@ -1,10 +1,21 @@
+# Ignore all VSCode configuration files
+vscode/*
+
+# Allow specific configuration files if needed
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Ignore workspace files
+!*.code-workspace
+
+# Ignore built Visual Studio Code extensions
+*.vsix
+
 config/api_key.yml
 config.yml
-
-# Ignore practice file
-
-practice_claude_server.py
-test.py
 
 # Ignore pycache files
 pycache/__pycache__/
@@ -14,11 +25,4 @@ pycache/__pycache__/
 venv/
 env/
 .virtualenv/
-
-# Ignore IDE specific files
-.vscode/
-
-# Ignore test output files
-*.html
-*.pdf
 
