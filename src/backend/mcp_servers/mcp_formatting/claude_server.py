@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 mcp = FastMCP("formatting")
 
 @mcp.tool()
-async def format_report(text_blocks: List[str], images: Optional[List[Tuple[str, str]]], color_scheme: Optional[str] = None) -> str:
+async def format_report(text_blocks: List[str], images: Optional[List[Tuple[str, str]]], color_scheme: Optional[str] = None, model: Optional[str] = None) -> str:
     """
     Formats text and images into a professional HTML report using an AI model.
     
@@ -73,15 +73,28 @@ async def format_report(text_blocks: List[str], images: Optional[List[Tuple[str,
         logger.error(f"Error loading reference images: {e}", exc_info=True)
         reference_images = []
 
+
     try:
-        # Generate HTML content using the Gemini client
-        report = await generate_html(
-            client=client, 
-            user_data=user_data, 
-            system_prompt=REPORT_PROMPT,
-            color_scheme=color_scheme
-        )
-        
+        # Generate HTML content using the Claude client
+        if model:
+            logger.info(f"Model override specified: {model}")
+            # Generate the report using the specified model, if provided
+            report = await generate_html(
+                client=client, 
+                model=model,
+                user_data=user_data, 
+                system_prompt=REPORT_PROMPT,
+                color_scheme=color_scheme
+            )
+        else:
+            # Generate the report using the default model from config
+            report = await generate_html(
+                client=client, 
+                user_data=user_data, 
+                system_prompt=REPORT_PROMPT,
+                color_scheme=color_scheme
+            )
+            
         # Save the latest report for debugging/review purposes
         with open("latest_report.html", "w", encoding="utf-8") as file:
             file.write(report)
