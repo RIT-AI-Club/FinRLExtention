@@ -16,6 +16,7 @@ import './App.css';
 
 function Frontend() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    // const [isDataLoading, setIsDataLoading] = useState(false);
   
     // NEW: A list of past reports
     const [pastReports, setPastReports] = useState([
