@@ -8,7 +8,7 @@ import matplotlib
 matplotlib.use("Agg")
 from fastmcp import FastMCP
 from fastmcp.utilities.types import Image
-from chart_helper_functions import *
+from chart_builder_functions import *
 
 # Default theme for graph
 DEFAULT_THEME = {
@@ -72,7 +72,7 @@ def generate_line_chart(
     if advanced:
         # Calculate and plot SMA 
         period = get_sma_period(dt_dates)
-        sma = calculate_sma(dt_dates, period)
+        sma = calculate_sma(prices, period)
 
         ax.plot(
             dt_dates, sma,

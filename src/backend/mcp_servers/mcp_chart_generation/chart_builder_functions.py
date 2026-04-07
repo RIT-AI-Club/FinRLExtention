@@ -139,103 +139,6 @@ def build_base_chart(
 
     return fig, ax
     
-def render_chart_to_image(fig: plt.Figure) -> Image:
-    """Saves a Matplotlib figure to a PNG Image object and cleans up."""
-    buffer = io.BytesIO()
-    fig.savefig(buffer, format="png", dpi=120)  # explicitly save figure
-    buffer.seek(0)
-    image_bytes = buffer.getvalue()
-    plt.close(fig)
-    return Image(data=image_bytes, format="png")
-
-def parse_dates(dates: list[str]) -> list[datetime]:
-    """
-    Convert a list of date/time strings to datetime objects.
-
-    Supports:
-      - ISO format (via fromisoformat)
-      - Common datetime formats listed in DATETIME_FORMATS
-      - Time‑only formats (combined with DUMMY_DATE)
-
-    Raises ValueError if a string cannot be parsed.
-    """
-    parsed = []
-    for d in dates:
-        dt = None
-
-        # 1. Try Python's built‑in ISO parser (handles both 'T' and space)
-        try:
-            dt = datetime.fromisoformat(d)
-            parsed.append(dt)
-            continue
-        except ValueError:
-            pass
-
-        # 2. Try each full datetime format
-        for fmt in DATETIME_FORMATS:
-            try:
-                dt = datetime.strptime(d, fmt)
-                parsed.append(dt)
-                break
-            except ValueError:
-                continue
-        if dt is not None:
-            continue
-
-        # 3. Try each time‑only format (combine with dummy date)
-        for fmt in TIME_FORMATS:
-            try:
-                time_part = datetime.strptime(d, fmt).time()
-                dt = datetime.combine(DUMMY_DATE, time_part)
-                parsed.append(dt)
-                break
-            except ValueError:
-                continue
-        if dt is not None:
-            continue
-
-        # 4. No format matched
-        raise ValueError(f"Unrecognized date/time format: {d}")
-
-    return parsed
-
-def validate_inputs(dates: list, prices: list[float]) -> None:
-    """Raises ValueError for mismatched or empty inputs."""
-    if not dates:
-        raise ValueError("Data empty: No dates or prices provided.")
-    if len(dates) != len(prices):
-        raise ValueError(f"Data mismatch: Received {len(dates)} dates and {len(prices)} prices.")
-
-def validate_ohlc(
-    dates: list,
-    opens: list[float],
-    highs: list[float],
-    lows: list[float],
-    closes: list[float],
-) -> None:
-    """Raises ValueError for invalid or mismatched OHLC inputs.
-
-    Checks that:
-    - No list is empty.
-    - All five lists share the same length.
-    - For every candle, high >= low.
-    """
-    if not dates:
-        raise ValueError("Data empty: No dates or prices provided.")
-
-    lengths = {"opens": len(opens), "highs": len(highs), "lows": len(lows), "closes": len(closes)}
-    for name, length in lengths.items():
-        if length != len(dates):
-            raise ValueError(
-                f"Data mismatch: Received {len(dates)} dates but {length} {name}."
-            )
-
-    for i, (h, l) in enumerate(zip(highs, lows)):
-        if h < l:
-            raise ValueError(
-                f"Invalid OHLC data at index {i}: high ({h}) is less than low ({l})."
-            )
-        
 def build_candlestick_chart(
     dt_dates: list,
     opens: list[float],
@@ -362,6 +265,94 @@ def build_candlestick_chart(
 
     return fig, ax
 
+def validate_inputs(dates: list, prices: list[float]) -> None:
+    """Raises ValueError for mismatched or empty inputs."""
+    if not dates:
+        raise ValueError("Data empty: No dates or prices provided.")
+    if len(dates) != len(prices):
+        raise ValueError(f"Data mismatch: Received {len(dates)} dates and {len(prices)} prices.")
+
+def validate_ohlc(
+    dates: list,
+    opens: list[float],
+    highs: list[float],
+    lows: list[float],
+    closes: list[float],
+) -> None:
+    """Raises ValueError for invalid or mismatched OHLC inputs.
+
+    Checks that:
+    - No list is empty.
+    - All five lists share the same length.
+    - For every candle, high >= low.
+    """
+    if not dates:
+        raise ValueError("Data empty: No dates or prices provided.")
+
+    lengths = {"opens": len(opens), "highs": len(highs), "lows": len(lows), "closes": len(closes)}
+    for name, length in lengths.items():
+        if length != len(dates):
+            raise ValueError(
+                f"Data mismatch: Received {len(dates)} dates but {length} {name}."
+            )
+
+    for i, (h, l) in enumerate(zip(highs, lows)):
+        if h < l:
+            raise ValueError(
+                f"Invalid OHLC data at index {i}: high ({h}) is less than low ({l})."
+            )
+
+def parse_dates(dates: list[str]) -> list[datetime]:
+    """
+    Convert a list of date/time strings to datetime objects.
+
+    Supports:
+      - ISO format (via fromisoformat)
+      - Common datetime formats listed in DATETIME_FORMATS
+      - Time‑only formats (combined with DUMMY_DATE)
+
+    Raises ValueError if a string cannot be parsed.
+    """
+    parsed = []
+    for d in dates:
+        dt = None
+
+        # 1. Try Python's built‑in ISO parser (handles both 'T' and space)
+        try:
+            dt = datetime.fromisoformat(d)
+            parsed.append(dt)
+            continue
+        except ValueError:
+            pass
+
+        # 2. Try each full datetime format
+        for fmt in DATETIME_FORMATS:
+            try:
+                dt = datetime.strptime(d, fmt)
+                parsed.append(dt)
+                break
+            except ValueError:
+                continue
+        if dt is not None:
+            continue
+
+        # 3. Try each time‑only format (combine with dummy date)
+        for fmt in TIME_FORMATS:
+            try:
+                time_part = datetime.strptime(d, fmt).time()
+                dt = datetime.combine(DUMMY_DATE, time_part)
+                parsed.append(dt)
+                break
+            except ValueError:
+                continue
+        if dt is not None:
+            continue
+
+        # 4. No format matched
+        raise ValueError(f"Unrecognized date/time format: {d}")
+
+    return parsed
+
 def get_date_locator_and_formatter(dt_dates: list) -> tuple[mdates.DateLocator, mdates.DateFormatter]:
     """
     Selects an appropriate x-axis tick locator and date formatter based on
@@ -411,7 +402,7 @@ def get_date_locator_and_formatter(dt_dates: list) -> tuple[mdates.DateLocator, 
         fmt = "%m/%d"
     elif total_days <= 365:                  # 3–12 months   → 1-month ticks
         locator = mdates.MonthLocator(interval=1)
-        fmt = "%Y-%m"
+        fmt = "%b %Y"
     else:                                    # >1 year       → quarterly ticks
         locator = mdates.MonthLocator(interval=3)
         fmt = "%Y"
@@ -433,11 +424,20 @@ def get_sma_period(dt_dates):
     span = dt_dates[-1] - dt_dates[0]
     total_days = span.total_seconds() / 86400
 
-    if total_days <= 1:    # intraday
+    if total_days > 0 and total_days <= 2: # day trading
         return 9
-    elif total_days <= 30: # days/weeks
-        return 10
-    elif total_days <= 365: # months
+    elif total_days <= 30: # short-term
         return 20
-    else:                  # years
+    elif total_days <= 300: # medium-term
         return 50
+    else:                  # long-term
+        return 200
+    
+def render_chart_to_image(fig: plt.Figure) -> Image:
+    """Saves a Matplotlib figure to a PNG Image object and cleans up."""
+    buffer = io.BytesIO()
+    fig.savefig(buffer, format="png", dpi=120)  # explicitly save figure
+    buffer.seek(0)
+    image_bytes = buffer.getvalue()
+    plt.close(fig)
+    return Image(data=image_bytes, format="png")

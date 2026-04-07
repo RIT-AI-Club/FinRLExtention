@@ -9,9 +9,9 @@ from example_themes import *
 
 THEMES = [NVIDIA_THEME, AMD_THEME, META_THEME, X_THEME]
 
-START_PRICE = 1011 # start price for dummy prices
-PRICE_DEVIATION = 30 # how far a new price may deviate from the last price
-NUMBER_OF_POINTS = 52 # number of price points (corresponds with date/time points)
+START_PRICE = 150 # start price for dummy prices
+PRICE_DEVIATION = 5 # how far a new price may deviate from the last price
+NUMBER_OF_POINTS = 72 # number of price points (corresponds with date/time points)
 
 WICK_EXTENSION = 1.5 # max extra range beyond open/close for high/low wicks
 
@@ -106,10 +106,10 @@ def test_candlestick_generation(dates):
 if __name__ == "__main__":
     # Simulate Data: Generate dummy stock data
     base_date = datetime.now()
-    dates = [(base_date - timedelta(weeks=i)).isoformat() for i in range(52)] # 1-YEAR weekly trend
+    # dates = [(base_date - timedelta(weeks=i)).isoformat() for i in range(52)] # 1-YEAR weekly trend
     # dates = [(base_date - timedelta(days=i)).isoformat() for i in range(30)] # 1-MONTH daily trend
     # dates = [(base_date - timedelta(days=i)).isoformat() for i in range(14)] # 2-WEEK daily trend
-    # dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(72)] #  3-DAY hourly trend
+    dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(72)] #  3-DAY hourly trend
     # dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(24)] # 1-DAY hourly trend
     # dates = [(base_date - timedelta(minutes=i)).isoformat() for i in range(60)] # 1-HOUR minutely trend
     dates.reverse() # Sort chronologically
