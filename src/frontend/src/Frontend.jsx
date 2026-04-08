@@ -15,15 +15,21 @@ import React, { useState } from 'react';
 import './App.css';
 
 function Frontend() {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    // const [isDataLoading, setIsDataLoading] = useState(false);
-  
-    // NEW: A list of past reports
-    const [pastReports, setPastReports] = useState([
-      { id: 1, ticker: 'AAPL', date: 'March 15', status: 'Completed' },
-      { id: 2, ticker: 'TSLA', date: 'March 18', status: 'Completed' },
-      { id: 3, ticker: 'NVDA', date: 'March 20', status: 'Failed' }
-    ]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [pastReports, setPastReports] = useState([
+    {id: 1, ticker: 'APPL', date: 'April 3', status: 'Pending'}
+  ]);
+  const [isDataLoading, setIsDataLoading] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [newChat, setNewChat] = [{}];
+
+  const handleSend = () => {
+    if (inputValue.trim() !== '') {
+      setMessages((prevMessages) => [...prevMessages, { id: Date.now(), text: inputValue, sender: 'user' }]);
+      setInputValue('');
+    }
+  }
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -35,7 +41,7 @@ function Frontend() {
       {/* 1. The Sidebar */}
       <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
         <div className="sidebar-header">
-          <h2>Past Reports</h2>
+          <h2>History</h2>
           <button onClick={toggleSidebar}>✕</button>
         </div>
         <div className="sidebar-content">
@@ -62,20 +68,29 @@ function Frontend() {
         </div>
         
         {/* The Big Chat Window */}
-        <div className="chat-window">
-          {/* Chat messages will appear here later */}
+        <div className="chat-window" style={{overflowY: 'auto'}}>
+          {messages.map((message) => (
+            <div key={message.id} className={'chat-message ${message.sender}'}>
+              <p>{message.text}</p>
+            </div>
+          ))}
         </div>
 
         {/* The Input Field and Button */}
         <div className="input-container">
           <input 
             type="text" 
-            placeholder="Ask about your FinRL model..." 
+            placeholder="Type Your Message Here..." 
             className="chat-input"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                handleSend();
+              }}}
           />
-          <button className="send-btn">Send</button>
+          <button className="send-btn" onClick={handleSend}>Send</button>
         </div>
-
       </div>
 
     </div>

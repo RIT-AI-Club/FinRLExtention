@@ -112,3 +112,34 @@
   cursor: pointer;
   font-size: 16px;
 }
+
+/* Add to App.css */
+
+.chat-message {
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  max-width: 70%;
+}
+
+.chat-message.user {
+  background-color: #007bff; /* Example color for user messages */
+  color: white;
+  align-self: flex-end; /* Align to the right */
+  margin-left: auto; /* Push to the right */
+}
+
+.chat-message.bot {
+  background-color: #333; /* Example color for bot messages */
+  color: white;
+  align-self: flex-start; /* Align to the left */
+  margin-right: auto; /* Push to the left */
+}
+
+/* Ensure the chat window content stacks properly */
+.chat-window {
+  display: flex;
+  flex-direction: column;
+  /* Other styles like height, border, background-color, etc. are already there */
+}
+
