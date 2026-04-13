@@ -37,7 +37,8 @@ def get_claude_client() -> AsyncAnthropic:
 def _build_user_prompt_parts(
     user_data: Dict[str, Any],
     reference_image_paths: Optional[List[str]] = None,
-    color_scheme: str = None,
+    prompt: Optional[str] = None,
+    color_scheme: str = None
 ) -> List[Dict[str, Any]]:
     """
     Constructs the list of content blocks for the Claude API request payload.
@@ -45,8 +46,9 @@ def _build_user_prompt_parts(
     Args:
         user_data: Dictionary containing text_blocks and images.
         reference_image_paths: Optional list of file paths to styling reference images.
-        color_scheme: Optional color string to base the report theme on.
-
+        prompt: Optional custom prompt string to guide the AI's response.
+        color_scheme: A string containing the main color scheme for the report.
+        
     Returns:
         List[Dict[str, Any]]: A list of content blocks to send to the Claude model.
     """
@@ -86,13 +88,16 @@ def _build_user_prompt_parts(
             f"Before finishing, count your <img> tags — there must be exactly {len(images)}.\n\n"
             f"Required images (copy src values exactly):\n{required_imgs}"
         )})
-
-    parts.append({"type": "text", "text": (
-        "Generate a complete HTML document with embedded CSS for a multi-page A4 PDF financial report using the data and image assets I provide above.\n"
-        "Use only the provided data and preserve all values exactly as given (no rounding, no estimating, no invented content).\n"
-        f"CRITICAL: The final HTML must contain exactly {len(images)} <img> tags — one for each image in the mandatory checklist above. Missing even one is a failure.\n"
-        "Do not use JavaScript. Put all CSS in a single <style> block in the <head>. Return only the final HTML document.\n"
-    )})
+    
+    if prompt:
+        parts.append({"type": "text", "text": prompt})
+    else:
+        parts.append({"type": "text", "text": (
+            "Generate a complete HTML document with embedded CSS for a multi-page A4 PDF financial report using the data and image assets I provide above.\n"
+            "Use only the provided data and preserve all values exactly as given (no rounding, no estimating, no invented content).\n"
+            f"CRITICAL: The final HTML must contain exactly {len(images)} <img> tags — one for each image in the mandatory checklist above. Missing even one is a failure.\n"
+            "Do not use JavaScript. Put all CSS in a single <style> block in the <head>. Return only the final HTML document.\n"
+        )})
 
     if color_scheme:
         parts.append({"type": "text", "text": color_scheme})
@@ -106,6 +111,7 @@ async def generate_html(
     client: AsyncAnthropic,
     user_data: List[Dict[str, Any]],
     system_prompt: str,
+    prompt: Optional[str] = None,
     reference_image_paths: Optional[List[str]] = None,
     model: Optional[str] = None,
     temperature: Optional[float] = None,
@@ -123,7 +129,8 @@ async def generate_html(
         model: Claude model to use (overrides config if provided).
         temperature: Generation temperature (overrides config if provided).
         max_output_tokens: Max output tokens (overrides config if provided).
-    
+        color_scheme: A string containing the main color scheme for the report.
+        prompt: A string containing a custom prompt for the AI model.
     Returns:
         str: Generated HTML document string.
     
@@ -132,7 +139,7 @@ async def generate_html(
         Exception: For other API call failures.
     """
     logger.info("Building request for Claude API.")
-    user_parts = _build_user_prompt_parts(user_data, reference_image_paths, color_scheme)
+    user_parts = _build_user_prompt_parts(user_data, reference_image_paths, color_scheme, prompt)
 
     # Use parameters if provided, otherwise fall back to config values
     final_model = model or claudeConfig.default_model
