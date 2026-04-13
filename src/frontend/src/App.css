@@ -76,7 +76,7 @@
   width: 100%;
   max-width: 800px;
   height: 50vh; /* Takes up 50% of the screen height */
-  border: 1px solid #ffffff; /* White border from your screenshot */
+  border: 1px solid #16161a; /* White border from your screenshot */
   background-color: transparent;
   margin-bottom: 20px;
 }
