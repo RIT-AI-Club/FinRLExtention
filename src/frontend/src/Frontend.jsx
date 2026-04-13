@@ -12,7 +12,7 @@ This is the main file for the User interface
  */
 
 // FIX: Removed unused `act` import from your HEAD version; kept collaborator's useEffect + useRef
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './App.css';
 
 // ── constants ────────────────────────────────────────────────────────────────
@@ -59,18 +59,38 @@ function Frontend() {
   // FIX: was misspelled as `activeMesssages` (triple-s) in HEAD version
   const activeMessages = conversations.find(c => c.id === activeConvoID)?.messages || [];
 
-  // Start a new conversation
-  const handleNewChat = () => {
+  // Start a new conversation and switch to it immediately
+  const handleNewChat = useCallback(() => {
     const newConvo = { id: Date.now(), messages: [] };
     // FIX: was `pre => [...prev, newConvo]` — `pre` typo caused a ReferenceError
     setConversations(prev => [...prev, newConvo]);
     setActiveConvoID(newConvo.id);
-  };
+    // Clear the input so the new chat starts fresh
+    setInputValue('');
+  }, []);
 
   // Switch to an existing conversation
   const handleSelectConvo = (id) => {
     setActiveConvoID(id);
   };
+
+  // Delete a conversation; if it was active, fall back to the most recent remaining one
+  const handleDeleteConvo = useCallback((e, id) => {
+    // Stop the click from also triggering handleSelectConvo on the parent div
+    e.stopPropagation();
+    setConversations(prev => {
+      const remaining = prev.filter(c => c.id !== id);
+      // Always keep at least one conversation so the UI is never empty
+      if (remaining.length === 0) {
+        const fresh = { id: Date.now(), messages: [] };
+        setActiveConvoID(fresh.id);
+        return [fresh];
+      }
+      // If the deleted convo was active, activate the first remaining one
+      setActiveConvoID(cur => cur === id ? remaining[0].id : cur);
+      return remaining;
+    });
+  }, []);
 
   // ── Collaborator additions ────────────────────────────────────────────────
   const [suggestedStocks, setSuggestedStocks] = useState(DEFAULT_SUGGESTIONS);
@@ -200,6 +220,15 @@ function Frontend() {
           0%, 100% { opacity: 0.25; transform: scale(0.8); }
           50%       { opacity: 1;    transform: scale(1);   }
         }
+
+        /* Show the delete button only when hovering the conversation row */
+        .convo-item .convo-delete-btn {
+          opacity: 0;
+          transition: opacity 0.15s ease;
+        }
+        .convo-item:hover .convo-delete-btn {
+          opacity: 1;
+        }
       `}</style>
 
       {/* 1. The Sidebar */}
@@ -240,9 +269,30 @@ function Frontend() {
                   key={convo.id}
                   className={`convo-item ${convo.id === activeConvoID ? 'active-convo' : ''}`}
                   onClick={() => handleSelectConvo(convo.id)}
+                  // Position relative so the delete button can sit flush to the right
+                  style={{ position: 'relative', display: 'flex', alignItems: 'center' }}
                 >
                   <span className="convo-icon">💬</span>
-                  <span className="convo-title">{getConvoTitle(convo)}</span>
+                  <span className="convo-title" style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {getConvoTitle(convo)}
+                  </span>
+                  {/* Delete button — only appears on hover via the CSS rule above */}
+                  <button
+                    className="convo-delete-btn"
+                    onClick={(e) => handleDeleteConvo(e, convo.id)}
+                    title="Delete conversation"
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '2px 4px',
+                      fontSize: '12px',
+                      color: 'var(--color-text-secondary)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    ✕
+                  </button>
                 </div>
               ))}
             </div>
