@@ -203,55 +203,74 @@ function Frontend() {
       `}</style>
 
       {/* 1. The Sidebar */}
-      <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
-        <div className="sidebar-header">
-          <h2>History</h2>
-          <div className="sidebar-header-actions">
-            <button className="new-chat-btn" onClick={handleNewChat} title="New Chat">
-              ✏️ New Chat
-            </button>
-            <button onClick={toggleSidebar}>✕</button>
-          </div>
+      <div className={`sidebar ${isSidebarOpen ? 'open' : 'collapsed'}`}>
+        
+        {/* Toggle Area - Always visible whether sidebar is open or closed */}
+        <div className="sidebar-toggle-area" style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '16px' }}>
+          <button className="hamburger-btn" onClick={toggleSidebar} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', textAlign: 'left', color: 'var(--color-text-primary)' }}>
+            ☰
+          </button>
+          
+          {/* Show a simple "New Chat" icon when closed, like Gemini */}
+          {!isSidebarOpen && (
+             <button onClick={handleNewChat} title="New Chat" style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', textAlign: 'left' }}>
+               ✏️
+             </button>
+          )}
         </div>
 
-        {/* Conversation list */}
-        <div className="sidebar-section-label">Chats</div>
-        <div className="sidebar-content">
-          {conversations.map((convo) => (
-            <div
-              key={convo.id}
-              // FIX: was `'active convo'` (space instead of hyphen) — broke CSS class lookup
-              className={`convo-item ${convo.id === activeConvoID ? 'active-convo' : ''}`}
-              onClick={() => handleSelectConvo(convo.id)}
-            >
-              <span className="convo-icon">💬</span>
-              <span className="convo-title">{getConvoTitle(convo)}</span>
+        {/* Sidebar Content - Only visible when expanded */}
+        {isSidebarOpen && (
+          <div className="sidebar-inner-content">
+            <div className="sidebar-header">
+              <h2>History</h2>
+              <div className="sidebar-header-actions">
+                <button className="new-chat-btn" onClick={handleNewChat} title="New Chat">
+                  ✏️ New Chat
+                </button>
+                {/* Note: The '✕' close button was removed because the hamburger button handles toggling now */}
+              </div>
             </div>
-          ))}
-        </div>
 
-        {/* Past Reports */}
-        <div className="sidebar-section-label">Past Reports</div>
-        <div className="sidebar-content">
-          {pastReports.map((report) => (
-            <div key={report.id} className="report-item">
-              <p><strong>{report.ticker}</strong>{report.date ? ` - ${report.date}` : ''}</p>
-              <small>{report.status}</small>
-              {report.filename && (
-                <div>
-                  <a
-                    href={`${API_BASE}/api/report/download/${encodeURIComponent(report.filename)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ fontSize: 12, color: '#185FA5' }}
-                  >
-                    ↓ Download PDF
-                  </a>
+            {/* Conversation list */}
+            <div className="sidebar-section-label">Chats</div>
+            <div className="sidebar-content">
+              {conversations.map((convo) => (
+                <div
+                  key={convo.id}
+                  className={`convo-item ${convo.id === activeConvoID ? 'active-convo' : ''}`}
+                  onClick={() => handleSelectConvo(convo.id)}
+                >
+                  <span className="convo-icon">💬</span>
+                  <span className="convo-title">{getConvoTitle(convo)}</span>
                 </div>
-              )}
+              ))}
             </div>
-          ))}
-        </div>
+
+            {/* Past Reports */}
+            <div className="sidebar-section-label">Past Reports</div>
+            <div className="sidebar-content">
+              {pastReports.map((report) => (
+                <div key={report.id} className="report-item">
+                  <p><strong>{report.ticker}</strong>{report.date ? ` - ${report.date}` : ''}</p>
+                  <small>{report.status}</small>
+                  {report.filename && (
+                    <div>
+                      <a
+                        href={`${API_BASE}/api/report/download/${encodeURIComponent(report.filename)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ fontSize: 12, color: '#185FA5' }}
+                      >
+                        ↓ Download PDF
+                      </a>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 2. The Main Chat Area */}
@@ -259,11 +278,11 @@ function Frontend() {
 
         {/* Header */}
         <div className="chat-header">
-          <button className="hamburger-btn" onClick={toggleSidebar}>☰</button>
+          {/*<button className="hamburger-btn" onClick={toggleSidebar}>☰</button>*/}
           <h1>FinRL Assistant</h1>
-          <button className="new-chat-header-btn" onClick={handleNewChat} title="New Chat">
+          {/*<button className="new-chat-header-btn" onClick={handleNewChat} title="New Chat">
             ✏️
-          </button>
+                  </button>*/}
         </div>
 
         {/* Chat Window */}
