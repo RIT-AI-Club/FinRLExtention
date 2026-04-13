@@ -90,8 +90,6 @@ async def generate_html(
     user_data: dict[str, Any],
     system_prompt: str,
     reference_image_paths: Optional[List[str]] = None,
-    model: Optional[str] = None,
-    temperature: Optional[float] = None,
     max_output_tokens: Optional[int] = None,
     color_scheme: str = None
 ) -> str:
