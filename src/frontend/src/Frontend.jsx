@@ -328,7 +328,7 @@ function Frontend() {
             className="chat-input"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={(e) => { if (e.key === 'Enter') handleSend(); }}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleSend(); }}
             disabled={isDataLoading}
           />
           <button
