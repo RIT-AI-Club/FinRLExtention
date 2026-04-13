@@ -37,7 +37,7 @@ class GeminiConfig:
     """Configuration for Gemini API."""
 
     api_key: str
-    model: str = "gemini-1.5-pro"
+    model: str = "gemini-2.5-flash"
     temperature: float = 0.7
     max_output_tokens: int = 8192
 
@@ -208,6 +208,23 @@ class MCPClient:
         logger.info(f"Discovered {len(self.tools)} tools from {len(self.sessions)} servers")
         return self.tools
 
+    # Fields supported by Gemini's Schema proto
+    _GEMINI_SCHEMA_FIELDS = {"type", "format", "description", "nullable", "enum", "items", "properties", "required"}
+
+    def _sanitize_schema(self, schema: dict[str, Any]) -> dict[str, Any]:
+        """Strip fields unsupported by Gemini and ensure arrays have an 'items' field."""
+        # Drop fields Gemini doesn't recognise (e.g. title, prefixItems, maxItems, minItems)
+        schema = {k: v for k, v in schema.items() if k in self._GEMINI_SCHEMA_FIELDS}
+        if schema.get("type") == "array" and "items" not in schema:
+            schema["items"] = {"type": "string"}
+        if "items" in schema:
+            schema["items"] = self._sanitize_schema(schema["items"])
+        if "properties" in schema:
+            schema["properties"] = {
+                k: self._sanitize_schema(v) for k, v in schema["properties"].items()
+            }
+        return schema
+
     def _convert_tools_to_gemini_format(self) -> list[dict[str, Any]]:
         """Convert MCP tools to Gemini function declarations format."""
         gemini_tools = []
@@ -215,7 +232,10 @@ class MCPClient:
         for tool_name, tool_info in self.tools.items():
             input_schema = tool_info.get("input_schema", {})
 
-            properties = input_schema.get("properties", {})
+            properties = {
+                k: self._sanitize_schema(v)
+                for k, v in input_schema.get("properties", {}).items()
+            }
             required = input_schema.get("required", [])
 
             parameters = {
@@ -286,17 +306,7 @@ class MCPClient:
                     genai.protos.FunctionDeclaration(
                         name=t["name"],
                         description=t["description"],
-                        parameters=genai.protos.Schema(
-                            type=genai.protos.Type.OBJECT,
-                            properties={
-                                k: genai.protos.Schema(
-                                    type=self._map_json_type_to_gemini(v.get("type", "string")),
-                                    description=v.get("description", ""),
-                                )
-                                for k, v in t["parameters"].get("properties", {}).items()
-                            },
-                            required=t["parameters"].get("required", []),
-                        ),
+                        parameters=self._dict_to_gemini_schema(t["parameters"]),
                     )
                     for t in gemini_tools
                 ]
@@ -363,6 +373,26 @@ class MCPClient:
                 response_text += part.text
 
         return response_text
+
+    def _dict_to_gemini_schema(self, schema: dict[str, Any]) -> "genai.protos.Schema":
+        """Recursively convert a sanitized schema dict to a genai.protos.Schema."""
+        kwargs: dict[str, Any] = {
+            "type": self._map_json_type_to_gemini(schema.get("type", "string")),
+        }
+        if "description" in schema:
+            kwargs["description"] = schema["description"]
+        if "items" in schema:
+            kwargs["items"] = self._dict_to_gemini_schema(schema["items"])
+        if "properties" in schema:
+            kwargs["properties"] = {
+                k: self._dict_to_gemini_schema(v)
+                for k, v in schema["properties"].items()
+            }
+        if "required" in schema:
+            kwargs["required"] = schema["required"]
+        if "enum" in schema:
+            kwargs["enum"] = schema["enum"]
+        return genai.protos.Schema(**kwargs)
 
     def _map_json_type_to_gemini(self, json_type: str) -> int:
         """Map JSON schema types to Gemini proto types."""
@@ -436,7 +466,7 @@ async def main():
     try:
         print("Available tools:", list(client.tools.keys()))
 
-        response = await client.process_message("Hello! What tools do you have available?")
+        response = await client.process_message("Hello! What tools do you have available? Do not call any tools")
         print("Response:", response)
 
     finally:
