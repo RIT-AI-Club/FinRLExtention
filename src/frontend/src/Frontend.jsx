@@ -165,11 +165,24 @@ function Frontend() {
 
         const data = await res.json();
 
-        // Add assistant reply to the active conversation
+        // Add assistant reply to the active conversation.
+        // If the backend generated a PDF, attach the filename to the message so the
+        // chat window can render a download button inline alongside the reply text.
         setConversations(prev =>
           prev.map(c =>
             c.id === activeConvoID
-              ? { ...c, messages: [...c.messages, { id: Date.now() + 1, text: data.reply, sender: 'assistant' }] }
+              ? {
+                  ...c,
+                  messages: [
+                    ...c.messages,
+                    {
+                      id: Date.now() + 1,
+                      text: data.reply,
+                      sender: 'assistant',
+                      pdf_filename: data.pdf_filename || null,  // ← attached here
+                    },
+                  ],
+                }
               : c
           )
         );
@@ -346,6 +359,29 @@ function Frontend() {
           {activeMessages.map((message) => (
             <div key={message.id} className={`chat-message ${message.sender}`}>
               <p>{message.text}</p>
+              {/* If the backend generated a PDF for this message, show an inline download button */}
+              {message.pdf_filename && (
+                <a
+                  href={`${API_BASE}/api/report/download/${encodeURIComponent(message.pdf_filename)}`}
+                  download={message.pdf_filename}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    marginTop: 8,
+                    padding: '6px 14px',
+                    borderRadius: 8,
+                    fontSize: 13,
+                    fontWeight: 500,
+                    color: '#185FA5',
+                    background: 'var(--color-background-secondary, #f0f4ff)',
+                    border: '0.5px solid var(--color-border-secondary)',
+                    textDecoration: 'none',
+                  }}
+                >
+                  ↓ Download Report PDF
+                </a>
+              )}
             </div>
           ))}
 

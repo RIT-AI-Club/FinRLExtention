@@ -84,7 +84,7 @@ Set width directly on the `<img>` tag. Let height scale naturally.
 
 ```html
 <!-- ✅ The only correct pattern -->
-<img src="http://localhost:8000/revenue_growth.png" style="width: 650px; height: auto; display: block;">
+<img src="http://localhost:8000/images/revenue_growth.png" style="width: 650px; height: auto; display: block;">
 ```
 
 **These three patterns are always wrong and must never appear:**
@@ -124,13 +124,13 @@ Chart images must NEVER be placed inside a grid column, flex child, or any conta
 ```html
 <!-- ✅ Correct — chart in its own full-width block, outside any grid -->
 <div style="width: 794px;">
-  <img src="http://localhost:8000/revenue_growth.png" style="width: 550px; height: auto; display: block;">
+  <img src="http://localhost:8000/images/revenue_growth.png" style="width: 550px; height: auto; display: block;">
 </div>
 
 <!-- ❌ WRONG — chart trapped inside a narrow grid column -->
 <div style="display: grid; grid-template-columns: 1fr 1fr;">
   <div>
-    <img src="http://localhost:8000/revenue_growth.png" style="width: 550px; height: auto;">
+    <img src="http://localhost:8000/images/revenue_growth.png" style="width: 550px; height: auto;">
   </div>
   <div>Some text...</div>
 </div>
@@ -192,7 +192,7 @@ Every chart image must be accompanied by a caption block placed directly beneath
 ```html
 <!-- ✅ Correct caption pattern -->
 <div style="width: 794px;">
-  <img src="http://localhost:8000/revenue_growth.png" style="width: 550px; height: auto; display: block;">
+  <img src="http://localhost:8000/images/revenue_growth.png" style="width: 550px; height: auto; display: block;">
   <p style="font-size: 11px; color: #888; margin-top: 6px;">
     Revenue Growth by Quarter · FY2023–FY2024 · Source: Company financials
   </p>
@@ -315,7 +315,7 @@ Set width directly on the `<img>` tag. Let height scale naturally.
 
 ```html
 <!-- ✅ The only correct pattern -->
-<img src="http://localhost:8000/revenue_growth.png" style="width: 550px; height: auto; display: block;">
+<img src="http://localhost:8000/images/revenue_growth.png" style="width: 550px; height: auto; display: block;">
 ```
 
 **These three patterns are always wrong and must never appear:**
@@ -354,13 +354,13 @@ Chart images must NEVER be placed inside a grid column, flex child, or any conta
 ```html
 <!-- ✅ Correct — chart in its own full-width block, outside any grid -->
 <div style="width: 794px;">
-  <img src="http://localhost:8000/revenue_growth.png" style="width: 550px; height: auto; display: block;">
+  <img src="http://localhost:8000/images/revenue_growth.png" style="width: 550px; height: auto; display: block;">
 </div>
 
 <!-- ❌ WRONG — chart trapped inside a narrow grid column -->
 <div style="display: grid; grid-template-columns: 1fr 1fr;">
   <div>
-    <img src="http://localhost:8000/revenue_growth.png" style="width: 550px; height: auto;">
+    <img src="http://localhost:8000/images/revenue_growth.png" style="width: 550px; height: auto;">
   </div>
   <div>Some text...</div>
 </div>

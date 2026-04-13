@@ -1,18 +1,35 @@
-﻿"""
-Test script for verifying report formatting and PDF conversion.
-This script uses hardcoded data to simulate a report generation process.
-Run this file to generate a report with fake data and images, and convert it to PDF. Check the console logs for success or failure messages.
-"""
-
+import sys
+import os
 import asyncio
-import logging
-from server import format_report
-from pdf_converter import html_to_pdf
 
-# Configure logging for the test script
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# src/backend/ — so pdf_converter and other peer modules are importable
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
+# src/backend/mcp_servers/mcp_formatting/ — so server.py's own
+# `from config import geminiConfig` resolves to the local config.py there
+_MCP_FORMATTING_DIR = os.path.join(
+    os.path.abspath(os.path.dirname(__file__)),
+    "mcp_servers", "mcp_formatting",
+)
+sys.path.insert(0, _MCP_FORMATTING_DIR)
+
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
+from contextlib import asynccontextmanager
+from pathlib import Path
+import glob, traceback, time
+
+# ── Swap in the test pipeline instead of the MCP client ──────────────────────
+from src.backend.mcp_servers.mcp_formatting.server import format_report
+from src.backend.mcp_servers.mcp_formatting.pdf_converter import html_to_pdf
+
+# Hardcoded test data pulled directly from test_report.py
 TEXT_BLOCKS = [
     "Market Dominance Overview: APX has successfully integrated the 'Synapse-Cloud' protocol across 142 terrestrial data centers spanning six continents. As of Q1 2026, APX controls 62% of the world's Inference-as-a-Service (IaaS) market share — up from just 18% in 2020. With a market capitalization now exceeding $4.5 trillion, APX is the world's first Intelligence Utility, providing the cognitive infrastructure that powers governments, enterprises, and critical systems globally.",        
     "Financial Efficiency & Margins: FY2025 delivered record results across every financial metric. Gross revenue reached $182.4 billion, a 28% increase year-over-year. Operating margin expanded to 44% driven by automated server maintenance reducing labor costs by 61% and Deep-Frost cooling units slashing energy expenditure. Net income of $68.2 billion represents a 34% net margin — exceptional for infrastructure at this scale. Capital expenditures of $42 billion were deployed primarily into Deep-Frost second-generation cooling and Border-Vault sovereign cluster expansion across 14 new NATO-aligned territories.",
@@ -30,98 +47,109 @@ TEXT_BLOCKS = [
 ]
 
 IMAGES = [
-    [
-        "http://localhost:8000/images/revenue_growth.png",
-        "Annual gross revenue showing 28% CAGR over 8 years, reaching $182.4B in FY2025."
-    ],
-    [
-        "http://localhost:8000/images/segment_donut.png",
-        "Intelligence segment revenue breakdown. Enterprise Inference dominates at 42%, with Sovereignty-Cloud as the fastest growing segment."
-    ],
-    [
-        "http://localhost:8000/images/margin_comparison.png",
-        "APX operating margin of 44% leads all peers by 13 percentage points."
-    ],
-    [
-        "http://localhost:8000/images/stock_price.png",
-        "APX stock price over 24 months. Cup and Handle formation targeting $1,450 breakout."
-    ],
-    [
-        "http://localhost:8000/images/rd_spend.png",
-        "R&D investment grew 38% YoY. Bio-Interface research saw the highest growth at +95%."
-    ],
-    [
-        "http://localhost:8000/images/datacenter_capacity.png",
-        "APX operates 142 data centers across 6 regions. Rapid expansion in Middle East and Africa."
-    ],
-    [
-        "http://localhost:8000/images/pue_trend.png",
-        "APX PUE improved from 1.42 to a world-record 1.008 following Deep-Frost deployment."
-    ],
-    [
-        "http://localhost:8000/images/market_share.png",
-        "APX IaaS market share grew from 18% in 2020 to 62% in 2025."
-    ],
-    [
-        "http://localhost:8000/images/latency_scatter.png",
-        "APX clusters achieve 0.12ms median latency at 4,200 tokens/watt vs industry 4.5ms at 850."
-    ],
-    [
-        "http://localhost:8000/images/cortex_bridge.png",
-        "Cortex-Bridge Phase II results. 92% motor control restoration vs 12% baseline."
-    ],
-    [
-        "http://localhost:8000/images/capital_waterfall.png",
-        "Of $68.2B net income, $60B returns to shareholders — largest capital return in tech history."
-    ],
-    [
-        "http://localhost:8000/images/headcount.png",
-        "Revenue per employee increased from $1.1M to $2.7M despite 4.3x headcount growth."
-    ]
+    ["http://localhost:8000/images/revenue_growth.png",    "Annual gross revenue showing 28% CAGR over 8 years, reaching $182.4B in FY2025."],
+    ["http://localhost:8000/images/segment_donut.png",     "Intelligence segment revenue breakdown. Enterprise Inference dominates at 42%, with Sovereignty-Cloud as the fastest growing segment."],
+    ["http://localhost:8000/images/margin_comparison.png", "APX operating margin of 44% leads all peers by 13 percentage points."],
+    ["http://localhost:8000/images/stock_price.png",       "APX stock price over 24 months. Cup and Handle formation targeting $1,450 breakout."],
+    ["http://localhost:8000/images/rd_spend.png",          "R&D investment grew 38% YoY. Bio-Interface research saw the highest growth at +95%."],
+    ["http://localhost:8000/images/datacenter_capacity.png", "APX operates 142 data centers across 6 regions. Rapid expansion in Middle East and Africa."],
+    ["http://localhost:8000/images/pue_trend.png",         "APX PUE improved from 1.42 to a world-record 1.008 following Deep-Frost deployment."],
+    ["http://localhost:8000/images/market_share.png",      "APX IaaS market share grew from 18% in 2020 to 62% in 2025."],
+    ["http://localhost:8000/images/latency_scatter.png",   "APX clusters achieve 0.12ms median latency at 4,200 tokens/watt vs industry 4.5ms at 850."],
+    ["http://localhost:8000/images/cortex_bridge.png",     "Cortex-Bridge Phase II results. 92% motor control restoration vs 12% baseline."],
+    ["http://localhost:8000/images/capital_waterfall.png", "Of $68.2B net income, $60B returns to shareholders — largest capital return in tech history."],
+    ["http://localhost:8000/images/headcount.png",         "Revenue per employee increased from $1.1M to $2.7M despite 4.3x headcount growth."],
 ]
 
-async def run_test():
-    """Executes the formatting and PDF conversion test."""
-    logger.info("Starting report formatting test...")
-    
-    html_output = await format_report(TEXT_BLOCKS, IMAGES, "red")
-    
-    if not html_output or html_output.startswith("{\"error\""):
-        logger.error(f"Formatting FAILED: {html_output}")
-    else:
-        logger.info("Formatting successful. Proceeding to PDF conversion...")
-        try:
-            await html_to_pdf(html_output, "test_report.pdf")
-            logger.info("SUCCESS! Report created as 'test_report.pdf'")
-        except Exception as e:
-            logger.error(f"PDF conversion FAILED: {e}")
+PDF_OUTPUT_DIR = "reports"
+os.makedirs(PDF_OUTPUT_DIR, exist_ok=True)
+
+# Resolved absolute path used for all security checks
+PDF_OUTPUT_DIR_ABS = Path(PDF_OUTPUT_DIR).resolve()
 
 
-async def stress_test():
-    """Executes the formatting and PDF conversion test."""
-    i = 1
-    while (True):
-        logger.info("Starting report formatting test...")
-        
+# ── No MCP client needed for testing — lifespan is a no-op ───────────────────
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+
+app.mount(
+    "/images",
+    StaticFiles(directory=Path(_MCP_FORMATTING_DIR) / "test_images"),
+    name="test_images",
+)
+
+# Use an env var so the frontend URL is not hardcoded for deployments
+FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:5173")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[FRONTEND_ORIGIN],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+class ChatRequest(BaseModel):
+    message: str
+    # history contains only PRIOR turns — the current message must NOT be included.
+    # Each entry: {"role": "user"|"ai", "content": "..."}
+    history: list[dict] = []
+
+
+@app.post("/api/chat")
+async def chat(req: ChatRequest):
+    # ── TEST MODE: ignore the incoming message and generate a fixed APX report ─
+    try:
         html_output = await format_report(TEXT_BLOCKS, IMAGES, "red")
 
-        if not html_output or html_output.startswith("{\"error\""):
-            logger.error(f"Formatting FAILED: {html_output}")
-            return
-        else:
-            logger.info("Formatting successful. Proceeding to PDF conversion...")
-            try:
-                await html_to_pdf(html_output, f"test_report{i}.pdf")
-                logger.info("SUCCESS! Report created as 'test_report.pdf'")
-            except Exception as e:
-                logger.error(f"PDF conversion FAILED: {e}")
-        i += 1
+        if not html_output or html_output.startswith('{"error"'):
+            raise RuntimeError(f"format_report returned an error: {html_output}")
 
-async def main():
-    """Main entry point for the test script."""
-    await run_test()
-    # await stress_test()
+        # Write the PDF into the reports directory with a timestamped filename
+        # so each request produces a distinct file and the frontend detects it
+        pdf_filename = f"APX_test_report_{int(time.time())}.pdf"
+        pdf_path = str(PDF_OUTPUT_DIR_ABS / pdf_filename)
 
-if __name__ == "__main__":
-    asyncio.run(main())
+        await html_to_pdf(html_output, pdf_path)
 
+        return {
+            "reply": "Test report generated successfully for APX (Apex-Neuralis). You can download it below.",
+            "pdf_filename": pdf_filename,
+        }
+
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/report/download/{filename}")
+async def download(filename: str):
+    """
+    Serve a report PDF.
+
+    The filename is validated against the resolved output directory to prevent
+    path traversal attacks (e.g. '../../etc/passwd').
+    """
+    # Resolve the candidate path and verify it stays inside PDF_OUTPUT_DIR_ABS
+    candidate = (PDF_OUTPUT_DIR_ABS / filename).resolve()
+    if not str(candidate).startswith(str(PDF_OUTPUT_DIR_ABS) + os.sep):
+        raise HTTPException(status_code=400, detail="Invalid filename")
+
+    if not candidate.exists():
+        raise HTTPException(status_code=404, detail="Report not found")
+
+    return FileResponse(str(candidate), media_type="application/pdf", filename=filename)
+
+
+@app.get("/api/reports")
+async def list_reports():
+    files = sorted(
+        glob.glob(f"{PDF_OUTPUT_DIR_ABS}/*.pdf"),
+        key=os.path.getmtime,
+        reverse=True,
+    )
+    return {"reports": [os.path.basename(f) for f in files]}
