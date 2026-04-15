@@ -65,8 +65,9 @@
   width: 100%;
   max-width: 800px;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start; /* Pushes items to the left side */
   align-items: center;
+  gap: 16px; /* This is the exact, permanent distance between the ☰ and the h1 */
   margin-bottom: 20px;
 }
 
