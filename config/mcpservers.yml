@@ -8,3 +8,7 @@ mcp_servers:
   - name: "research"
     command: "python"
     args: ["src/backend/mcp_servers/mcp_research/server.py"]
+
+  - name: "charts"
+    command: "python"
+    args: ["src/backend/mcp_servers/mcp_chart_generation/server.py"]
