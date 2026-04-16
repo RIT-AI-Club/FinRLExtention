@@ -18,28 +18,24 @@
 
 /* The Sidebar Base Styles */
 .sidebar {
-  position: absolute;
-  top: 0;
-  left: 0;
   height: 100%;
-  width: 250px;
-  background-color: #1e1e2f; /* Dark theme color */
+  background-color: #1e1e2f; 
   color: white;
-  transition: transform 0.3s ease-in-out; /* Smooth sliding animation */
+  transition: width 0.3s ease-in-out; /* Animates the width instead of floating it */
   z-index: 10;
   box-shadow: 2px 0 5px rgba(0,0,0,0.5);
-  font-family: var(--font-sans)
+  font-family: var(--font-sans);
+  overflow: hidden; /* Hides the text inside when it shrinks */
 }
 
-/* The Toggle Logic */
-.sidebar.collapsed {
-  transform: translateX(0%); /* Hides it off-screen to the left */
-  width: 80px;
+/* When the sidebar is hidden */
+.sidebar.closed {
+  width: 0px; 
 }
 
+/* When the sidebar is open */
 .sidebar.open {
-  transform: translateX(50); /* Brings it back on-screen */
-  width: 260px; /* or your preferred expanded width */
+  width: 260px; 
 }
 
 /* Main Chat Area - Updated for Dark Theme */
@@ -69,8 +65,9 @@
   width: 100%;
   max-width: 800px;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start; /* Pushes items to the left side */
   align-items: center;
+  gap: 16px; /* This is the exact, permanent distance between the ☰ and the h1 */
   margin-bottom: 20px;
 }
 
@@ -78,7 +75,7 @@
   margin: 0;
   font-size: 24px;
   font-weight: normal;
-  font-family: var(--font-sans)
+  font-family: var(--font-sans);
 }
 
 .spacer {
