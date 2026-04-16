@@ -1,4 +1,5 @@
 # MCP Server Configurations
+# Add your MCP servers here
 
 mcp_servers:
   - name: "formatting"
