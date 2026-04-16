@@ -266,7 +266,6 @@ function Frontend() {
         {isSidebarOpen && (
           <div className="sidebar-inner-content">
             <div className="sidebar-header">
-              <h2>History</h2>
               <div className="sidebar-header-actions">
                 <button className="new-chat-btn" onClick={handleNewChat} title="New Chat">
                   ✏️ New Chat
