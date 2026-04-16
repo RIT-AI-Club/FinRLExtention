@@ -101,21 +101,26 @@
   display: flex;
   gap: 10px;
   border-radius: 16px;
-  overflow: hidden;
   border: 1px solid #16161a;
   padding: 8px;
+  align-items: flex-end;
 }
 
 /* The text field */
 .chat-input {
   flex-grow: 1;
-  background-color: #16161a; /* Dark gray input box */
-  border: 1px solid #16161a; /* Light blueish outline from your screenshot */
+  background-color: #16161a;
+  border: 1px solid #16161a;
   color: white;
   padding: 12px 16px;
   font-size: 16px;
   border-radius: 12px;
   outline: none;
+  resize: none;
+  overflow-y: auto;
+  line-height: 1.5;
+  font-family: inherit;
+  max-height: calc(50vh - 200px);
 }
 
 .chat-input::placeholder {

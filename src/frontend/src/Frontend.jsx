@@ -68,6 +68,7 @@ function Frontend() {
     setActiveConvoID(newConvo.id);
     // Clear the input so the new chat starts fresh
     setInputValue('');
+    if (textareaRef.current) textareaRef.current.style.height = 'auto';
   }, []);
 
   // Switch to an existing conversation
@@ -97,6 +98,12 @@ function Frontend() {
   const [suggestedStocks, setSuggestedStocks] = useState(DEFAULT_SUGGESTIONS);
   const [errorMsg, setErrorMsg] = useState(null);
   const chatEndRef = useRef(null);
+  const textareaRef = useRef(null);
+
+  const autoResize = (el) => {
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  };
 
   // Fetch the list of past report PDFs from the server on mount
   useEffect(() => {
@@ -149,6 +156,7 @@ function Frontend() {
       }));
 
       setInputValue('');
+      if (textareaRef.current) textareaRef.current.style.height = 'auto';
       setIsDataLoading(true);
       setErrorMsg(null);
 
@@ -428,13 +436,13 @@ function Frontend() {
 
         {/* Input */}
         <div className="input-container">
-          <input
-            type="text"
+          <textarea
+            ref={textareaRef}
             placeholder="Type Your Message Here..."
             className="chat-input"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') handleSend(); }}
+            onChange={(e) => { setInputValue(e.target.value); autoResize(e.target); }}
+            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
             disabled={isDataLoading}
           />
           <button
