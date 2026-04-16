@@ -1,24 +1,14 @@
 # MCP Server Configurations
-# Add your MCP servers here
 
 mcp_servers:
-  - name: "research"
-    command: "python"
-    args: ["src/backend/mcp_servers/mcp_research/server.py"]
-
-  # THIS IS THE FORMATTING SERVER
   - name: "formatting"
     command: "python"
     args: ["src/backend/mcp_servers/mcp_formatting/server.py"]
 
-  # Example server configuration:
-  # - name: "example-server"
-  #   command: "python"
-  #   args: ["-m", "example_mcp_server"]
-  #   env:
-  #     SOME_VAR: "value"
+  - name: "research"
+    command: "python"
+    args: ["src/backend/mcp_servers/mcp_research/server.py"]
 
-  # Filesystem server example:
-  # - name: "filesystem"
-  #   command: "npx"
-  #   args: ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/allowed/directory"]
+  - name: "charts"
+    command: "python"
+    args: ["src/backend/mcp_servers/mcp_chart_generation/server.py"]
