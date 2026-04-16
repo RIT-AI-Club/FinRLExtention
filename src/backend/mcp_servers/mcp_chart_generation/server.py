@@ -3,19 +3,12 @@ MCP server for chart generation
 """
 
 import matplotlib
-
-from src.backend.mcp_servers.mcp_chart_generation.chart_builder_functions import build_base_chart, build_candlestick_chart, calculate_sma, get_sma_period, parse_dates, render_chart_to_image, validate_inputs, validate_ohlc
 # CRITICAL: Set the backend to "Agg" before importing pyplot.
 # This prevents the server from trying to open a GUI window, which would crash it.
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-import io
-from datetime import datetime
 from fastmcp import FastMCP
 from fastmcp.utilities.types import Image
-import random
-import numpy as np
+from chart_builder_functions import *
 
 # Default theme for graph
 DEFAULT_THEME = {
@@ -32,38 +25,6 @@ DEFAULT_THEME = {
     "marker": ".",                       # line marker style
     "line_width": 2,                      # main line width
 }
-
-# Default colors
-COLORS = ["red", "limegreen", "royalblue"]
-
-# Control the number of ticks
-TICK_NUMBER = 6
-
-# Common datetime formats (date + time) to try
-DATETIME_FORMATS = [
-    "%Y-%m-%d %H:%M:%S.%f",   # 2025-03-03 14:30:15.123456
-    "%Y-%m-%d %H:%M:%S",       # 2025-03-03 14:30:15
-    "%Y-%m-%d %H:%M",          # 2025-03-03 14:30
-    "%Y/%m/%d %H:%M:%S.%f",    # 2025/03/03 14:30:15.123456
-    "%Y/%m/%d %H:%M:%S",       # 2025/03/03 14:30:15
-    "%Y/%m/%d %H:%M",          # 2025/03/03 14:30
-    "%m/%d/%Y %H:%M:%S.%f",    # 03/03/2025 14:30:15.123456
-    "%m/%d/%Y %H:%M:%S",       # 03/03/2025 14:30:15
-    "%m/%d/%Y %H:%M",          # 03/03/2025 14:30
-    "%d-%m-%Y %H:%M:%S.%f",    # 03-03-2025 14:30:15.123456
-    "%d-%m-%Y %H:%M:%S",       # 03-03-2025 14:30:15
-    "%d-%m-%Y %H:%M",          # 03-03-2025 14:30
-]
-
-# Common time-only formats (to be combined with a dummy date)
-TIME_FORMATS = [
-    "%H:%M:%S.%f",   # 14:30:15.123456
-    "%H:%M:%S",      # 14:30:15
-    "%H:%M",         # 14:30
-]
-
-# Dummy date for time‑only inputs
-DUMMY_DATE = datetime(2000, 1, 1)
 
 # Initialize the server
 mcp = FastMCP("chart_generation")
@@ -109,17 +70,16 @@ def generate_line_chart(
     fig, ax = build_base_chart(dt_dates, prices, symbol, effective_theme)
 
     if advanced:
-        # 3-day Simple Moving Average
-        sma = [
-            sum(prices[max(0, i - 2) : i + 1]) / len(prices[max(0, i - 2) : i + 1])
-            for i in range(len(prices))
-        ]
+        # Calculate and plot SMA 
+        period = get_sma_period(dt_dates)
+        sma = calculate_sma(prices, period)
+
         ax.plot(
             dt_dates, sma,
             color=effective_theme.get("trend_line", "gold"),
             linestyle=effective_theme.get("trend_line_style", "--"),
             linewidth=1.5,
-            label="3-Day Trend"
+            label=f"{period}-Day Trend"
         )
 
         # Annotate the latest price
