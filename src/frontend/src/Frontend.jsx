@@ -9,6 +9,7 @@ This is the main file for the User interface
 - Shows recommended stocks based on past requests
 - Create a toggle button that pulls up the side bar
 - Create a way for the UI to access data collected or generated from servers to produce output
+- Preview option for PDF generation
  */
 
 // FIX: Removed unused `act` import from your HEAD version; kept collaborator's useEffect + useRef
