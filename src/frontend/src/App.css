@@ -152,6 +152,28 @@
   color: #aaaaaa;
 }
 
+.chat-input::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-input::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-input::-webkit-scrollbar-thumb {
+  background-color: #555555;
+  border-radius: 99px;
+}
+
+.chat-input::-webkit-scrollbar-thumb:hover {
+  background-color: #888888;
+}
+
+.chat-input {
+  scrollbar-width: thin;
+  scrollbar-color: #555555 transparent;
+}
+
 /* The send button */
 .send-btn {
   background-color: #555555;
