@@ -381,7 +381,7 @@ function Frontend() {
                 >
                   ↓ Download {message.pdf_filename}
                 </a>
-              )}v
+              )}
             </div>
           ))}
 
