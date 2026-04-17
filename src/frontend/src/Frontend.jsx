@@ -42,6 +42,10 @@ function LoadingDots() {
   );
 }
 
+function pdfPreviewOverlay({filepath, onClose}){
+  const pdfPath = filepath;
+
+}
 function Frontend() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -49,10 +53,11 @@ function Frontend() {
     { id: 1, ticker: 'AAPL', date: 'April 3', status: 'Pending' }
   ]);
   const [isDataLoading, setIsDataLoading] = useState(false);
-
+  //For pdf preview
+  const [previewPdf, setPreviewPdf] = useState(null);
   // ── Conversation state ────────────────────────────────────────────────────
   const [conversations, setConversations] = useState([
-    { id: 1, messages: [] }
+    { id: 1, messages: [] } 
   ]);
   const [activeConvoID, setActiveConvoID] = useState(1);
 
@@ -372,24 +377,11 @@ function Frontend() {
                 <a
                   href={`${API_BASE}/api/report/download/${encodeURIComponent(message.pdf_filename)}`}
                   download={message.pdf_filename}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    marginTop: 8,
-                    padding: '6px 14px',
-                    borderRadius: 8,
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: '#185FA5',
-                    background: 'var(--color-background-secondary, #f0f4ff)',
-                    border: '0.5px solid var(--color-border-secondary)',
-                    textDecoration: 'none',
-                  }}
+                  className='download-button'
                 >
-                  ↓ Download Report PDF
+                  ↓ Download {message.pdf_filename}
                 </a>
-              )}
+              )}v
             </div>
           ))}
 
