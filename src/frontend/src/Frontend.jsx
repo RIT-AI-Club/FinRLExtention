@@ -375,15 +375,8 @@ function Frontend() {
               {/* If the backend generated a PDF for this message, show an inline download button */}
               
               {message.pdf_filename && (
-                <div>
-                <button onClick={() => setPreviewPdf(message.pdf_filename)} className='download-button'> <img src="/view.png" alt="View" className='preview-logo'/></button>
-                <a
-                  href={`${API_BASE}/api/report/download/${encodeURIComponent(message.pdf_filename)}`}
-                  download={message.pdf_filename}
-                  className='download-button'
-                >
-                  ↓ Download {message.pdf_filename}
-                </a>
+                <div style ={{textAlign: 'center'}}>
+                <button onClick={() => setPreviewPdf(message.pdf_filename)} className='download-button'> {message.pdf_filename} </button>
                 </div>
               )}
             </div>
