@@ -29,9 +29,9 @@ function PdfPreviewOverlay({ filepath, onClose }) {
           <a
             href={`${API_BASE}/api/report/download/${encodeURIComponent(filepath)}`}
             download={filepath}
-            className="download-button"
+            className="pdf-download-button"
           >
-            ↓
+            ⭳
           </a>
           <button className="pdf-modal-close" onClick={onClose}>✕</button>
         </div>
