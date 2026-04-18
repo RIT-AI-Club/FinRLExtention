@@ -15,6 +15,7 @@ This is the main file for the User interface
 // FIX: Removed unused `act` import from your HEAD version; kept collaborator's useEffect + useRef
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './App.css';
+import PdfPreviewOverlay from './PdfPreviewOverlay';
 
 // ── constants ────────────────────────────────────────────────────────────────
 const API_BASE = 'http://localhost:8000';
@@ -42,10 +43,9 @@ function LoadingDots() {
   );
 }
 
-function pdfPreviewOverlay({filepath, onClose}){
-  const pdfPath = filepath;
 
-}
+
+
 function Frontend() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -119,7 +119,7 @@ function Frontend() {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [activeMessages, isDataLoading]);
-
+  //Function to get the reports
   async function fetchReports() {
     try {
       const res = await fetch(`${API_BASE}/api/reports`);
@@ -373,7 +373,10 @@ function Frontend() {
             <div key={message.id} className={`chat-message ${message.sender}`}>
               <p>{message.text}</p>
               {/* If the backend generated a PDF for this message, show an inline download button */}
+              
               {message.pdf_filename && (
+                <div>
+                <button onClick={() => setPreviewPdf(message.pdf_filename)} className='download-button'> <img src="/view.png" alt="View" className='preview-logo'/></button>
                 <a
                   href={`${API_BASE}/api/report/download/${encodeURIComponent(message.pdf_filename)}`}
                   download={message.pdf_filename}
@@ -381,6 +384,7 @@ function Frontend() {
                 >
                   ↓ Download {message.pdf_filename}
                 </a>
+                </div>
               )}
             </div>
           ))}
@@ -445,7 +449,7 @@ function Frontend() {
           </button>
         </div>
       </div>
-
+      {previewPdf && <PdfPreviewOverlay filepath={previewPdf} onClose={() => setPreviewPdf(null)} />}
     </div>
   );
 }
