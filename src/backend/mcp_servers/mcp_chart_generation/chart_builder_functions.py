@@ -19,7 +19,7 @@ import numpy as np
 COLORS = ["red", "limegreen", "royalblue"]
 
 # Control the number of ticks
-TICK_NUMBER = 6
+TICK_NUMBER = 10
 
 # Common datetime formats (date + time) to try
 DATETIME_FORMATS = [
@@ -110,17 +110,17 @@ def build_base_chart(
     ax.set_xlabel("Trading Date", fontsize=12, labelpad=10, fontweight="bold", color=text_color)
 
     # Calculate and apply locator and formatter to axis
-    locator, formatter = get_date_locator_and_formatter(dt_dates)
+    locator, formatter, ticks = get_date_locator_and_formatter(dt_dates)
     ax.xaxis.set_major_locator(locator)
     ax.xaxis.set_major_formatter(formatter)
 
     # Evenly space X and Y ticks
     xmin, xmax = ax.get_xlim()
-    xticks = np.linspace(xmin, xmax, TICK_NUMBER)   # evenly spaced
+    xticks = np.linspace(xmin, xmax, ticks)   # evenly spaced
     ax.set_xticks(xticks)
 
     ymin, ymax = ax.get_ylim()
-    yticks = np.linspace(ymin, ymax, TICK_NUMBER)
+    yticks = np.linspace(ymin, ymax, ticks)
     ax.set_yticks(yticks)
 
     # Grid and tick parameters using theme
@@ -244,17 +244,17 @@ def build_candlestick_chart(
     )
 
     # Calculate and apply locator and formatter
-    locator, formatter = get_date_locator_and_formatter(dt_dates)
+    locator, formatter, ticks = get_date_locator_and_formatter(dt_dates)
     ax.xaxis.set_major_locator(locator)
     ax.xaxis.set_major_formatter(formatter)
     
     # Evenly space X and Y ticks
     xmin, xmax = ax.get_xlim()
-    xticks = np.linspace(xmin, xmax, TICK_NUMBER)   # evenly spaced
+    xticks = np.linspace(xmin, xmax, ticks)   # evenly spaced
     ax.set_xticks(xticks)
 
     ymin, ymax = ax.get_ylim()
-    yticks = np.linspace(ymin, ymax, TICK_NUMBER)
+    yticks = np.linspace(ymin, ymax, ticks)
     ax.set_yticks(yticks)
 
     # Format x‑axis labels
@@ -376,38 +376,57 @@ def get_date_locator_and_formatter(dt_dates: list) -> tuple[mdates.DateLocator, 
     if total_hours <= 1:                     # ≤1 hour       → 5-minute ticks
         locator = mdates.MinuteLocator(interval=5)
         fmt = "%I:%M %p"
+        ticks = 8
     elif total_hours <= 2:                   # 1–2 hours     → 15-minute ticks
         locator = mdates.MinuteLocator(interval=15)
         fmt = "%I:%M %p"
+        ticks = 8
     elif total_hours <= 6:                   # 2–6 hours     → 30-minute ticks
         locator = mdates.MinuteLocator(interval=30)
         fmt = "%I:%M %p"
+        ticks = 8
     elif total_hours <= 12:                  # 6–12 hours    → 1-hour ticks
         locator = mdates.HourLocator(interval=1)
         fmt = "%I:%M %p"
+        ticks = 8
     elif total_hours <= 24:                  # 12–24 hours   → 2-hour ticks
         locator = mdates.HourLocator(interval=2)
         fmt = "%I:%M %p"
+        ticks = 8
     elif total_days <= 3:                    # 1–3 days      → 6-hour ticks
         locator = mdates.HourLocator(interval=6)
         fmt = "%m/%d %I:%M %p"
+        ticks = 6
     elif total_days <= 7:                    # 3–7 days      → 1-day ticks
         locator = mdates.DayLocator(interval=1)
         fmt = "%m/%d"
+        ticks = 8
     elif total_days <= 28:                   # 1–4 weeks     → 2-day ticks
         locator = mdates.DayLocator(interval=2)
         fmt = "%m/%d"
+        ticks = 8
     elif total_days <= 90:                   # 1–3 months    → 1-week ticks
         locator = mdates.WeekdayLocator(interval=1)
         fmt = "%m/%d"
+        ticks = 8
     elif total_days <= 365:                  # 3–12 months   → 1-month ticks
         locator = mdates.MonthLocator(interval=1)
         fmt = "%b %Y"
-    else:                                    # >1 year       → quarterly ticks
+        ticks = 8
+    elif total_days <= 365 * 3:              # 1-3 years       → quarterly ticks
         locator = mdates.MonthLocator(interval=3)
+        fmt = "%b %Y"
+        ticks = 8
+    elif total_days <= 365 * 6:              # 3-6 years       → half-yearly ticks
+        locator = mdates.MonthLocator(interval=6)
+        fmt = "%b %Y"
+        ticks = 8
+    else:                                    # > 6 years       → yearly ticks
+        locator = mdates.YearLocator(interval=1)
         fmt = "%Y"
+        ticks = 8
 
-    return locator, mdates.DateFormatter(fmt)
+    return locator, mdates.DateFormatter(fmt), ticks
 
 def calculate_sma(prices: list[float], period: int = 3) -> list[float]:
     """

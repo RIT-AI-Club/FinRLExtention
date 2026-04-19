@@ -29,7 +29,7 @@ DEFAULT_THEME = {
 # Initialize the server
 mcp = FastMCP("chart_generation")
 
-@mcp.tool() # comment out for manual testing
+# @mcp.tool() # comment out for manual testing
 def generate_line_chart(
     dates: list[str],
     prices: list[float],
@@ -105,7 +105,7 @@ def generate_line_chart(
 
     return render_chart_to_image(fig)
 
-@mcp.tool() # comment out for manual testing
+# @mcp.tool() # comment out for manual testing
 def generate_candlestick_chart(
     dates: list[str],
     opens: list[float],
