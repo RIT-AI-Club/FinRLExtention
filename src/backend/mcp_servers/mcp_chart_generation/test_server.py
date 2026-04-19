@@ -1,125 +1,161 @@
 """
-Run this program to test the chart generation MCP server
+Run this program to test the chart generation MCP server.
+
+Usage:
+    python test_server.py                              # all charts, random theme & seed
+    python test_server.py --theme nvidia --seed 42     # pin both for exact reproduction
+    python test_server.py --theme amd --timespan 1y    # specific theme + timespan
+    python test_server.py --charts 1 3                 # basic line + candlestick only
+    python test_server.py --charts 2 --seed 7 --points 30
+
+    # Run same data across all themes:
+    for t in nvidia amd meta x; do
+        python test_server.py --theme $t --seed 42
+    done
+
+Arguments:
+    --charts    1=basic line, 2=advanced line, 3=candlestick (default: all)
+    --theme     nvidia, amd, meta, x (default: random)
+    --timespan  1y, 1mo, 3d, 1d, 1h (default: 3d)
+    --seed      Integer for reproducible data (default: random)
+    --points    Override number of data points (default: determined by --timespan)
 """
 
 from server import *
 from datetime import datetime, timedelta
 import random
+import argparse
+import os
 from example_themes import *
 
-THEMES = [NVIDIA_THEME, AMD_THEME, META_THEME, X_THEME]
+THEME_MAP = {
+    "nvidia": NVIDIA_THEME,
+    "amd":    AMD_THEME,
+    "meta":   META_THEME,
+    "x":      X_THEME,
+}
 
-START_PRICE = 150 # start price for dummy prices
-PRICE_DEVIATION = 5 # how far a new price may deviate from the last price
-NUMBER_OF_POINTS = 72 # number of price points (corresponds with date/time points)
+START_PRICE = 150      # start price for dummy prices
+PRICE_DEVIATION = 5    # how far a new price may deviate from the last price
+NUMBER_OF_POINTS = 72  # number of price points (corresponds with date/time points)
+WICK_EXTENSION = 1.5   # max extra range beyond open/close for high/low wicks
 
-WICK_EXTENSION = 1.5 # max extra range beyond open/close for high/low wicks
+OUTPUT_DIR = "src/backend/charts"
 
-def test_chart_generation(advanced, dates):
-    print("Starting local test of Stock Analyzer...")
+TIMESPANS = {
+    "1h":  (timedelta(minutes=1), 60),
+    "1d":  (timedelta(hours=1),   24),
+    "3d":  (timedelta(hours=1),   72),
+    "2w": (timedelta(days=1),    14),
+    "1mo": (timedelta(days=1),    30),
+    "1y":  (timedelta(weeks=1),   52),
+    "3y": (timedelta(weeks=1),    104),
+    "6y": (timedelta(weeks=1),    208),
+}
 
-    # create a random walk for price
-    prices = [START_PRICE] # start price
-    for _ in range(NUMBER_OF_POINTS - 1):
-        change = random.uniform(-PRICE_DEVIATION, PRICE_DEVIATION)
-        new_price = prices[-1] + change
-        if new_price < 0:
-            new_price = 0
+
+def make_prices(n, rng):
+    prices = [START_PRICE]
+    for _ in range(n - 1):
+        new_price = max(0.01, prices[-1] + rng.uniform(-PRICE_DEVIATION, PRICE_DEVIATION))
         prices.append(new_price)
+    return prices
 
-    print(f"Generated {len(dates)} pieces of sample data.")
 
-    # 2. Call the Tool Directly
-    try:
-        print("calling chart_generator()...")
-        image_result = generate_line_chart(dates=dates, prices=prices, symbol="TEST-CO", advanced=advanced, theme=random.choice(THEMES))
-        
-        # 3. Save the output to verify visual correctness
-        output_filename = "src/backend/charts/test_chart_output.png"
-        with open(output_filename, "wb") as f:
-            f.write(image_result.data)
-            
-        print(f"Success! Image saved to '{output_filename}'")
-        print("Please open this file to verify the layout, dates, and styles.")
-
-    except Exception as e:
-        print(f"Error during generation: {e}")
-
-def test_candlestick_generation(dates):
-    print("Starting local test of Candlestick Chart...")
- 
-    # Generate OHLC data via a random walk.
-    # Each candle's open is the previous candle's close, keeping the series continuous.
-    # High/low wicks extend randomly beyond the open/close body.
+def make_ohlc(n, rng):
     opens, highs, lows, closes = [], [], [], []
-    current_price = START_PRICE
- 
-    for _ in range(NUMBER_OF_POINTS):
-        open_price = current_price
- 
-        # Close drifts randomly from the open
-        close_price = open_price + random.uniform(-PRICE_DEVIATION, PRICE_DEVIATION)
-        close_price = max(close_price, 0.01) # floor at near-zero to avoid negatives
- 
-        candle_top    = max(open_price, close_price)
-        candle_bottom = min(open_price, close_price)
- 
-        # Wicks extend a random amount beyond the candle body
-        high_price = candle_top    + random.uniform(0, WICK_EXTENSION)
-        low_price  = candle_bottom - random.uniform(0, WICK_EXTENSION)
-        low_price  = max(low_price, 0.01) # floor at near-zero
- 
-        opens.append(round(open_price, 2))
-        closes.append(round(close_price, 2))
-        highs.append(round(high_price, 2))
-        lows.append(round(low_price, 2))
- 
-        current_price = close_price # next candle opens where this one closed
- 
-    print(f"Generated {len(dates)} OHLC data points.")
- 
-    # 2. Call the Tool Directly
-    try:
-        print("calling generate_candlestick_chart()...")
-        image_result = generate_candlestick_chart(
-            dates=dates,
-            opens=opens,
-            highs=highs,
-            lows=lows,
-            closes=closes,
-            symbol="TEST-CO",
-            theme=random.choice(THEMES)
-        )
- 
-        # 3. Save the output to verify visual correctness
-        output_filename = "src/backend/charts/test_candlestick_output.png"
-        with open(output_filename, "wb") as f:
-            f.write(image_result.data)
- 
-        print(f"Success! Image saved to '{output_filename}'")
-        print("Please open this file to verify candle colors, wicks, and styles.")
- 
-    except Exception as e:
-        print(f"Error during generation: {e}")
- 
- 
-if __name__ == "__main__":
-    # Simulate Data: Generate dummy stock data
-    base_date = datetime.now()
-    # dates = [(base_date - timedelta(weeks=i)).isoformat() for i in range(52)] # 1-YEAR weekly trend
-    # dates = [(base_date - timedelta(days=i)).isoformat() for i in range(30)] # 1-MONTH daily trend
-    # dates = [(base_date - timedelta(days=i)).isoformat() for i in range(14)] # 2-WEEK daily trend
-    dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(72)] #  3-DAY hourly trend
-    # dates = [(base_date - timedelta(hours=i)).isoformat() for i in range(24)] # 1-DAY hourly trend
-    # dates = [(base_date - timedelta(minutes=i)).isoformat() for i in range(60)] # 1-HOUR minutely trend
-    dates.reverse() # Sort chronologically
+    current = START_PRICE
+    for _ in range(n):
+        open_p = current
+        close_p = max(0.01, open_p + rng.uniform(-PRICE_DEVIATION, PRICE_DEVIATION))
+        top, bot = max(open_p, close_p), min(open_p, close_p)
+        opens.append(round(open_p, 2))
+        closes.append(round(close_p, 2))
+        highs.append(round(top + rng.uniform(0, WICK_EXTENSION), 2))
+        lows.append(round(max(0.01, bot - rng.uniform(0, WICK_EXTENSION)), 2))
+        current = close_p
+    return opens, highs, lows, closes
 
-    chart_generator = int(input("Please select which chart you want to test:" \
-                            "\n\t(1) basic line chart\n\t(2) advanced line chart\n\t(3) candlestick chart\n> "))
-    match chart_generator:
-        case 1:
-            test_chart_generation(False, dates)
-        case 2:
-            test_chart_generation(True, dates)
-        case 3:
-            test_candlestick_generation(dates)
+
+def save_image(image_result, filename):
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    path = os.path.join(OUTPUT_DIR, filename)
+    with open(path, "wb") as f:
+        f.write(image_result.data)
+    print(f"  Saved → {path}")
+
+
+def test_line_chart(advanced, dates, rng, theme):
+    label = "advanced line" if advanced else "basic line"
+    print(f"\n[{label}] Generating...")
+    prices = make_prices(len(dates), rng)
+    try:
+        result = generate_line_chart(
+            dates=dates, prices=prices, symbol="TEST-CO",
+            advanced=advanced, theme=theme
+        )
+        save_image(result, f"test_{'advanced' if advanced else 'basic'}_line.png")
+    except Exception as e:
+        print(f"  FAILED: {e}")
+
+
+def test_candlestick_chart(dates, rng, theme):
+    print("\n[candlestick] Generating...")
+    opens, highs, lows, closes = make_ohlc(len(dates), rng)
+    try:
+        result = generate_candlestick_chart(
+            dates=dates, opens=opens, highs=highs, lows=lows,
+            closes=closes, symbol="TEST-CO", theme=theme
+        )
+        save_image(result, "test_candlestick.png")
+    except Exception as e:
+        print(f"  FAILED: {e}")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Test chart generation")
+    parser.add_argument(
+        "--charts", nargs="+", type=int, choices=[1, 2, 3],
+        default=[1, 2, 3],
+        help="Charts to run: 1=basic line, 2=advanced line, 3=candlestick (default: all)"
+    )
+    parser.add_argument(
+        "--seed", type=int, default=None,
+        help="Random seed for reproducible output (default: random)"
+    )
+    parser.add_argument(
+        "--timespan", choices=TIMESPANS.keys(), default="3d",
+        help="Time span to simulate: 1h, 1d, 3d, 2w, 1mo, 1y, 3y, 6y (default: 3d)"
+    )
+    parser.add_argument(
+        "--theme", choices=THEME_MAP.keys(), default=None,
+        help="Theme to use: nvidia, amd, meta, x (default: random)"
+    )
+    parser.add_argument(
+        "--points", type=int, default=None,
+        help="Override number of data points (default: determined by --timespan)"
+    )
+    args = parser.parse_args()
+
+    seed = args.seed if args.seed is not None else random.randint(0, 9999)
+    rng = random.Random(seed)
+    print(f"Seed: {seed}  (re-run with --seed {seed} to reproduce)")
+
+    theme = THEME_MAP[args.theme] if args.theme else rng.choice(list(THEME_MAP.values()))
+    print(f"Theme: {args.theme or 'random'}")
+
+    interval, default_points = TIMESPANS[args.timespan]
+    n = args.points if args.points is not None else default_points
+    base_date = datetime.now()
+    dates = [(base_date - interval * i).isoformat() for i in range(n)]
+    dates.reverse()
+
+    for chart in sorted(set(args.charts)):
+        if chart == 1:
+            test_line_chart(advanced=False, dates=dates, rng=rng, theme=theme)
+        elif chart == 2:
+            test_line_chart(advanced=True, dates=dates, rng=rng, theme=theme)
+        elif chart == 3:
+            test_candlestick_chart(dates=dates, rng=rng, theme=theme)
+
+    print("\nDone.")
