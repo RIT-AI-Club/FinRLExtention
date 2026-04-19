@@ -6,9 +6,9 @@ import matplotlib
 # CRITICAL: Set the backend to "Agg" before importing pyplot.
 # This prevents the server from trying to open a GUI window, which would crash it.
 matplotlib.use("Agg")
-from fastmcp import FastMCP
-from fastmcp.utilities.types import Image
-from chart_builder_functions import *
+from mcp.server.fastmcp import FastMCP
+from mcp.types import ImageContent as Image
+from chart_builder_functions import validate_inputs, parse_dates, build_base_chart, get_sma_period, calculate_sma, build_candlestick_chart, render_chart_to_image, validate_ohlc
 
 # Default theme for graph
 DEFAULT_THEME = {
@@ -64,7 +64,7 @@ def generate_line_chart(
     if theme:
         effective_theme.update(theme)
     # text_color argument overrides theme's text color
-    effective_theme["text"] = theme.get("text", "dimgrey")
+    effective_theme["text"] = (theme or {}).get("text", "dimgrey")
 
     # Create base chart with the theme
     fig, ax = build_base_chart(dt_dates, prices, symbol, effective_theme)

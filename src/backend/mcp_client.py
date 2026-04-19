@@ -20,6 +20,10 @@ from mcp.client.stdio import stdio_client
 
 logger = logging.getLogger(__name__)
 
+# Gemini finish_reason codes
+_FINISH_REASON_MALFORMED_FUNCTION_CALL = 12
+_FINISH_REASON_STOP = 1
+
 
 @dataclass
 class MCPServerConfig:
@@ -39,6 +43,112 @@ class GeminiConfig:
     model: str = "gemini-2.5-flash"
     temperature: float = 0.7
     max_output_tokens: int = 8192
+
+
+def _fc_args_to_python(fc: Any) -> dict[str, Any]:
+    """
+    Extract function-call arguments from a Gemini FunctionCall object as a
+    plain Python dict, bypassing proto-plus wrapper types entirely.
+
+    The most reliable path is fc._pb.args (a raw google.protobuf.Struct),
+    which MessageToDict converts perfectly — including nested lists/numbers.
+    Multiple fallbacks handle edge cases.
+    """
+    if fc is None:
+        return {}
+
+    # Primary: raw protobuf Struct via fc._pb.args
+    try:
+        from google.protobuf.json_format import MessageToDict
+        result = MessageToDict(fc._pb.args, preserving_proto_field_name=True)
+        logger.debug(f"fc_args converted via _pb.args: {result}")
+        return result
+    except Exception as e:
+        logger.debug(f"_pb.args MessageToDict failed ({e}), trying manual walk")
+
+    # Fallback A: manual walk of fc._pb.args Struct fields
+    try:
+        return _struct_to_python(fc._pb.args)
+    except Exception as e:
+        logger.debug(f"Manual struct walk failed ({e}), trying proto-plus iteration")
+
+    # Fallback B: proto-plus MapComposite iteration
+    try:
+        return {k: _value_to_python(v) for k, v in (fc.args or {}).items()}
+    except Exception as e:
+        logger.warning(f"All fc.args conversion paths failed: {e}. Returning empty dict.")
+        return {}
+
+
+def _struct_to_python(struct: Any) -> dict:
+    """Convert a google.protobuf.Struct to a plain Python dict."""
+    return {k: _value_to_python(v) for k, v in struct.fields.items()}
+
+
+def _value_to_python(value: Any) -> Any:
+    """
+    Convert a google.protobuf.Value (oneof) or any proto-plus wrapper
+    to its Python equivalent.
+    """
+    # google.protobuf.Value (oneof) — most common case for fc._pb.args values
+    try:
+        from google.protobuf import struct_pb2
+        if isinstance(value, struct_pb2.Value):
+            kind = value.WhichOneof("kind")
+            if kind == "null_value":
+                return None
+            if kind == "bool_value":
+                return bool(value.bool_value)
+            if kind == "number_value":
+                v = value.number_value
+                return int(v) if v == int(v) else v
+            if kind == "string_value":
+                return value.string_value
+            if kind == "list_value":
+                return [_value_to_python(i) for i in value.list_value.values]
+            if kind == "struct_value":
+                return _struct_to_python(value.struct_value)
+            return None
+        if isinstance(value, struct_pb2.ListValue):
+            return [_value_to_python(i) for i in value.values]
+        if isinstance(value, struct_pb2.Struct):
+            return _struct_to_python(value)
+    except ImportError:
+        pass
+
+    # proto-plus RepeatedComposite / RepeatedScalar
+    try:
+        from proto.marshal.collections.repeated import RepeatedComposite, RepeatedScalar
+        if isinstance(value, (RepeatedComposite, RepeatedScalar)):
+            return [_value_to_python(i) for i in value]
+    except ImportError:
+        pass
+
+    # proto-plus MapComposite
+    try:
+        from proto.marshal.collections.maps import MapComposite
+        if isinstance(value, MapComposite):
+            return {k: _value_to_python(v) for k, v in value.items()}
+    except ImportError:
+        pass
+
+    # Any other protobuf Message
+    try:
+        from google.protobuf.message import Message as PbMessage
+        from google.protobuf.json_format import MessageToDict
+        if isinstance(value, PbMessage):
+            return MessageToDict(value, preserving_proto_field_name=True)
+    except ImportError:
+        pass
+
+    # Plain Python containers
+    if isinstance(value, dict):
+        return {k: _value_to_python(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_value_to_python(i) for i in value]
+
+    # Primitive scalar
+    return value
 
 
 class MCPClient:
@@ -92,7 +202,7 @@ class MCPClient:
 
         self.gemini_config = GeminiConfig(
             api_key=api_key,
-            model=gemini_cfg.get("model", "gemini-1.5-pro"),
+            model=gemini_cfg.get("model", "gemini-2.5-flash"),
             temperature=gemini_cfg.get("temperature", 0.7),
             max_output_tokens=gemini_cfg.get("max_output_tokens", 8192),
         )
@@ -208,20 +318,31 @@ class MCPClient:
         return self.tools
 
     # Fields supported by Gemini's Schema proto
-    _GEMINI_SCHEMA_FIELDS = {"type", "format", "description", "nullable", "enum", "items", "properties", "required"}
+    _GEMINI_SCHEMA_FIELDS = {
+        "type", "format", "description", "nullable",
+        "enum", "items", "properties", "required",
+    }
 
     def _sanitize_schema(self, schema: dict[str, Any]) -> dict[str, Any]:
-        """Strip fields unsupported by Gemini and ensure arrays have an 'items' field."""
-        # Drop fields Gemini doesn't recognise (e.g. title, prefixItems, maxItems, minItems)
+        """
+        Strip fields unsupported by Gemini, ensure arrays always have an
+        'items' sub-schema, and recurse into nested properties.
+        """
         schema = {k: v for k, v in schema.items() if k in self._GEMINI_SCHEMA_FIELDS}
+
+        # Arrays must have an items definition
         if schema.get("type") == "array" and "items" not in schema:
             schema["items"] = {"type": "string"}
+
         if "items" in schema:
             schema["items"] = self._sanitize_schema(schema["items"])
+
         if "properties" in schema:
             schema["properties"] = {
-                k: self._sanitize_schema(v) for k, v in schema["properties"].items()
+                k: self._sanitize_schema(v)
+                for k, v in schema["properties"].items()
             }
+
         return schema
 
     def _convert_tools_to_gemini_format(self) -> list[dict[str, Any]]:
@@ -257,7 +378,7 @@ class MCPClient:
 
         Args:
             tool_name: Name of the tool to call.
-            arguments: Arguments to pass to the tool.
+            arguments: Arguments to pass to the tool (plain Python types).
 
         Returns:
             The tool's response.
@@ -275,6 +396,34 @@ class MCPClient:
 
         result = await session.call_tool(tool_name, arguments)
         return result
+
+    @staticmethod
+    def _extract_function_calls(response) -> list:
+        """
+        Return a list of function_call objects from a Gemini response,
+        safely handling candidates whose finish_reason is MALFORMED_FUNCTION_CALL.
+        """
+        try:
+            candidate = response.candidates[0]
+        except (IndexError, AttributeError):
+            return []
+
+        finish_reason = getattr(candidate, "finish_reason", None)
+        # finish_reason 12 == MALFORMED_FUNCTION_CALL — nothing to parse
+        if finish_reason == _FINISH_REASON_MALFORMED_FUNCTION_CALL:
+            logger.warning(
+                "Gemini returned MALFORMED_FUNCTION_CALL (finish_reason=12). "
+                "The model could not construct a valid tool call. "
+                "Check that the tool schema is correct and all required fields are present."
+            )
+            return []
+
+        parts = getattr(candidate.content, "parts", None) or []
+        return [
+            part.function_call
+            for part in parts
+            if hasattr(part, "function_call") and part.function_call.name
+        ]
 
     async def process_message(
         self,
@@ -295,53 +444,73 @@ class MCPClient:
             self._initialize_gemini()
 
         history = conversation_history or []
-
         gemini_tools = self._convert_tools_to_gemini_format()
 
         tools_config = None
         if gemini_tools:
-            tools_config = [genai.protos.Tool(
-                function_declarations=[
-                    genai.protos.FunctionDeclaration(
-                        name=t["name"],
-                        description=t["description"],
-                        parameters=self._dict_to_gemini_schema(t["parameters"]),
-                    )
-                    for t in gemini_tools
-                ]
-            )]
-
-        chat = self._model.start_chat(history=self._convert_history_to_gemini(history))
-
-        response = await asyncio.to_thread(
-            chat.send_message,
-            message,
-            tools=tools_config,
-        )
-
-        while response.candidates[0].content.parts:
-            function_calls = [
-                part.function_call
-                for part in response.candidates[0].content.parts
-                if hasattr(part, "function_call") and part.function_call.name
+            tools_config = [
+                genai.protos.Tool(
+                    function_declarations=[
+                        genai.protos.FunctionDeclaration(
+                            name=t["name"],
+                            description=t["description"],
+                            parameters=self._dict_to_gemini_schema(t["parameters"]),
+                        )
+                        for t in gemini_tools
+                    ]
+                )
             ]
 
+        chat = self._model.start_chat(
+            history=self._convert_history_to_gemini(history)
+        )
+
+        # ------------------------------------------------------------------ #
+        # Initial send                                                         #
+        # ------------------------------------------------------------------ #
+        try:
+            response = await asyncio.to_thread(
+                chat.send_message,
+                message,
+                tools=tools_config,
+            )
+        except Exception as e:
+            logger.error(f"Gemini send_message failed: {e}")
+            raise
+
+        # ------------------------------------------------------------------ #
+        # Agentic tool-call loop                                               #
+        # ------------------------------------------------------------------ #
+        max_iterations = 10  # safety guard against infinite loops
+        iteration = 0
+
+        while iteration < max_iterations:
+            iteration += 1
+
+            function_calls = self._extract_function_calls(response)
             if not function_calls:
                 break
 
-            function_responses = []
+            function_responses: list[genai.protos.Part] = []
+
             for fc in function_calls:
                 tool_name = fc.name
-                arguments = dict(fc.args) if fc.args else {}
+
+                # Convert proto args to plain Python types before passing to MCP
+                arguments: dict[str, Any] = _fc_args_to_python(fc)
+
+                logger.debug(f"Tool call: {tool_name}({json.dumps(arguments, default=str)})")
 
                 try:
                     result = await self.call_tool(tool_name, arguments)
+
                     content = result.content if hasattr(result, "content") else str(result)
                     if hasattr(content, "__iter__") and not isinstance(content, str):
                         content = "\n".join(
                             item.text if hasattr(item, "text") else str(item)
                             for item in content
                         )
+
                     function_responses.append(
                         genai.protos.Part(
                             function_response=genai.protos.FunctionResponse(
@@ -350,6 +519,7 @@ class MCPClient:
                             )
                         )
                     )
+
                 except Exception as e:
                     logger.error(f"Tool call failed for {tool_name}: {e}")
                     function_responses.append(
@@ -361,17 +531,36 @@ class MCPClient:
                         )
                     )
 
-            response = await asyncio.to_thread(
-                chat.send_message,
-                function_responses,
-            )
+            # Send all tool results back in one turn
+            try:
+                response = await asyncio.to_thread(
+                    chat.send_message,
+                    function_responses,
+                    tools=tools_config,
+                )
+            except Exception as e:
+                logger.error(f"Gemini send_message (tool response) failed: {e}")
+                raise
 
+        # ------------------------------------------------------------------ #
+        # Extract final text                                                   #
+        # ------------------------------------------------------------------ #
         response_text = ""
-        for part in response.candidates[0].content.parts:
-            if hasattr(part, "text"):
-                response_text += part.text
+        try:
+            for part in response.candidates[0].content.parts:
+                if hasattr(part, "text") and part.text:
+                    response_text += part.text
+        except (IndexError, AttributeError):
+            pass
+
+        if not response_text:
+            logger.warning("No text content in final Gemini response.")
 
         return response_text
+
+    # ---------------------------------------------------------------------- #
+    # Schema helpers                                                           #
+    # ---------------------------------------------------------------------- #
 
     def _dict_to_gemini_schema(self, schema: dict[str, Any]) -> "genai.protos.Schema":
         """Recursively convert a sanitized schema dict to a genai.protos.Schema."""
@@ -435,6 +624,10 @@ class MCPClient:
         self.tool_to_server.clear()
 
 
+# --------------------------------------------------------------------------- #
+# Factory                                                                      #
+# --------------------------------------------------------------------------- #
+
 async def create_mcp_client(
     config_path: Optional[str] = None,
     mcp_servers_path: Optional[str] = None,
@@ -465,11 +658,14 @@ async def main():
     try:
         print("Available tools:", list(client.tools.keys()))
 
-        response = await client.process_message("Hello! What tools do you have available? Do not call any tools")
+        response = await client.process_message(
+            "Hello! What tools do you have available? Do not call any tools"
+        )
         print("Response:", response)
-        while (inp:=input(">> ")) != "bye":
+
+        while (inp := input(">> ")) != "bye":
             response = await client.process_message(inp)
-            print(">",response)
+            print(">", response)
 
     finally:
         await client.close()
