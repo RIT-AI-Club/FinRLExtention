@@ -9,11 +9,13 @@ This is the main file for the User interface
 - Shows recommended stocks based on past requests
 - Create a toggle button that pulls up the side bar
 - Create a way for the UI to access data collected or generated from servers to produce output
+- Preview option for PDF generation
  */
 
 // FIX: Removed unused `act` import from your HEAD version; kept collaborator's useEffect + useRef
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './App.css';
+import PdfPreviewOverlay from './PdfPreviewOverlay';
 
 // ── constants ────────────────────────────────────────────────────────────────
 const API_BASE = 'http://localhost:8000';
@@ -41,6 +43,9 @@ function LoadingDots() {
   );
 }
 
+
+
+
 function Frontend() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -48,10 +53,11 @@ function Frontend() {
     { id: 1, ticker: 'AAPL', date: 'April 3', status: 'Pending' }
   ]);
   const [isDataLoading, setIsDataLoading] = useState(false);
-
+  //For pdf preview
+  const [previewPdf, setPreviewPdf] = useState(null);
   // ── Conversation state ────────────────────────────────────────────────────
   const [conversations, setConversations] = useState([
-    { id: 1, messages: [] }
+    { id: 1, messages: [] } 
   ]);
   const [activeConvoID, setActiveConvoID] = useState(1);
 
@@ -67,6 +73,7 @@ function Frontend() {
     setActiveConvoID(newConvo.id);
     // Clear the input so the new chat starts fresh
     setInputValue('');
+    if (textareaRef.current) textareaRef.current.style.height = 'auto';
   }, []);
 
   // Switch to an existing conversation
@@ -96,6 +103,12 @@ function Frontend() {
   const [suggestedStocks, setSuggestedStocks] = useState(DEFAULT_SUGGESTIONS);
   const [errorMsg, setErrorMsg] = useState(null);
   const chatEndRef = useRef(null);
+  const textareaRef = useRef(null);
+
+  const autoResize = (el) => {
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  };
 
   // Fetch the list of past report PDFs from the server on mount
   useEffect(() => {
@@ -106,7 +119,7 @@ function Frontend() {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [activeMessages, isDataLoading]);
-
+  //Function to get the reports
   async function fetchReports() {
     try {
       const res = await fetch(`${API_BASE}/api/reports`);
@@ -148,6 +161,7 @@ function Frontend() {
       }));
 
       setInputValue('');
+      if (textareaRef.current) textareaRef.current.style.height = 'auto';
       setIsDataLoading(true);
       setErrorMsg(null);
 
@@ -265,7 +279,6 @@ function Frontend() {
         {isSidebarOpen && (
           <div className="sidebar-inner-content">
             <div className="sidebar-header">
-              <h2>History</h2>
               <div className="sidebar-header-actions">
                 <button className="new-chat-btn" onClick={handleNewChat} title="New Chat">
                   ✏️ New Chat
@@ -360,27 +373,11 @@ function Frontend() {
             <div key={message.id} className={`chat-message ${message.sender}`}>
               <p>{message.text}</p>
               {/* If the backend generated a PDF for this message, show an inline download button */}
+              
               {message.pdf_filename && (
-                <a
-                  href={`${API_BASE}/api/report/download/${encodeURIComponent(message.pdf_filename)}`}
-                  download={message.pdf_filename}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    marginTop: 8,
-                    padding: '6px 14px',
-                    borderRadius: 8,
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: '#185FA5',
-                    background: 'var(--color-background-secondary, #f0f4ff)',
-                    border: '0.5px solid var(--color-border-secondary)',
-                    textDecoration: 'none',
-                  }}
-                >
-                  ↓ Download Report PDF
-                </a>
+                <div style ={{textAlign: 'center'}}>
+                <button onClick={() => setPreviewPdf(message.pdf_filename)} className='download-button'> {message.pdf_filename} </button>
+                </div>
               )}
             </div>
           ))}
@@ -427,13 +424,13 @@ function Frontend() {
 
         {/* Input */}
         <div className="input-container">
-          <input
-            type="text"
+          <textarea
+            ref={textareaRef}
             placeholder="Type Your Message Here..."
             className="chat-input"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') handleSend(); }}
+            onChange={(e) => { setInputValue(e.target.value); autoResize(e.target); }}
+            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
             disabled={isDataLoading}
           />
           <button
@@ -445,7 +442,7 @@ function Frontend() {
           </button>
         </div>
       </div>
-
+      {previewPdf && <PdfPreviewOverlay filepath={previewPdf} onClose={() => setPreviewPdf(null)} />}
     </div>
   );
 }
