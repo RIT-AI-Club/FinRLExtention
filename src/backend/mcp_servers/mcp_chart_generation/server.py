@@ -6,7 +6,7 @@ import matplotlib
 # CRITICAL: Set the backend to "Agg" before importing pyplot.
 # This prevents the server from trying to open a GUI window, which would crash it.
 matplotlib.use("Agg")
-from fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP
 from fastmcp.utilities.types import Image
 from chart_builder_functions import *
 
