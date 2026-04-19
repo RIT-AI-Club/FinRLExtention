@@ -273,7 +273,7 @@ def _validate_inputs(dates: list, prices: list[float]) -> None:
     if len(dates) != len(prices):
         raise ValueError(f"Data mismatch: Received {len(dates)} dates and {len(prices)} prices.")
 
-# @mcp.tool() # comment out for manual testing
+@mcp.tool()
 def generate_line_chart(
     dates: list[str],
     prices: list[float],

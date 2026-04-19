@@ -11,6 +11,10 @@ mcp_servers:
     command: "python"
     args: ["src/backend/mcp_servers/mcp_formatting/server.py"]
 
+  - name: "chart-generation"
+    command: "python"
+    args: ["src/backend/mcp_servers/mcp_chart_generation/server.py"]
+
   # Example server configuration:
   # - name: "example-server"
   #   command: "python"
