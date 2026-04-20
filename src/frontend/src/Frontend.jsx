@@ -288,15 +288,13 @@ function Frontend() {
             </div>
 
             {/* Conversation list */}
-            <div className="sidebar-section-label">Chats</div>
+            <div className="sidebar-section-label">Recent Chats</div>
             <div className="sidebar-content">
               {conversations.map((convo) => (
                 <div
                   key={convo.id}
                   className={`convo-item ${convo.id === activeConvoID ? 'active-convo' : ''}`}
                   onClick={() => handleSelectConvo(convo.id)}
-                  // Position relative so the delete button can sit flush to the right
-                  style={{ position: 'relative', display: 'flex', alignItems: 'center' }}
                 >
                   <span className="convo-icon">💬</span>
                   <span className="convo-title" style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -307,15 +305,6 @@ function Frontend() {
                     className="convo-delete-btn"
                     onClick={(e) => handleDeleteConvo(e, convo.id)}
                     title="Delete conversation"
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      padding: '2px 4px',
-                      fontSize: '12px',
-                      color: 'var(--color-text-secondary)',
-                      flexShrink: 0,
-                    }}
                   >
                     ✕
                   </button>
@@ -355,6 +344,7 @@ function Frontend() {
         {/* Header */}
         <div className="chat-header">
           {/*<button className="hamburger-btn" onClick={toggleSidebar}>☰</button>*/}
+          <img src='/logo_rit_AI_transparent_white.png' style = {{height: '50px', width: 'auto'}} />
           <h1>FinRL Assistant</h1>
           {/*<button className="new-chat-header-btn" onClick={handleNewChat} title="New Chat">
             ✏️
