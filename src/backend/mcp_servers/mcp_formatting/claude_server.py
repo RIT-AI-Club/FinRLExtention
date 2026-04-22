@@ -66,6 +66,27 @@ async def format_report(text_blocks: List[str], images: Optional[List[List[str]]
             color_scheme=color_scheme,
             prompt=prompt
         )
+
+        # Inject real chart images into placeholder tokens Claude wrote.
+        # Claude writes CHART_PLACEHOLDER_N tokens; we replace each with a
+        # self-contained <img> block carrying the actual base64 data.
+        for i, image_pair in enumerate(user_data.get("images", [])):
+            base64_data = image_pair[0]
+            caption = image_pair[1] if len(image_pair) > 1 else f"Chart {i + 1}"
+            placeholder = f"CHART_PLACEHOLDER_{i}"
+            chart_html = (
+                f'<div style="width: 794px; margin: 24px 0; break-inside: avoid;">'
+                f'<img src="data:image/png;base64,{base64_data}" '
+                f'style="width: 650px; height: auto; display: block;">'
+                f'<p style="font-size: 11px; color: #888; margin-top: 6px;">'
+                f'{caption} · Source: Market data</p>'
+                f'</div>'
+            )
+            if placeholder in report:
+                report = report.replace(placeholder, chart_html, 1)
+            else:
+                logger.warning(f"Placeholder {placeholder} not found in Claude output — chart may be missing")
+
         with open("latest_report.html", "w", encoding="utf-8") as f:
             f.write(report)
         return report

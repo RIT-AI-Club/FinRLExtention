@@ -40,6 +40,26 @@ If the output could have been produced by a template, you have failed. Push furt
 
 ---
 
+## 2c. MANDATORY CONTENT SECTIONS ✦ — Non-Negotiable
+
+The report MUST contain ALL NINE of the following content sections, rendered in this exact order. Omitting any section is a critical failure equivalent to a missing image — do not skip sections even if the research data is sparse. If data for a section is unavailable, render the section with a styled "Data unavailable" placeholder consistent with the report theme.
+
+**Required sections (render all nine, in order):**
+
+1. **Company Overview** — What the company does, sector, market cap, key products and services, employee count
+2. **Recent Price Action** — Current price, 52-week high/low, performance vs benchmarks, trend narrative. Include the price chart image in this section.
+3. **Financial Summary** — Revenue, earnings, margins, debt, cash flow for most recent quarter and trailing twelve months
+4. **Growth Prospects** — Revenue/earnings growth rates, expansion plans, new products or markets being entered
+5. **Competitive Position** — Market share estimates, competitive moat analysis, named key competitors with context
+6. **Technical Analysis** — Specific support and resistance price levels, 50-day and 200-day moving averages, volume trend vs 30-day average
+7. **Analyst Consensus** — Count of buy/hold/sell ratings, mean price target with range, at least two named analysts or firms with their ratings
+8. **Risks and Catalysts** — Upcoming earnings date, regulatory risks, macro exposure, key events to watch in the next 30–90 days
+9. **FinRL Relevance** — 3–5 specific observable features for a reinforcement learning trading agent, each with a brief explanation of why it is predictive
+
+Each section must receive a **visually distinct treatment** per the Anti-Generic Rules (§3b). No two consecutive sections may have the same background color, layout density, or typographic scale.
+
+---
+
 ## 3. Design Direction
 
 Before writing any code, choose a complete visual identity for this specific report:
@@ -253,6 +273,8 @@ Before outputting, verify every item on this list. A report that fails any item 
 - [ ] A conceptual hook, layout personality, and one unexpected element were defined before coding began (§2b)
 - [ ] No section of the report resembles a generic AI-generated financial template — each section has a distinct, intentional visual treatment
 - [ ] All content containers have `page-break-inside: avoid` to prevent splitting across PDF pages
+- [ ] All 9 required content sections are present: Company Overview, Recent Price Action, Financial Summary, Growth Prospects, Competitive Position, Technical Analysis, Analyst Consensus, Risks and Catalysts, FinRL Relevance
+- [ ] Each of the 9 sections has a visually distinct treatment from its neighbors (different background, typographic scale, or layout density)
 
 ---
 

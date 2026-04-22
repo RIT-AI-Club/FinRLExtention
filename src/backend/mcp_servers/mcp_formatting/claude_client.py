@@ -52,7 +52,18 @@ def _build_user_prompt_parts(
     Returns:
         List[Dict[str, Any]]: A list of content blocks to send to the Claude model.
     """
-    parts = [{"type": "text", "text": f"PRIMARY DATA SOURCE (TRANSCRIPTION ONLY): {json.dumps(user_data)}"}]
+    # Strip base64 from images — passing raw base64 to Claude wastes ~67K input tokens per
+    # image and forces Claude to reproduce the binary in its output, consuming the entire
+    # token budget. Instead, pass only captions; the server injects base64 after generation.
+    images = user_data.get("images", [])
+    user_data_safe = {
+        "text_blocks": user_data.get("text_blocks", []),
+        "charts": [
+            {"index": i, "caption": img[1] if len(img) > 1 else f"Chart {i + 1}"}
+            for i, img in enumerate(images)
+        ],
+    }
+    parts = [{"type": "text", "text": f"PRIMARY DATA SOURCE: {json.dumps(user_data_safe)}"}]
 
     if reference_image_paths:
         parts.append({"type": "text", "text": "### VISUAL REFERENCE GALLERY ###"})
@@ -75,27 +86,30 @@ def _build_user_prompt_parts(
                 {"type": "text", "text": f"REFERENCE IMAGE {i+1}: Analyze the spatial rhythm and layout balance of this image. Use it to inform the 'Couture' editorial vibe of your HTML."},
             ])
 
-    # Build an explicit numbered checklist of every image the model MUST include
-    images = user_data.get("images", [])
+    # Tell Claude exactly where to place each chart using text tokens.
+    # The server replaces these tokens with real <img> tags after generation.
     if images:
-        required_imgs = "\n".join(
-            f'  {i+1}. <img src="{img[0]}" style="width: 650px; height: auto; display: block;">  <!-- {img[1] if len(img) > 1 else ""} -->'
-            for i, img in enumerate(images)
+        chart_list = "\n".join(
+            f"  {i+1}. At the chart position write exactly (nothing else): CHART_PLACEHOLDER_{i}  "
+            f"(caption: {images[i][1] if len(images[i]) > 1 else f'Chart {i+1}'})"
+            for i in range(len(images))
         )
         parts.append({"type": "text", "text": (
-            f"MANDATORY IMAGE CHECKLIST — You MUST embed ALL {len(images)} images below as <img> tags in the final HTML. "
-            f"Do not skip, omit, or replace any of them with placeholders. "
-            f"Before finishing, count your <img> tags — there must be exactly {len(images)}.\n\n"
-            f"Required images (copy src values exactly):\n{required_imgs}"
+            f"CHART PLACEMENT — The report contains {len(images)} chart(s). "
+            f"At each position where a chart should appear, write the EXACT placeholder text shown below "
+            f"(no <img> tags, no base64, no other markup — just the raw text). "
+            f"The pipeline replaces these tokens with real images after your HTML is complete.\n\n"
+            f"{chart_list}"
         )})
-    
+
     if prompt:
         parts.append({"type": "text", "text": prompt})
     else:
         parts.append({"type": "text", "text": (
-            "Generate a complete HTML document with embedded CSS for a multi-page A4 PDF financial report using the data and image assets I provide above.\n"
-            "Use only the provided data and preserve all values exactly as given (no rounding, no estimating, no invented content).\n"
-            f"CRITICAL: The final HTML must contain exactly {len(images)} <img> tags — one for each image in the mandatory checklist above. Missing even one is a failure.\n"
+            "Generate a complete HTML document with embedded CSS for a multi-page A4 PDF financial report.\n"
+            "Use only the provided data; preserve all values exactly (no rounding, estimating, or invented content).\n"
+            f"CRITICAL: Insert the text CHART_PLACEHOLDER_0 at the position where the chart should appear "
+            f"(e.g. inside the Recent Price Action section). Do NOT write any base64 data or <img> tags yourself.\n"
             "Do not use JavaScript. Put all CSS in a single <style> block in the <head>. Return only the final HTML document.\n"
         )})
 
