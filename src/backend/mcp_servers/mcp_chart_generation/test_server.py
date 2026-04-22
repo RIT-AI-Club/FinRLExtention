@@ -49,8 +49,8 @@ TIMESPANS = {
     "2w": (timedelta(days=1),    14),
     "1mo": (timedelta(days=1),    30),
     "1y":  (timedelta(weeks=1),   52),
-    "3y": (timedelta(weeks=1),    104),
-    "6y": (timedelta(weeks=1),    208),
+    "3y": (timedelta(weeks=1),    156),
+    "6y": (timedelta(weeks=1),    312),
 }
 
 
