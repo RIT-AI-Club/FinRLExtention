@@ -10,6 +10,7 @@ Usage:
 
 import asyncio
 import argparse
+import json
 import logging
 import os
 import random
@@ -99,14 +100,26 @@ async def generate_report(
 
         # --- 3. Format into HTML ---
         logger.info("[3/4] Formatting HTML report")
-        format_result = await client.call_tool(
-            "format_report",
-            {"text_blocks": text_blocks, "images": images},
-        )
-        html_content = _extract_text(format_result)
+        html_content = None
+        for attempt in range(4):
+            format_result = await client.call_tool(
+                "format_report",
+                {"text_blocks": text_blocks, "images": images},
+            )
+            html_content = _extract_text(format_result)
 
-        if html_content.strip().startswith('{"error"'):
-            raise RuntimeError(f"Formatting server returned an error: {html_content}")
+            if not html_content.strip().startswith('{"error"'):
+                break
+
+            error_msg = json.loads(html_content).get("error", html_content)
+            if "503" not in error_msg and "unavailable" not in error_msg.lower():
+                raise RuntimeError(f"Formatting server returned an error: {html_content}")
+            if attempt == 3:
+                raise RuntimeError(f"Formatting server failed after 4 attempts: {html_content}")
+
+            wait = 2 ** attempt
+            logger.warning(f"Gemini 503 on formatting attempt {attempt + 1}/4, retrying in {wait}s...")
+            await asyncio.sleep(wait)
 
         # --- 4. Save outputs ---
         logger.info("[4/4] Saving report files")

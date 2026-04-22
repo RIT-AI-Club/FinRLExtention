@@ -5,6 +5,7 @@ from pathlib import Path
 from google import genai
 from google.genai import types
 from typing import Any, Optional, List
+import asyncio
 import json
 
 from config import config
@@ -105,16 +106,25 @@ async def generate_html(
     )
 
     logger.info(f"Sending request to Gemini model '{final_model}'...")
-    try:
-        response = await client.aio.models.generate_content(
-            model=final_model,
-            contents=[types.Content(role="user", parts=user_parts)],
-            config=generation_config,
-        )
-        logger.info("Received response from Gemini.")
-    except Exception as e:
-        logger.error(f"Gemini API call failed: {e}", exc_info=True)
-        raise
+    contents = [types.Content(role="user", parts=user_parts)]
+    response = None
+    for attempt in range(4):
+        try:
+            response = await client.aio.models.generate_content(
+                model=final_model,
+                contents=contents,
+                config=generation_config,
+            )
+            logger.info("Received response from Gemini.")
+            break
+        except Exception as e:
+            is_503 = "503" in str(e) or "unavailable" in str(e).lower()
+            if not is_503 or attempt == 3:
+                logger.error(f"Gemini API call failed (attempt {attempt + 1}/4, {type(e).__name__}): {e}", exc_info=True)
+                raise
+            wait = 2 ** attempt
+            logger.warning(f"Gemini 503 on attempt {attempt + 1}/4, retrying in {wait}s... ({type(e).__name__})")
+            await asyncio.sleep(wait)
 
     # Extract HTML from response
     try:
