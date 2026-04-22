@@ -29,6 +29,14 @@ FinRLExtention/
 │   │       ├── mcp_chart_generation/ # Matplotlib charting
 │   │       └── mcp_formatting/ # Claude-based HTML formatting
 │   └── frontend/           # React + Vite frontend
+│        ├── public/        # Images for frontend
+│        └── src/
+│           ├── App.css     # Static styles for the frontend
+│           ├── App.jsx     # Loads the frontend
+│           ├── Frontend.jsx # Frontend functionality
+│           ├── index.css   # Basic page styles
+│           ├── main.jsx    # Where the frontend runs from
+│           └── PdfPreviewOverlay.jsx # PDF preview overlay styles and functionality
 ├── requirements.txt        # Python dependencies
 └── README.md
 ```
