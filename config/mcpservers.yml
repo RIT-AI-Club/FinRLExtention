@@ -14,6 +14,8 @@ mcp_servers:
   - name: "chart-generation"
     command: "python"
     args: ["src/backend/mcp_servers/mcp_chart_generation/server.py"]
+    env:
+      FASTMCP_CHECK_FOR_UPDATES: "never"
 
   # Example server configuration:
   # - name: "example-server"
