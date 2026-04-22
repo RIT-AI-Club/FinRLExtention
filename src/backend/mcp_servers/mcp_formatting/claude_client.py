@@ -1,6 +1,6 @@
 """
-Gemini API client for report generation.
-This module handles communication with the Google Gemini API, including
+Claude API client for report generation.
+This module handles communication with the Anthropic Claude API, including
 constructing prompts with data and reference images.
 """
 
@@ -35,22 +35,22 @@ def get_claude_client() -> AsyncAnthropic:
     )
 
 def _build_user_prompt_parts(
-    user_data: List[Dict[str, Any]],
+    user_data: Dict[str, Any],
     reference_image_paths: Optional[List[str]] = None,
     prompt: Optional[str] = None,
     color_scheme: str = None
 ) -> List[Dict[str, Any]]:
     """
-    Constructs the list of 'parts' for the Claude API request payload.
-    
+    Constructs the list of content blocks for the Claude API request payload.
+
     Args:
-        user_data: List of dictionaries containing text blocks and processed image URLs.
+        user_data: Dictionary containing text_blocks and images.
         reference_image_paths: Optional list of file paths to styling reference images.
         prompt: Optional custom prompt string to guide the AI's response.
         color_scheme: A string containing the main color scheme for the report.
         
     Returns:
-        List[Dict[str, Any]]: A list of parts to be sent to the Claude model.
+        List[Dict[str, Any]]: A list of content blocks to send to the Claude model.
     """
     parts = [{"type": "text", "text": f"PRIMARY DATA SOURCE (TRANSCRIPTION ONLY): {json.dumps(user_data)}"}]
 
@@ -61,29 +61,50 @@ def _build_user_prompt_parts(
             if not img_path.exists():
                 logger.warning(f"Reference image not found, skipping: {img_path}")
                 continue
-            
             logger.info(f"Attaching reference image: {img_path.name}")
             image_bytes = img_path.read_bytes()
             parts.extend([
-                {"type": "image", "image": image_bytes},
-                {"type": "text", "text": f"REFERENCE IMAGE {i+1}: Analyze the spatial rhythm and layout balance of this image. Use it to inform the 'Couture' editorial vibe of your HTML."}
+                {
+                    "type": "image",
+                    "source": {
+                        "type": "base64",
+                        "media_type": "image/png",
+                        "data": __import__("base64").b64encode(image_bytes).decode(),
+                    },
+                },
+                {"type": "text", "text": f"REFERENCE IMAGE {i+1}: Analyze the spatial rhythm and layout balance of this image. Use it to inform the 'Couture' editorial vibe of your HTML."},
             ])
+
+    # Build an explicit numbered checklist of every image the model MUST include
+    images = user_data.get("images", [])
+    if images:
+        required_imgs = "\n".join(
+            f'  {i+1}. <img src="{img[0]}" style="width: 650px; height: auto; display: block;">  <!-- {img[1] if len(img) > 1 else ""} -->'
+            for i, img in enumerate(images)
+        )
+        parts.append({"type": "text", "text": (
+            f"MANDATORY IMAGE CHECKLIST — You MUST embed ALL {len(images)} images below as <img> tags in the final HTML. "
+            f"Do not skip, omit, or replace any of them with placeholders. "
+            f"Before finishing, count your <img> tags — there must be exactly {len(images)}.\n\n"
+            f"Required images (copy src values exactly):\n{required_imgs}"
+        )})
     
     if prompt:
         parts.append({"type": "text", "text": prompt})
     else:
         parts.append({"type": "text", "text": (
             "Generate a complete HTML document with embedded CSS for a multi-page A4 PDF financial report using the data and image assets I provide above.\n"
-            "Use only the provided data and preserve all values exactly as given (no rounding, no estimating, no invented content). Use all provided chart/image assets as real <img> elements with the exact src values I provide. Do not create placeholders.\n"
-            "Do not use JavaScript. Do not use inline styles. Put all CSS in a single <style> block in the <head>. Return only the final HTML document.\n"
+            "Use only the provided data and preserve all values exactly as given (no rounding, no estimating, no invented content).\n"
+            f"CRITICAL: The final HTML must contain exactly {len(images)} <img> tags — one for each image in the mandatory checklist above. Missing even one is a failure.\n"
+            "Do not use JavaScript. Put all CSS in a single <style> block in the <head>. Return only the final HTML document.\n"
         )})
 
     if color_scheme:
         parts.append({"type": "text", "text": color_scheme})
-        parts.append({"type": "text", "text": "Create a color scheme based on the color given. Make the background a slighlty lighter, opaque version of the color and make containers a darker opaque version of the color. Include any other colors you would like to add but keep it all similar to the color given."})
-    else: 
+        parts.append({"type": "text", "text": "Create a color scheme based on the color given. Make the background a slightly lighter, opaque version of the color and make containers a darker opaque version of the color. Include any other colors you would like to add but keep it all similar to the color given."})
+    else:
         parts.append({"type": "text", "text": "Create your own color scheme based on the company given in the data above."})
-    
+
     return parts
 
 async def generate_html(
