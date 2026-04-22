@@ -139,7 +139,7 @@ async def generate_html(
         Exception: For other API call failures.
     """
     logger.info("Building request for Claude API.")
-    user_parts = _build_user_prompt_parts(user_data, reference_image_paths, color_scheme, prompt)
+    user_parts = _build_user_prompt_parts(user_data, reference_image_paths, prompt, color_scheme)
 
     # Use parameters if provided, otherwise fall back to config values
     final_model = model or claudeConfig.default_model
@@ -154,9 +154,8 @@ async def generate_html(
             system=system_prompt
         ) as stream:
             response = ""
-            async for message in stream:
-                if message.text:
-                    response += message.text
+            async for text in stream.text_stream:
+                response += text
         logger.info("Received response from Claude.")
     except Exception as e:
         logger.error(f"Claude API call failed: {e}", exc_info=True)

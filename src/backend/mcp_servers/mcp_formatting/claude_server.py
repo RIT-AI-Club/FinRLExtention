@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 mcp = FastMCP("formatting")
 
 @mcp.tool()
-async def format_report(text_blocks: List[str], images: Optional[List[List[str, str]]], color_scheme: Optional[str] = None, prompt: Optional[str] = None) -> str:
+async def format_report(text_blocks: List[str], images: Optional[List[List[str]]], color_scheme: Optional[str] = None, prompt: Optional[str] = None) -> str:
     """
     Formats text and images into a professional HTML report using an AI model.
 
