@@ -6,7 +6,7 @@ Run this file to generate a report with fake data and images, and convert it to 
 
 import asyncio
 import logging
-from server import format_report
+from src.backend.mcp_servers.mcp_formatting.gemini_old.server import format_report
 from pdf_converter import html_to_pdf
 
 # Configure logging for the test script
