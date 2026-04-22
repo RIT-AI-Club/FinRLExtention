@@ -27,7 +27,10 @@
   font-family: var(--font-sans);
   overflow: hidden; /* Hides the text inside when it shrinks */
 }
-
+/* When the sidebar is open */
+.sidebar.open {
+  width: 300px; 
+}
 /* When the sidebar is hidden */
 .sidebar.closed {
   width: 0px; 
@@ -52,10 +55,7 @@
 .download-button:hover{
   background-color:  #434350
 }
-/* When the sidebar is open */
-.sidebar.open {
-  width: 260px; 
-}
+
 
 /*Pdf previewer*/
 .pdf-modal-overlay {
@@ -349,17 +349,42 @@
   background-color: #555555;
   color: white;
   border: none;
-  padding: 10px 72px;
   cursor: pointer;
   font-size: 16px;
   font-family: var(--font-sans);
   border-radius: 24px;
+  padding: 10px 74px;
+  display: block;
+  margin: 0 auto;
 }
 
 .new-chat-btn:hover{
   background-color: #4b4a4a
 }
 .sidebar-section-label {
-  padding: 10px 30px;
+  padding: 10px 3px;
   font-size: 16px;
+}
+.convo-item{
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 2px 2px;
+}
+.convo-delete-btn {
+  background:transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px 10px;
+  font-size: 14px;
+  color: #ffffff ;
+  flex-shrink: 0;
+  margin-left: auto
+}
+.convo-title{
+  flex: 1;
+  overflow: 'hidden';
+  text-overflow: 'ellipsis';
+  white-space: 'nowrap' 
+
 }

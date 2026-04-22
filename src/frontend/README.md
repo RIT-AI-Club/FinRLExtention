@@ -17,4 +17,4 @@ If you are developing a production application, we recommend using TypeScript wi
 
 ## React-pdf
 
-run `npm install react-pdf` in src/frontend ton install it
+run `npm install react-pdf` in src/frontend to install it
