@@ -63,8 +63,6 @@ def generate_line_chart(
     effective_theme = DEFAULT_THEME.copy()
     if theme:
         effective_theme.update(theme)
-    # text_color argument overrides theme's text color
-    effective_theme["text"] = theme.get("text", "dimgrey")
 
     # Create base chart with the theme
     fig, ax = build_base_chart(dt_dates, prices, symbol, effective_theme)

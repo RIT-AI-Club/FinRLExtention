@@ -8,6 +8,7 @@ handling tool calls.
 import asyncio
 import json
 import logging
+import os
 from contextlib import AsyncExitStack
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -258,10 +259,11 @@ class MCPClient:
         Returns:
             The connected ClientSession.
         """
+        merged_env = {**os.environ, **(server_config.env or {})}
         server_params = StdioServerParameters(
             command=server_config.command,
             args=server_config.args,
-            env=server_config.env if server_config.env else None,
+            env=merged_env,
         )
 
         read_stream, write_stream = await self._exit_stack.enter_async_context(
@@ -284,10 +286,16 @@ class MCPClient:
             if not server_config.command:
                 logger.warning(f"Skipping server {server_config.name}: no command specified")
                 continue
-            try:
-                await self.connect_to_server(server_config)
-            except Exception as e:
-                logger.error(f"Failed to connect to server {server_config.name}: {e}")
+            for attempt in range(2):
+                try:
+                    await self.connect_to_server(server_config)
+                    break
+                except Exception as e:
+                    if attempt == 0:
+                        logger.warning(f"Retrying server {server_config.name} after error: {e}")
+                        await asyncio.sleep(2)
+                    else:
+                        logger.error(f"Failed to connect to server {server_config.name}: {e}")
 
     async def discover_tools(self) -> dict[str, dict[str, Any]]:
         """
