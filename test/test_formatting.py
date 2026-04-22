@@ -1,4 +1,5 @@
-from src.backend.mcp_servers.mcp_formatting.server import *
+from src.backend.mcp_servers.mcp_formatting import *
+from pathlib import Path
 import pytest
 import re
 from bs4 import BeautifulSoup, Comment, Doctype
