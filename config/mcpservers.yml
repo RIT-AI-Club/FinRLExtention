@@ -8,7 +8,7 @@ mcp_servers:
     
   - name: "formatting"
     command: "python"
-    args: ["src/backend/mcp_servers/mcp_formatting/server.py"]
+    args: ["src/backend/mcp_servers/mcp_formatting/claude_server.py"]
 
   - name: "research"
     command: "python"
