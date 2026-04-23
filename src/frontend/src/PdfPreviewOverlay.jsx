@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
@@ -13,6 +13,31 @@ const API_BASE = 'http://localhost:8000';
 function PdfPreviewOverlay({ filepath, onClose }) {
   const [numPages, setNumPages] = useState(null);
   const [zoom, setZoom] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageRefs = useRef([]);
+  const bodyRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let mostVisible = null;
+        let maxRatio = 0;
+        entries.forEach(entry => {
+          if (entry.intersectionRatio > maxRatio) {
+            maxRatio = entry.intersectionRatio;
+            mostVisible = entry.target;
+          }
+        });
+        if (mostVisible) {
+          setCurrentPage(Number(mostVisible.dataset.page));
+        }
+      },
+      { root: bodyRef.current, threshold: Array.from({ length: 11 }, (_, i) => i / 10) }
+    );
+
+    pageRefs.current.forEach(el => { if (el) observer.observe(el); });
+    return () => observer.disconnect();
+  }, [numPages]);
 
   return (
     <div className="pdf-modal-overlay" onClick={onClose}>
@@ -24,6 +49,7 @@ function PdfPreviewOverlay({ filepath, onClose }) {
           <button onClick={() => setZoom(z => Math.max(0.5, z - 0.25))}>−</button>
           <span>{Math.round(zoom * 100)}%</span>
           <button onClick={() => setZoom(z => Math.min(3, z + 0.25))}>+</button>
+          <span>{currentPage}{"/"}{numPages}</span>
         </div>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <a
@@ -37,9 +63,7 @@ function PdfPreviewOverlay({ filepath, onClose }) {
         </div>
       </div>
 
-
-
-        <div className="pdf-modal-body">
+        <div className="pdf-modal-body" ref={bodyRef}>
           <Document
             file={`${API_BASE}/api/report/download/${encodeURIComponent(filepath)}`}
             onLoadSuccess={({ numPages }) => setNumPages(numPages)}
@@ -47,13 +71,18 @@ function PdfPreviewOverlay({ filepath, onClose }) {
             error={<p style={{ color: '#f88', padding: '20px' }}>Failed to load PDF.</p>}
           >
             {Array.from({ length: numPages || 0 }, (_, i) => (
-              <Page
+              <div
                 key={i + 1}
-                pageNumber={i + 1}
-                width={600 * zoom}
-                renderTextLayer={true}
-                renderAnnotationLayer={true}
-              />
+                data-page={i + 1}
+                ref={el => pageRefs.current[i] = el}
+              >
+                <Page
+                  pageNumber={i + 1}
+                  width={600 * zoom}
+                  renderTextLayer={true}
+                  renderAnnotationLayer={true}
+                />
+              </div>
             ))}
           </Document>
         </div>
