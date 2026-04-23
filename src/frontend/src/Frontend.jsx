@@ -48,6 +48,8 @@ function LoadingDots() {
 
 function Frontend() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isChatsCollapsed, setIsChatsCollapsed] = useState(false);
+  const [isReportsCollapsed, setIsReportsCollapsed] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [pastReports, setPastReports] = useState([
     { id: 1, ticker: 'AAPL', date: 'April 3', status: 'Pending' }
@@ -288,54 +290,64 @@ function Frontend() {
             </div>
 
             {/* Conversation list */}
-            <div className="sidebar-section-label" style = {{paddingTop: "32px"}}>Recent Chats</div>
-            <div className="sidebar-content">
-              {conversations.map((convo) => (
-                <div
-                  key={convo.id}
-                  className={`convo-item ${convo.id === activeConvoID ? 'active-convo' : ''}`}
-                  onClick={() => handleSelectConvo(convo.id)}
-                >
-                  <span className="convo-icon">💬</span>
-                  <span className="convo-title" style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {getConvoTitle(convo)}
-                  </span>
-                  {/* Delete button — only appears on hover via the CSS rule above */}
-                  <button
-                    className="convo-delete-btn"
-                    onClick={(e) => handleDeleteConvo(e, convo.id)}
-                    title="Delete conversation"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
+            <div className="sidebar-section-label sidebar-section-label-collapsible" style={{ paddingTop: "32px" }} onClick={() => setIsChatsCollapsed(v => !v)}>
+              <span>Recent Chats</span>
+              <span className="section-collapse-arrow">{isChatsCollapsed ? '▶' : '▼'}</span>
             </div>
+            {!isChatsCollapsed && (
+              <div className="sidebar-content">
+                {conversations.map((convo) => (
+                  <div
+                    key={convo.id}
+                    className={`convo-item ${convo.id === activeConvoID ? 'active-convo' : ''}`}
+                    onClick={() => handleSelectConvo(convo.id)}
+                  >
+                    <span className="convo-icon">💬</span>
+                    <span className="convo-title" style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {getConvoTitle(convo)}
+                    </span>
+                    {/* Delete button — only appears on hover via the CSS rule above */}
+                    <button
+                      className="convo-delete-btn"
+                      onClick={(e) => handleDeleteConvo(e, convo.id)}
+                      title="Delete conversation"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Past Reports */}
-            <div className="sidebar-section-label">Past Reports</div>
-            <div className="sidebar-content">
-              {pastReports.map((report) => (
-                <div key={report.id} className="report-item" onClick={() => report.filename && setPreviewPdf(report.filename)} style={{ cursor: report.filename ? 'pointer' : 'default' }}>
-                  <span className="report-item-icon">📄</span>
-                  <span className="report-item-name">
-                    <span>{report.ticker}{report.date ? ` · ${report.date}` : ''}</span>
-                    <span className="report-item-status">{report.status}</span>
-                  </span>
-                  {report.filename && (
-                    <a
-                      className="report-download-btn"
-                      href={`${API_BASE}/api/report/download/${encodeURIComponent(report.filename)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title="Download PDF"
-                    >
-                      ↓
-                    </a>
-                  )}
-                </div>
-              ))}
+            <div className="sidebar-section-label sidebar-section-label-collapsible" onClick={() => setIsReportsCollapsed(v => !v)}>
+              <span>Past Reports</span>
+              <span className="section-collapse-arrow">{isReportsCollapsed ? '▶' : '▼'}</span>
             </div>
+            {!isReportsCollapsed && (
+              <div className="sidebar-content">
+                {pastReports.map((report) => (
+                  <div key={report.id} className="report-item" onClick={() => report.filename && setPreviewPdf(report.filename)} style={{ cursor: report.filename ? 'pointer' : 'default' }}>
+                    <span className="report-item-icon">📄</span>
+                    <span className="report-item-name">
+                      <span>{report.ticker}{report.date ? ` · ${report.date}` : ''}</span>
+                      <span className="report-item-status">{report.status}</span>
+                    </span>
+                    {report.filename && (
+                      <a
+                        className="report-download-btn"
+                        href={`${API_BASE}/api/report/download/${encodeURIComponent(report.filename)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Download PDF"
+                      >
+                        ↓
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
