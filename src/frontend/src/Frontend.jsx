@@ -269,7 +269,7 @@ function Frontend() {
           
           {/* Show a simple "New Chat" icon when closed, like Gemini */}
           {!isSidebarOpen && (
-             <button onClick={handleNewChat} title="New Chat" style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', textAlign: 'left' }}>
+             <button onClick={handleNewChat} title="New Chat" style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', textAlign: 'center' }}>
                ✏️
              </button>
           )}
@@ -288,7 +288,7 @@ function Frontend() {
             </div>
 
             {/* Conversation list */}
-            <div className="sidebar-section-label">Recent Chats</div>
+            <div className="sidebar-section-label" style = {{paddingTop: "32px"}}>Recent Chats</div>
             <div className="sidebar-content">
               {conversations.map((convo) => (
                 <div
@@ -316,20 +316,22 @@ function Frontend() {
             <div className="sidebar-section-label">Past Reports</div>
             <div className="sidebar-content">
               {pastReports.map((report) => (
-                <div key={report.id} className="report-item">
-                  <p><strong>{report.ticker}</strong>{report.date ? ` - ${report.date}` : ''}</p>
-                  <small>{report.status}</small>
+                <div key={report.id} className="report-item" onClick={() => report.filename && setPreviewPdf(report.filename)} style={{ cursor: report.filename ? 'pointer' : 'default' }}>
+                  <span className="report-item-icon">📄</span>
+                  <span className="report-item-name">
+                    <span>{report.ticker}{report.date ? ` · ${report.date}` : ''}</span>
+                    <span className="report-item-status">{report.status}</span>
+                  </span>
                   {report.filename && (
-                    <div>
-                      <a
-                        href={`${API_BASE}/api/report/download/${encodeURIComponent(report.filename)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ fontSize: 12, color: '#185FA5' }}
-                      >
-                        ↓ Download PDF
-                      </a>
-                    </div>
+                    <a
+                      className="report-download-btn"
+                      href={`${API_BASE}/api/report/download/${encodeURIComponent(report.filename)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Download PDF"
+                    >
+                      ↓
+                    </a>
                   )}
                 </div>
               ))}
@@ -400,12 +402,7 @@ function Frontend() {
             <button
               key={ticker}
               onClick={() => setInputValue(`Generate a report on ${ticker}`)}
-              style={{
-                padding: '4px 12px', borderRadius: 99, fontSize: 12, fontWeight: 500, cursor: 'pointer',
-                background: 'transparent',
-                border: '0.5px solid var(--color-border-secondary)',
-                color: 'var(--color-text-primary)',
-              }}
+              className='suggested-ticker'
             >
               {ticker}
             </button>
