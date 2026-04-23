@@ -18,6 +18,14 @@ function PdfPreviewOverlay({ filepath, onClose }) {
   const bodyRef = useRef(null);
 
   useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         let mostVisible = null;
