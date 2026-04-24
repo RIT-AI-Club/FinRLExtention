@@ -7,7 +7,7 @@ from pathlib import Path
 from mcp.server.fastmcp import FastMCP
 
 from config import geminiConfig
-from gemini_client import get_gemini_client, generate_html
+from src.backend.mcp_servers.mcp_formatting.gemini_old.gemini_client import get_gemini_client, generate_html
 from prompts import REPORT_PROMPT
 
 logger = logging.getLogger(__name__)
