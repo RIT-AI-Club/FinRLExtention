@@ -2,13 +2,14 @@
 
 import json
 import logging
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 from pathlib import Path
 from mcp.server.fastmcp import FastMCP
 
-from config import config
-from gemini_client import get_gemini_client, generate_html
-from prompts import FORMATTING_PROMPT
+from config import geminiConfig
+from src.backend.mcp_servers.mcp_formatting.gemini_old.gemini_client import get_gemini_client, generate_html
+from prompts import REPORT_PROMPT
+from image_loader import start_image_server, prepare_image_urls
 
 # Get a logger for this module
 logger = logging.getLogger(__name__)
@@ -17,14 +18,15 @@ logger = logging.getLogger(__name__)
 mcp = FastMCP("formatting")
 
 @mcp.tool()
-async def format_report(text_blocks: List[str], images: List[List[str]]) -> str:
+async def format_report(text_blocks: List[str], images: Optional[List[Tuple[str, str]]], color_scheme: Optional[str] = None) -> str:
     """
     Formats text and images into a professional HTML report using an AI model.
     
     Args:
         text_blocks: A list of text content strings to include in the report.
         images: A list of tuples, where each tuple contains image data 
-                (e.g., base64) and its corresponding caption.
+                (filename) and its corresponding caption.
+        color_scheme: A string containing the main color scheme to format the report.
     
     Returns:
         A string containing the generated HTML report or a JSON string with an 
@@ -34,6 +36,12 @@ async def format_report(text_blocks: List[str], images: List[List[str]]) -> str:
         error_msg = "No text blocks provided. At least one text block is required."
         logger.warning(error_msg)
         return json.dumps({"error": error_msg})
+    
+    # 1. Start the image server in background (if not already started)
+    port = start_image_server(8000)
+    
+    # 2. Convert filenames to local URLs if necessary
+    processed_images = prepare_image_urls(images, port) if port else images
     
     try:
         # Initialize client, raises ValueError if the key is missing
@@ -45,7 +53,7 @@ async def format_report(text_blocks: List[str], images: List[List[str]]) -> str:
     # Prepare data structure for the AI
     user_data = {
         "text_blocks": text_blocks,
-        "images": images or []
+        "images": processed_images
     }
 
     # Load reference images for style guidance
@@ -65,29 +73,24 @@ async def format_report(text_blocks: List[str], images: List[List[str]]) -> str:
         reference_images = []
 
     try:
-        # Generate HTML content
-        html_content = await generate_html(
+        # Generate HTML content using the Gemini client
+        report = await generate_html(
             client=client, 
             user_data=user_data, 
-            system_prompt=FORMATTING_PROMPT, 
-            reference_image_paths=reference_images
+            system_prompt=REPORT_PROMPT,
+            color_scheme=color_scheme
         )
         
-        # Write HTML to a local file for debugging only if enabled in config
-        if config.debug:
-            debug_path = Path.cwd() / "latest_report.html"
-            try:
-                debug_path.write_text(html_content, encoding="utf-8")
-                logger.info(f"Debug HTML report saved to {debug_path}")
-            except IOError as e:
-                logger.error(f"Failed to write debug HTML file: {e}")
-
-        return html_content
+        # Save the latest report for debugging/review purposes
+        with open("latest_report.html", "w", encoding="utf-8") as file:
+            file.write(report)
+            
+        return report
     
     except Exception as e:
-        # This will catch exceptions from generate_html (API errors, parsing errors, etc.)
+        # Catch exceptions from generate_html (API errors, parsing errors, etc.)
         logger.error(f"An unexpected error occurred during report formatting: {e}", exc_info=True)
-        return json.dumps({"error": f"Failed to format report: {e}"})
+        return json.dumps({"error": f"Failed to format HTML: {e}"})
 
 
 if __name__ == "__main__":

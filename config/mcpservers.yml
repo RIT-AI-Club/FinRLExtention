@@ -1,5 +1,4 @@
 # MCP Server Configurations
-# Add your MCP servers here
 
 mcp_servers:
   - name: "research"
@@ -9,7 +8,11 @@ mcp_servers:
   # THIS IS THE FORMATTING SERVER
   - name: "formatting"
     command: "python"
-    args: ["src/backend/mcp_servers/mcp_formatting/server.py"]
+    args: ["src/backend/mcp_servers/mcp_formatting/claude_server.py"]
+
+  - name: "chart_generation"
+    command: "python"
+    args: ["src/backend/mcp_servers/mcp_chart_generation/server.py"]
 
   # Example server configuration:
   # - name: "example-server"

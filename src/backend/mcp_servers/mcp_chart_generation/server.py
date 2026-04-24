@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import io
 from datetime import datetime
-from fastmcp import FastMCP
-from fastmcp.utilities.types import Image
+from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp.utilities.types import Image
 import random
 import numpy as np
 
@@ -273,7 +273,7 @@ def _validate_inputs(dates: list, prices: list[float]) -> None:
     if len(dates) != len(prices):
         raise ValueError(f"Data mismatch: Received {len(dates)} dates and {len(prices)} prices.")
 
-# @mcp.tool() # comment out for manual testing
+@mcp.tool()
 def generate_line_chart(
     dates: list[str],
     prices: list[float],
@@ -307,8 +307,6 @@ def generate_line_chart(
     effective_theme = DEFAULT_THEME.copy()
     if theme:
         effective_theme.update(theme)
-    # text_color argument overrides theme's text color
-    effective_theme["text"] = theme.get("text", "dimgrey")
 
     # Create base chart with the theme
     fig, ax = _build_base_chart(dt_dates, prices, symbol, effective_theme)

@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AAPL — Financial Intelligence Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  @page {
+    background: #0a0a0f;
+    margin: 40px;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    width: 794px;
+    margin: 0 auto;
+    padding: 0;
+    background: #0a0a0f;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-family: 'DM Mono', monospace;
+    color: #e8e8f0;
+  }
+
+  p, h1, h2, h3, h4, h5, h6,
+  img, figure, table, thead, tbody, tr,
+  ul, ol, li,
+  .card, .section, .block, .metric, .chart, .row,
+  [class*="chart"], [class*="section"], [class*="callout"],
+  .summary-statement, .stat-row, .kpi-block, .news-item,
+  .risk-item, .table-row {
+    break-inside: avoid;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    width: 794px;
+    min-height: 520px;
+    background: #0a0a0f;
+    position: relative;
+    padding: 0;
+    overflow: hidden;
+    break-inside: avoid;
+  }
+
+  .cover-stripe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: #007AFF;
+  }
+
+  .cover-accent-bar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 220px;
+    height: 100%;
+    background: linear-gradient(135deg, #0a0a0f 0%, #0d1a2e 100%);
+    border-left: 1px solid #1a2a40;
+  }
+
+  .cover-content {
+    padding: 60px 50px 50px 60px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .cover-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: #007AFF;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .cover-ticker {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 140px;
+    line-height: 0.85;
+    color: #ffffff;
+    letter-spacing: 2px;
+    margin-bottom: 0;
+  }
+
+  .cover-ticker span {
+    color: #007AFF;
+  }
+
+  .cover-company {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: #6b7a8d;
+    letter-spacing: 2px;
+    margin-top: 16px;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+  }
+
+  .cover-divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, #007AFF 0%, #1a2a40 60%, transparent 100%);
+    margin-bottom: 32px;
+  }
+
+  .cover-meta-row {
+    display: flex;
+    gap: 48px;
+    align-items: flex-start;
+  }
+
+  .cover-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .cover-meta-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #4a5568;
+    text-transform: uppercase;
+  }
+
+  .cover-meta-value {
+    font-size: 14px;
+    color: #e8e8f0;
+    font-weight: 500;
+  }
+
+  .cover-price-hero {
+    position: absolute;
+    right: 30px;
+    bottom: 50px;
+    text-align: right;
+    z-index: 3;
+  }
+
+  .cover-price-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #4a5568;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .cover-price-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    color: #007AFF;
+    line-height: 1;
+  }
+
+  .cover-price-change {
+    font-size: 11px;
+    color: #ff453a;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+
+  /* ── SECTION HEADERS ── */
+  .section-header {
+    width: 794px;
+    padding: 28px 50px 20px 50px;
+    background: #0d1117;
+    border-top: 1px solid #1a2a40;
+    border-bottom: 1px solid #1a2a40;
+    margin-bottom: 0;
+    break-inside: avoid;
+  }
+
+  .section-header-inner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .section-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: #1a2a40;
+    line-height: 1;
+    min-width: 52px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: #e8e8f0;
+    letter-spacing: 3px;
+    line-height: 1;
+  }
+
+  .section-subtitle {
+    font-size: 10px;
+    color: #4a5568;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* ── BODY SECTIONS ── */
+  .body-section {
+    width: 794px;
+    padding: 32px 50px;
+    background: #0a0a0f;
+    break-inside: avoid;
+  }
+
+  .body-section-alt {
+    width: 794px;
+    padding: 32px 50px;
+    background: #0d1117;
+    break-inside: avoid;
+  }
+
+  /* ── GIANT METRIC HERO ── */
+  .metric-hero {
+    width: 794px;
+    padding: 40px 50px;
+    background: #0a0a0f;
+    border-bottom: 1px solid #1a2a40;
+    break-inside: avoid;
+  }
+
+  .metric-hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+  }
+
+  .metric-hero-item {
+    padding: 0 32px 0 0;
+    border-right: 1px solid #1a2a40;
+    break-inside: avoid;
+  }
+
+  .metric-hero-item:last-child {
+    border-right: none;
+    padding-right: 0;
+    padding-left: 32px;
+  }
+
+  .metric-hero-item:nth-child(2) {
+    padding-left: 32px;
+  }
+
+  .metric-hero-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #4a5568;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .metric-hero-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    color: #ffffff;
+    line-height: 1;
+  }
+
+  .metric-hero-value.blue {
+    color: #007AFF;
+  }
+
+  .metric-hero-value.green {
+    color: #30d158;
+  }
+
+  .metric-hero-sub {
+    font-size: 10px;
+    color: #6b7a8d;
+    margin-top: 6px;
+    letter-spacing: 1px;
+  }
+
+  /* ── STAT ROWS ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: #1a2a40;
+    border: 1px solid #1a2a40;
+    break-inside: avoid;
+  }
+
+  .stat-cell {
+    background: #0d1117;
+    padding: 16px 20px;
+    break-inside: avoid;
+  }
+
+  .stat-cell-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: #4a5568;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .stat-cell-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    color: #e8e8f0;
+    font-weight: 500;
+  }
+
+  .stat-cell-value.accent {
+    color: #007AFF;
+  }
+
+  .stat-cell-value.green {
+    color: #30d158;
+  }
+
+  .stat-cell-value.red {
+    color: #ff453a;
+  }
+
+  /* ── PULL QUOTE ── */
+  .pull-quote {
+    width: 794px;
+    padding: 48px 50px;
+    background: #007AFF;
+    break-inside: avoid;
+  }
+
+  .pull-quote-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: #ffffff;
+    line-height: 1.15;
+    letter-spacing: 1px;
+  }
+
+  .pull-quote-source {
+    font-size: 10px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 16px;
+  }
+
+  /* ── BAR CHART CSS ── */
+  .bar-chart-container {
+    width: 100%;
+    break-inside: avoid;
+  }
+
+  .bar-chart-title {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: #4a5568;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    break-inside: avoid;
+  }
+
+  .bar-label {
+    font-size: 10px;
+    color: #6b7a8d;
+    width: 120px;
+    flex-shrink: 0;
+    letter-spacing: 1px;
+  }
+
+  .bar-track {
+    flex: 1;
+    height: 6px;
+    background: #1a2a40;
+    position: relative;
+  }
+
+  .bar-fill {
+    height: 100%;
+    background: #007AFF;
+  }
+
+  .bar-fill.green {
+    background: #30d158;
+  }
+
+  .bar-fill.dim {
+    background: #2a3a50;
+  }
+
+  .bar-value {
+    font-size: 11px;
+    color: #e8e8f0;
+    width: 60px;
+    text-align: right;
+    flex-shrink: 0;
+    font-weight: 500;
+  }
+
+  /* ── BODY TEXT ── */
+  .body-text {
+    font-size: 11px;
+    line-height: 1.75;
+    color: #8a9ab0;
+    margin-bottom: 16px;
+    break-inside: avoid;
+  }
+
+  .body-text strong {
+    color: #c8d0dc;
+    font-weight: 500;
+  }
+
+  /* ── INLINE LABEL ── */
+  .inline-label {
+    display: inline-block;
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #007AFF;
+    border: 1px solid #007AFF;
+    padding: 2px 6px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  .inline-label.green {
+    color: #30d158;
+    border-color: #30d158;
+  }
+
+  .inline-label.red {
+    color: #ff453a;
+    border-color: #ff453a;
+  }
+
+  .inline-label.neutral {
+    color: #6b7a8d;
+    border-color: #6b7a8d;
+  }
+
+  /* ── NEWS ITEMS ── */
+  .news-item {
+    padding: 20px 0;
+    border-bottom: 1px solid #1a2a40;
+    break-inside: avoid;
+  }
+
+  .news-item:last-child {
+    border-bottom: none;
+  }
+
+  .news-date {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: #4a5568;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .news-headline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    color: #e8e8f0;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    line-height: 1.1;
+  }
+
+  .news-body {
+    font-size: 10px;
+    line-height: 1.7;
+    color: #6b7a8d;
+  }
+
+  .news-impact {
+    display: inline-block;
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    margin-top: 8px;
+  }
+
+  .news-impact.bullish {
+    background: rgba(48, 209, 88, 0.12);
+    color: #30d158;
+    border: 1px solid rgba(48, 209, 88, 0.3);
+  }
+
+  .news-impact.bearish {
+    background: rgba(255, 69, 58, 0.12);
+    color: #ff453a;
+    border: 1px solid rgba(255, 69, 58, 0.3);
+  }
+
+  .news-impact.neutral {
+    background: rgba(107, 122, 141, 0.12);
+    color: #6b7a8d;
+    border: 1px solid rgba(107, 122, 141, 0.3);
+  }
+
+  /* ── RISK TABLE ── */
+  .risk-table {
+    width: 100%;
+    border-collapse: collapse;
+    break-inside: avoid;
+  }
+
+  .risk-table th {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #4a5568;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 10px 16px;
+    background: #0d1117;
+    border-bottom: 1px solid #1a2a40;
+  }
+
+  .risk-table td {
+    font-size: 11px;
+    color: #8a9ab0;
+    padding: 12px 16px;
+    border-bottom: 1px solid #0f1820;
+    vertical-align: top;
+    line-height: 1.6;
+  }
+
+  .risk-table tr:nth-child(even) td {
+    background: #0d1117;
+  }
+
+  .risk-table tr:nth-child(odd) td {
+    background: #0a0a0f;
+  }
+
+  .risk-table td:first-child {
+    color: #c8d0dc;
+    font-weight: 500;
+    width: 160px;
+  }
+
+  /* ── TECHNICAL LEVELS ── */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    break-inside: avoid;
+  }
+
+  .tech-card {
+    background: #0d1117;
+    border: 1px solid #1a2a40;
+    padding: 20px;
+    break-inside: avoid;
+  }
+
+  .tech-card-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #4a5568;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .tech-card-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: #e8e8f0;
+    line-height: 1;
+  }
+
+  .tech-card-value.blue { color: #007AFF; }
+  .tech-card-value.green { color: #30d158; }
+  .tech-card-value.yellow { color: #ffd60a; }
+
+  .tech-card-sub {
+    font-size: 9px;
+    color: #4a5568;
+    margin-top: 6px;
+    letter-spacing: 1px;
+  }
+
+  /* ── SENTIMENT BAND ── */
+  .sentiment-band {
+    width: 794px;
+    padding: 32px 50px;
+    background: #0d1117;
+    border-top: 3px solid #30d158;
+    break-inside: avoid;
+  }
+
+  .sentiment-label {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: #30d158;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .sentiment-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: #e8e8f0;
+    letter-spacing: 2px;
+    line-height: 1.3;
+  }
+
+  /* ── FOOTER ── */
+  .report-footer {
+    width: 794px;
+    padding: 24px 50px;
+    background: #0d1117;
+    border-top: 1px solid #1a2a40;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    break-inside: avoid;
+  }
+
+  .footer-left {
+    font-size: 9px;
+    color: #2a3a50;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .footer-right {
+    font-size: 9px;
+    color: #2a3a50;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* ── ROTATED LABEL ── */
+  .rotated-section-tag {
+    display: inline-block;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: #1a2a40;
+    transform: rotate(-90deg);
+    transform-origin: left center;
+    white-space: nowrap;
+    margin-right: 8px;
+  }
+
+  /* ── HORIZONTAL DIVIDER ── */
+  .h-rule {
+    width: 100%;
+    height: 1px;
+    background: #1a2a40;
+    margin: 24px 0;
+  }
+
+  .h-rule-blue {
+    width: 100%;
+    height: 2px;
+    background: #007AFF;
+    margin: 0;
+  }
+
+  /* ── FINRL SECTION ── */
+  .finrl-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    break-inside: avoid;
+  }
+
+  .finrl-item {
+    background: #0d1117;
+    border-left: 3px solid #007AFF;
+    padding: 14px 16px;
+    break-inside: avoid;
+  }
+
+  .finrl-item-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: #007AFF;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .finrl-item-value {
+    font-size: 12px;
+    color: #c8d0dc;
+    line-height: 1.5;
+  }
+
+  /* ── GROWTH PROJECTIONS ── */
+  .growth-row {
+    display: flex;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid #0f1820;
+    break-inside: avoid;
+  }
+
+  .growth-row:last-child {
+    border-bottom: none;
+  }
+
+  .growth-metric {
+    width: 200px;
+    font-size: 11px;
+    color: #6b7a8d;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+  }
+
+  .growth-bar-track {
+    flex: 1;
+    height: 4px;
+    background: #1a2a40;
+    margin: 0 16px;
+  }
+
+  .growth-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #007AFF, #30d158);
+  }
+
+  .growth-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: #30d158;
+    width: 80px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ── CHART CAPTION ── */
+  .chart-caption {
+    font-size: 10px;
+    color: #4a5568;
+    margin-top: 10px;
+    letter-spacing: 1px;
+    padding-left: 2px;
+  }
+
+  /* ── OVERVIEW INTRO ── */
+  .overview-intro {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+    break-inside: avoid;
+  }
+
+  .overview-text-col {
+    flex: 1;
+  }
+
+  .overview-stat-col {
+    width: 200px;
+    flex-shrink: 0;
+  }
+
+  .mini-stat {
+    padding: 12px 0;
+    border-bottom: 1px solid #1a2a40;
+    break-inside: avoid;
+  }
+
+  .mini-stat:last-child {
+    border-bottom: none;
+  }
+
+  .mini-stat-label {
+    font-size: 8px;
+    letter-spacing: 2px;
+    color: #4a5568;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .mini-stat-value {
+    font-size: 13px;
+    color: #e8e8f0;
+    font-weight: 500;
+  }
+
+  /* ── SPACER ── */
+  .spacer-sm { height: 16px; }
+  .spacer-md { height: 24px; }
+  .spacer-lg { height: 40px; }
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- COVER -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-stripe"></div>
+  <div class="cover-accent-bar"></div>
+  <div class="cover-content">
+    <div class="cover-label">Equity Intelligence Report · Technology Sector</div>
+    <div class="cover-ticker">AA<span>PL</span></div>
+    <div class="cover-company">Apple Inc. · NASDAQ · Consumer Electronics &amp; Services</div>
+    <div class="cover-divider"></div>
+    <div class="cover-meta-row">
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Report Date</div>
+        <div class="cover-meta-value">April 2026</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Market Cap</div>
+        <div class="cover-meta-value">$3.77T</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Sector</div>
+        <div class="cover-meta-value">Technology</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Employees</div>
+        <div class="cover-meta-value">~164,000</div>
+      </div>
+    </div>
+  </div>
+  <div class="cover-price-hero">
+    <div class="cover-price-label">Last Price</div>
+    <div class="cover-price-num">$237.88</div>
+    <div class="cover-price-change">▼ −1.81 (−0.76%) · Vol 48.99M</div>
+  </div>
+</div>
+
+<div class="h-rule-blue"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- KEY METRICS HERO -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="metric-hero">
+  <div class="metric-hero-grid">
+    <div class="metric-hero-item">
+      <div class="metric-hero-label">Q4 CY2025 Revenue</div>
+      <div class="metric-hero-value blue">$143.8B</div>
+      <div class="metric-hero-sub">+15.7% YoY · Beat est. by 4.1%</div>
+    </div>
+    <div class="metric-hero-item">
+      <div class="metric-hero-label">GAAP EPS (Q4 CY2025)</div>
+      <div class="metric-hero-value">$2.84</div>
+      <div class="metric-hero-sub">Beat estimates by 6.4%</div>
+    </div>
+    <div class="metric-hero-item">
+      <div class="metric-hero-label">Free Cash Flow Margin</div>
+      <div class="metric-hero-value green">35.9%</div>
+      <div class="metric-hero-sub">Up from 21.7% prior period</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 1: COMPANY OVERVIEW -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section-header">
+  <div class="section-header-inner">
+    <div class="section-num">01</div>
+    <div>
+      <div class="section-title">Company Overview</div>
+      <div class="section-subtitle">Business Profile · Products · Market Position</div>
+    </div>
+  </div>
+</div>
+
+<div class="body-section">
+  <div class="overview-intro">
+    <div class="overview-text-col">
+      <p class="body-text">
+        <strong>Apple Inc. (AAPL)</strong> designs, manufactures, and markets consumer electronics including the iPhone, Mac computers, iPad tablets, wearables, operating systems, services like iCloud and Apple Pay, and digital content via iTunes and other portals. It operates in the technology sector, serving creative, education, government, and consumer markets.
+      </p>
+      <p class="body-text">
+        The company's integrated ecosystem is the cornerstone of its competitive moat — driving services revenue growth and sustaining extraordinary customer retention. Key products span hardware, software, and a rapidly expanding services segment that includes Apple Pay, iCloud, the App Store, and Apple Intelligence AI features.
+      </p>
+      <p class="body-text">
+        Apple leads in consumer electronics with a strong brand, innovative ecosystem, and services lock-in as key moats. Market re-rating from growth compounder to high-quality compounder reflects the company's consistent outperformance via profitability metrics.
+      </p>
+    </div>
+    <div class="overview-stat-col">
+      <div class="mini-stat">
+        <div class="mini-stat-label">Employees</div>
+        <div class="mini-stat-value">~164,000</div>
+      </div>
+      <div class="mini-stat">
+        <div class="mini-stat-label">R&amp;D / 2024 Sales</div>
+        <div class="mini-stat-value">8.0%</div>
+      </div>
+      <div class="mini-stat">
+        <div class="mini-stat-label">Cash Position</div>
+        <div class="mini-stat-value">$65.17B</div>
+      </div>
+      <div class="mini-stat">
+        <div class="mini-stat-label">Levered FCF (TTM)</div>
+        <div class="mini-stat-value">$110.85B</div>
+      </div>
+      <div class="mini-stat">
+        <div class="mini-stat-label">Profit Margin (TTM)</div>
+        <div class="mini-stat-value">23.97%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 2: FINANCIAL SUMMARY -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="section-header">
+  <div class="section-header-inner">
+    <div class="section-num">02</div>
+    <div>
+      <div class="section-title">Financial Summary</div>
+      <div class="section-subtitle">Q4 CY2025 Results · Trailing Twelve Months · Valuation</div>
+    </div>
+  </div>
+</div>
+
+<div class="body-section-alt">
+  <div class="stat-grid">
+    <div class="stat-cell">
+      <div class="stat-cell-label">Q4 CY2025 Revenue</div>
+      <div class="stat-cell-value accent">$143.8B</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-cell-label">Revenue YoY Growth</div>
+      <div class="stat-cell-value green">+15.7%</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-cell-label">GAAP Operating Profit (Q4)</div>
+      <div class="stat-cell-value">$50.85B</div>
+    </div>
+    <div class="stat-cell">
+      <div class
