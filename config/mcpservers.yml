@@ -1,6 +1,11 @@
 # MCP Server Configurations
+# Add your MCP servers here
 
 mcp_servers:
+  - name: "chart_generation"
+    command: "python"
+    args: ["src/backend/mcp_servers/mcp_chart_generation/server.py"]
+    
   - name: "formatting"
     command: "python"
     args: ["src/backend/mcp_servers/mcp_formatting/server.py"]
@@ -9,6 +14,3 @@ mcp_servers:
     command: "python"
     args: ["src/backend/mcp_servers/mcp_research/server.py"]
 
-  - name: "charts"
-    command: "python"
-    args: ["src/backend/mcp_servers/mcp_chart_generation/server.py"]
