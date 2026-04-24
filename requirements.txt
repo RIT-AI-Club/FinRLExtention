@@ -1,20 +1,27 @@
 # FinRLExtention Dependencies
 
-# Google Gemini API
+# Web Framework
+fastapi>=0.110.0
+uvicorn>=0.27.0
+pydantic>=2.6.0
+
+# AI APIs
 google-generativeai>=0.8.0
+anthropic>=0.30.0
+openai>=1.0.0  # Used for Perplexity API compatibility
 
-# MCP (Model Context Protocol) SDK
+# MCP (Model Context Protocol)
 mcp>=1.0.0
-fastmcp
+fastmcp>=2.0.0
 
-# Configuration
+# Visualization & Charts
+matplotlib>=3.8.0
+
+# PDF Generation
+playwright>=1.40.0
+
+# Configuration & Utilities
 pyyaml>=6.0
-
-# OpenAI SDK (used for Perplexity API compatibility)
-openai>=1.0.0
-
-# Async support
 anyio>=4.0.0
-
-# Retry logic
 tenacity>=8.0.0
+google-protobuf>=4.25.0
