@@ -44,6 +44,17 @@ def _dummy_prices(start: float, n: int, deviation: float = 2.5) -> list[float]:
     return prices
 
 
+def _fetch_real_prices(ticker: str) -> tuple[list[str], list[float]]:
+    """Fetch real 90-day closing prices via yfinance."""
+    import yfinance as yf
+    hist = yf.Ticker(ticker).history(period="3mo")
+    if hist.empty:
+        raise ValueError(f"No price data returned for {ticker}")
+    dates = [d.strftime("%Y-%m-%d") for d in hist.index]
+    prices = [round(float(p), 4) for p in hist["Close"].tolist()]
+    return dates, prices
+
+
 async def generate_report(
     ticker: str,
     save_pdf: bool = True,
@@ -71,16 +82,48 @@ async def generate_report(
     try:
         # --- 1. Research ---
         logger.info(f"[1/4] Researching stock: {ticker}")
-        stock_result = await client.call_tool("research_stock", {"ticker": ticker})
-        news_result = await client.call_tool("research_news", {"ticker": ticker})
+        stock_result, news_result = await asyncio.gather(
+            client.call_tool("research_stock", {"ticker": ticker}),
+            client.call_tool("research_news", {"ticker": ticker}),
+        )
         text_blocks = [_extract_text(stock_result), _extract_text(news_result)]
+
+        logger.info(f"[1b/4] Supplemental research for: {ticker}")
+        sector_result, valuation_result = await asyncio.gather(
+            client.call_tool("research_topic", {
+                "query": (
+                    f"Competitive landscape, industry trends, and market size for the sector "
+                    f"that {ticker} operates in. Include key competitors, market share estimates, "
+                    f"and any major regulatory or macro factors affecting the industry."
+                )
+            }),
+            client.call_tool("research_topic", {
+                "query": (
+                    f"Detailed valuation analysis for {ticker}: current P/E, forward P/E, PEG ratio, "
+                    f"EV/EBITDA, P/S ratio, comparison to sector peers, and analyst fair value or "
+                    f"price target estimates with named analysts or firms."
+                )
+            }),
+        )
+        text_blocks.extend([_extract_text(sector_result), _extract_text(valuation_result)])
+        logger.info(
+            f"Research complete: {len(text_blocks)} blocks, "
+            f"{sum(len(b) for b in text_blocks):,} total characters"
+        )
 
         # --- 2. Chart generation ---
         logger.info(f"[2/4] Generating chart for: {ticker}")
-        base = datetime.now()
-        dates = [(base - timedelta(days=i)).strftime("%Y-%m-%d") for i in range(90)]
-        dates.reverse()
-        prices = _dummy_prices(start=150.0, n=90)
+        try:
+            dates, prices = _fetch_real_prices(ticker)
+            chart_caption = f"{ticker.upper()} — 90-Day Closing Price (Real Data)"
+            logger.info(f"Fetched {len(dates)} real price points for {ticker}")
+        except Exception as e:
+            logger.warning(f"yfinance fetch failed ({e}), using dummy prices")
+            base = datetime.now()
+            dates = [(base - timedelta(days=i)).strftime("%Y-%m-%d") for i in range(90)]
+            dates.reverse()
+            prices = _dummy_prices(start=150.0, n=90)
+            chart_caption = f"{ticker.upper()} — 90-Day Price History"
 
         chart_result = await client.call_tool(
             "generate_line_chart",
@@ -96,7 +139,7 @@ async def generate_report(
         images = []
         for item in chart_result.content:
             if hasattr(item, "data"):
-                images.append([item.data, f"{ticker.upper()} — 90-Day Price History"])
+                images.append([item.data, chart_caption])
 
         # --- 3. Format into HTML ---
         logger.info("[3/4] Formatting HTML report")

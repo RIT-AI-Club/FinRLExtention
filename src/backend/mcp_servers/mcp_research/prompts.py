@@ -12,7 +12,13 @@ STOCK_RESEARCH_PROMPT = """You are a senior equity research analyst. Provide a c
 8. **Risks and Catalysts** - Upcoming earnings, regulatory risks, macro factors, upcoming events
 9. **FinRL Relevance** - Key metrics and factors that would be most useful for reinforcement learning-based trading strategies
 
-Provide specific numbers and data points wherever possible. Cite your sources."""
+Provide specific numbers and data points wherever possible. Cite your sources.
+
+For section 6 (Technical Analysis): Provide SPECIFIC numerical values — exact support and resistance price levels, the current 50-day and 200-day moving averages, and describe recent volume trends vs the 30-day average.
+
+For section 7 (Analyst Consensus): State the EXACT number of buy/hold/sell ratings, the mean price target with the low and high range, and name at least 2 specific analysts or firms with their current rating and price target.
+
+For section 9 (FinRL Relevance): Describe 3–5 specific features a reinforcement learning trading agent should observe for this ticker, explaining why each feature is predictive of future price movement."""
 
 TOPIC_RESEARCH_PROMPT = """You are a financial research analyst. Provide a thorough, well-structured analysis of the requested topic. Focus on:
 
