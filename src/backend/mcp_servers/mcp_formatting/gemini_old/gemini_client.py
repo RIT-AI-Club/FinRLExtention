@@ -10,7 +10,6 @@ from pathlib import Path
 from typing import Any, Optional, List
 from google import genai
 from google.genai import types
-from typing import Any, Optional, List
 import asyncio
 import json
 
@@ -43,16 +42,6 @@ def _build_user_prompt_parts(
     reference_image_paths: Optional[List[str]] = None,
     color_scheme: str = None
 ) -> List[types.Part]:
-    """
-    Constructs the list of 'parts' for the Gemini API request payload.
-    
-    Args:
-        user_data: Dictionary containing text blocks and processed image URLs.
-        reference_image_paths: Optional list of file paths to styling reference images.
-        
-    Returns:
-        List[types.Part]: A list of parts to be sent to the Gemini model.
-    """
     parts = [types.Part(text=f"PRIMARY DATA SOURCE (TRANSCRIPTION ONLY): {json.dumps(user_data)}")]
 
     if reference_image_paths:
@@ -62,30 +51,40 @@ def _build_user_prompt_parts(
             if not img_path.exists():
                 logger.warning(f"Reference image not found, skipping: {img_path}")
                 continue
-            
             logger.info(f"Attaching reference image: {img_path.name}")
             image_bytes = img_path.read_bytes()
             parts.extend([
-                types.Part(
-                    inline_data=types.Blob(mime_type="image/png", data=image_bytes)
-                ),
-                types.Part(
-                    text=f"REFERENCE IMAGE {i+1}: Analyze the spatial rhythm and layout balance of this image. Use it to inform the 'Couture' editorial vibe of your HTML."
-                )
+                types.Part(inline_data=types.Blob(mime_type="image/png", data=image_bytes)),
+                types.Part(text=f"REFERENCE IMAGE {i+1}: Analyze the spatial rhythm and layout balance of this image. Use it to inform the 'Couture' editorial vibe of your HTML.")
             ])
+
+    # Build an explicit numbered checklist of every image the model MUST include
+    images = user_data.get("images", [])
+    if images:
+        required_imgs = "\n".join(
+            f"  {i+1}. <img src=\"{img[0]}\" style=\"width: 650px; height: auto; display: block;\">  <!-- {img[1] if len(img) > 1 else ''} -->"
+            for i, img in enumerate(images)
+        )
+        parts.append(types.Part(text=(
+            f"MANDATORY IMAGE CHECKLIST — You MUST embed ALL {len(images)} images below as <img> tags in the final HTML. "
+            f"Do not skip, omit, or replace any of them with placeholders. "
+            f"Before finishing, count your <img> tags — there must be exactly {len(images)}.\n\n"
+            f"Required images (copy src values exactly):\n{required_imgs}"
+        )))
 
     parts.append(types.Part(text=(
         "Generate a complete HTML document with embedded CSS for a multi-page A4 PDF financial report using the data and image assets I provide above.\n"
-        "Use only the provided data and preserve all values exactly as given (no rounding, no estimating, no invented content). Use all provided chart/image assets as real <img> elements with the exact src values I provide. Do not create placeholders.\n"
-        "Do not use JavaScript. Do not use inline styles. Put all CSS in a single <style> block in the <head>. Return only the final HTML document.\n"
+        "Use only the provided data and preserve all values exactly as given (no rounding, no estimating, no invented content).\n"
+        f"CRITICAL: The final HTML must contain exactly {len(images)} <img> tags — one for each image in the mandatory checklist above. Missing even one is a failure.\n"
+        "Do not use JavaScript. Put all CSS in a single <style> block in the <head>. Return only the final HTML document.\n"
     )))
 
     if color_scheme:
         parts.append(types.Part(text=color_scheme))
-        parts.append(types.Part(text="Create a color scheme based on the color given. Make the background a slighlty lighter, opaque version of the color and make containers a darker opaque version of the color. Include any other colors you would like to add but keep it all similar to the color given."))
-    else: 
+        parts.append(types.Part(text="Create a color scheme based on the color given. Make the background a slightly lighter, opaque version of the color and make containers a darker opaque version of the color."))
+    else:
         parts.append(types.Part(text="Create your own color scheme based on the company given in the data above."))
-    
+
     return parts
 
 async def generate_html(
@@ -93,8 +92,6 @@ async def generate_html(
     user_data: dict[str, Any],
     system_prompt: str,
     reference_image_paths: Optional[List[str]] = None,
-    model: Optional[str] = None,
-    temperature: Optional[float] = None,
     max_output_tokens: Optional[int] = None,
     color_scheme: str = None
 ) -> str:
@@ -121,33 +118,27 @@ async def generate_html(
     user_parts = _build_user_prompt_parts(user_data, reference_image_paths, color_scheme)
 
     # Use parameters if provided, otherwise fall back to config values
-    final_model = model or geminiConfig.default_model
+    final_model = "gemini-3.1-flash-lite-preview"
     generation_config = types.GenerateContentConfig(
-        temperature=temperature if temperature is not None else geminiConfig.temperature,
+        temperature=1.0,
         max_output_tokens=max_output_tokens if max_output_tokens is not None else geminiConfig.max_output_tokens,
-        system_instruction=types.Content(parts=[types.Part(text=system_prompt)]),
+        system_instruction=system_prompt,
+        thinking_config=types.ThinkingConfig(
+            thinking_level="medium"  # "low", "medium", or "high"
+        )
     )
 
     logger.info(f"Sending request to Gemini model '{final_model}'...")
-    contents = [types.Content(role="user", parts=user_parts)]
-    response = None
-    for attempt in range(4):
-        try:
-            response = await client.aio.models.generate_content(
-                model=final_model,
-                contents=contents,
-                config=generation_config,
-            )
-            logger.info("Received response from Gemini.")
-            break
-        except Exception as e:
-            is_503 = "503" in str(e) or "unavailable" in str(e).lower()
-            if not is_503 or attempt == 3:
-                logger.error(f"Gemini API call failed (attempt {attempt + 1}/4, {type(e).__name__}): {e}", exc_info=True)
-                raise
-            wait = 2 ** attempt
-            logger.warning(f"Gemini 503 on attempt {attempt + 1}/4, retrying in {wait}s... ({type(e).__name__})")
-            await asyncio.sleep(wait)
+    try:
+        response = await client.aio.models.generate_content(
+            model=final_model,
+            contents=[types.Content(role="user", parts=user_parts)],
+            config=generation_config,
+        )
+        logger.info("Received response from Gemini.")
+    except Exception as e:
+        logger.error(f"Gemini API call failed: {e}", exc_info=True)
+        raise
 
     # Extract HTML from response
     try:

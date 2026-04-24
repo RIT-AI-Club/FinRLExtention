@@ -28,3 +28,7 @@ env/
 
 node_modules/
 
+# Output files
+*.pdf
+latest_report.html
+

@@ -137,7 +137,7 @@ Set width directly on the `<img>` tag. Let height scale naturally.
 
 ```html
 <!-- ✅ The only correct pattern -->
-<img src="http://localhost:8000/revenue_growth.png" style="width: 650px; height: auto; display: block;">
+<img src="http://localhost:8000/images/revenue_growth.png" style="width: 650px; height: auto; display: block;">
 ```
 
 **These three patterns are always wrong and must never appear:**
@@ -177,13 +177,13 @@ Chart images must NEVER be placed inside a grid column, flex child, or any conta
 ```html
 <!-- ✅ Correct — chart in its own full-width block, outside any grid -->
 <div style="width: 794px;">
-  <img src="http://localhost:8000/revenue_growth.png" style="width: 550px; height: auto; display: block;">
+  <img src="http://localhost:8000/images/revenue_growth.png" style="width: 550px; height: auto; display: block;">
 </div>
 
 <!-- ❌ WRONG — chart trapped inside a narrow grid column -->
 <div style="display: grid; grid-template-columns: 1fr 1fr;">
   <div>
-    <img src="http://localhost:8000/revenue_growth.png" style="width: 550px; height: auto;">
+    <img src="http://localhost:8000/images/revenue_growth.png" style="width: 550px; height: auto;">
   </div>
   <div>Some text...</div>
 </div>
@@ -246,7 +246,7 @@ Every chart image must be accompanied by a caption block placed directly beneath
 ```html
 <!-- ✅ Correct caption pattern -->
 <div style="width: 794px;">
-  <img src="http://localhost:8000/revenue_growth.png" style="width: 550px; height: auto; display: block;">
+  <img src="http://localhost:8000/images/revenue_growth.png" style="width: 550px; height: auto; display: block;">
   <p style="font-size: 11px; color: #888; margin-top: 6px;">
     Revenue Growth by Quarter · FY2023–FY2024 · Source: Company financials
   </p>
@@ -336,7 +336,126 @@ Interpret creatively and make unexpected choices that feel genuinely designed fo
 
 **IMPORTANT**: Match implementation complexity to the aesthetic vision. Maximalist designs need elaborate code with extensive animations and effects. Minimalist or refined designs need restraint, precision, and careful attention to spacing, typography, and subtle details. Elegance comes from executing the vision well.
 
-Remember: Claude is capable of extraordinary creative work. Don't hold back, show what can truly be created when thinking outside the box and committing fully to a distinctive vision.
+---
+
+## 4. Document Structure
+
+Use a fixed document width of **794px** so content maps cleanly to PDF page width.
+
+```css
+@page {
+  background: #your-color; /* makes PDF margins match your background — not white */
+  margin: 40px;
+}
+
+body {
+  width: 794px;
+  margin: 0 auto;
+  padding: 0;
+  background: #your-color; /* must match @page background */
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  font-family: 'Your Font', sans-serif;
+}
+```
+
+Both `@page` and `body` must use the same background color or you'll see a mismatch at page edges. The `print-color-adjust: exact` lines are required — without them Chromium strips background colors.
+
+---
+
+## 5. Preventing Elements From Splitting Across Pages
+
+```css
+p, h1, h2, h3, h4, h5, h6,
+img, figure, table, thead, tbody, tr,
+ul, ol, li,
+.card, .section, .block, .metric, .chart, .row, .chart-container {
+  break-inside: avoid;
+}
+```
+
+Required on every report. Do not omit it.
+
+---
+
+## 6. ⚠️ Images — Critical Rules, No Exceptions
+
+> **Every chart image must be at least 500px wide. This is non-negotiable. A chart smaller than 500px will have illegible axis labels, unreadable legends, and invisible annotations — making it completely useless in the final PDF. When in doubt, go wider.**
+
+Set width directly on the `<img>` tag. Let height scale naturally.
+
+```html
+<!-- ✅ The only correct pattern -->
+<img src="http://localhost:8000/images/revenue_growth.png" style="width: 550px; height: auto; display: block;">
+```
+
+**These three patterns are always wrong and must never appear:**
+
+```html
+<!-- ❌ WRONG — explicit height letterboxes the chart leaving empty space above and below -->
+<img src="..." style="width: 550px; height: 350px; object-fit: contain;">
+
+<!-- ❌ WRONG — width on a wrapper div does nothing to the actual image size -->
+<div style="width: 550px;">
+  <img src="...">
+</div>
+
+<!-- ❌ WRONG — height set in a CSS class has the same letterboxing problem -->
+.chart-container img { width: 550px; height: 350px; }
+```
+
+**Before outputting, find every `<img>` tag and verify:**
+1. Width is set as an inline style directly on the `<img>` — minimum 500px
+2. Height is `auto` — never a fixed pixel value
+3. No parent wrapper div is controlling the size instead
+
+---
+
+## 6b. ⚠️ Chart Image Containers — Critical Layout Rules
+
+Chart images must NEVER be placed inside a grid column, flex child, or any container that is narrower than the image's width. A chart image placed in a container too small to hold it will overflow, clip, or be forced to shrink — making axis labels and data unreadable. This is a critical failure.
+
+**Rules for every chart image, no exceptions:**
+
+1. Charts must always live in a full-width container spanning the entire 794px document width.
+2. If a section uses a multi-column grid layout, charts must break out of it entirely — place them outside the grid wrapper, in their own full-width block.
+3. Never place a chart image as a grid-column child, sidebar item, or inside any container with a constrained width.
+4. If a section must show both a chart and accompanying text, stack them vertically (chart on top, text below) — never side by side in columns.
+
+```html
+<!-- ✅ Correct — chart in its own full-width block, outside any grid -->
+<div style="width: 794px;">
+  <img src="http://localhost:8000/images/revenue_growth.png" style="width: 550px; height: auto; display: block;">
+</div>
+
+<!-- ❌ WRONG — chart trapped inside a narrow grid column -->
+<div style="display: grid; grid-template-columns: 1fr 1fr;">
+  <div>
+    <img src="http://localhost:8000/images/revenue_growth.png" style="width: 550px; height: auto;">
+  </div>
+  <div>Some text...</div>
+</div>
+```
+
+---
+
+## 7. Typography
+
+All font sizes in `px` only. No `rem`, `em`, or `%`.
+
+---
+
+## 8. Playwright Configuration
+
+```python
+page.pdf(
+    width="794px",
+    print_background=True,
+    # margins controlled by @page in CSS, not here
+)
+```
+
+Images are served from a local HTTP server at `http://localhost:8000`. Use image URLs exactly as provided — do not modify them.
 """
 
 # NOTE: This prompt is currently unused in the application.
