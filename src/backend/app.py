@@ -1,5 +1,6 @@
 import sys
 import os
+import re
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from fastapi import FastAPI, HTTPException
@@ -11,6 +12,18 @@ from pathlib import Path
 import glob, traceback
 
 from mcp_client import MCPClient, create_mcp_client
+from generate_report import generate_report as _run_generate_report
+
+_REPORT_KEYWORDS = frozenset(['report', 'generate', 'analyze', 'analysis', 'create'])
+
+
+def _detect_report_ticker(message: str) -> str | None:
+    """Return uppercase ticker if the message is a report generation request, else None."""
+    lower = message.lower()
+    if not any(kw in lower for kw in _REPORT_KEYWORDS):
+        return None
+    match = re.search(r'\b([A-Z]{2,5})\b', message)
+    return match.group(1) if match else None
 
 PDF_OUTPUT_DIR = "reports"
 os.makedirs(PDF_OUTPUT_DIR, exist_ok=True)
@@ -60,24 +73,34 @@ def _guard_client() -> MCPClient:
 async def chat(req: ChatRequest):
     mcp = _guard_client()
 
-    # Snapshot existing PDFs *before* the request so we can detect new ones afterward.
-    # We capture full paths and mtimes here to minimise the race window.
-    files_before = {
-        p: os.path.getmtime(p)
-        for p in glob.glob(f"{PDF_OUTPUT_DIR_ABS}/*.pdf")
-    }
+    ticker = _detect_report_ticker(req.message)
+    if ticker:
+        try:
+            paths = await _run_generate_report(
+                ticker=ticker,
+                save_pdf=True,
+                output_dir=PDF_OUTPUT_DIR_ABS,
+                client=mcp,
+            )
+            pdf_filename = paths["pdf"].name if "pdf" in paths else None
+            return {
+                "reply": f"Report for {ticker} has been generated.",
+                "pdf_filename": pdf_filename,
+            }
+        except Exception as e:
+            traceback.print_exc()
+            raise HTTPException(status_code=500, detail=str(e))
 
+    # Non-report chat: use the Gemini agentic loop and detect any incidentally generated PDFs.
+    files_before = {p: os.path.getmtime(p) for p in glob.glob(f"{PDF_OUTPUT_DIR_ABS}/*.pdf")}
     try:
         reply = await mcp.process_message(req.message, req.history)
 
-        # Detect PDFs that did not exist before this request
         files_after = set(glob.glob(f"{PDF_OUTPUT_DIR_ABS}/*.pdf"))
         new_files = [p for p in files_after if p not in files_before]
-
         pdf_filename: str | None = None
         if new_files:
-            newest = max(new_files, key=os.path.getmtime)
-            pdf_filename = os.path.basename(newest)
+            pdf_filename = os.path.basename(max(new_files, key=os.path.getmtime))
 
         return {"reply": reply, "pdf_filename": pdf_filename}
 

@@ -51,9 +51,7 @@ function Frontend() {
   const [isChatsCollapsed, setIsChatsCollapsed] = useState(false);
   const [isReportsCollapsed, setIsReportsCollapsed] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  const [pastReports, setPastReports] = useState([
-    { id: 1, ticker: 'AAPL', date: 'April 3', status: 'Pending' }
-  ]);
+  const [pastReports, setPastReports] = useState([]);
   const [isDataLoading, setIsDataLoading] = useState(false);
   //For pdf preview
   const [previewPdf, setPreviewPdf] = useState(null);
@@ -129,7 +127,7 @@ function Frontend() {
       const data = await res.json();
       const serverReports = (data.reports || []).map((filename, i) => ({
         id: `server-${i}`,
-        ticker: filename.replace(/\.pdf$/i, '').replace(/[_-]/g, ' '),
+        ticker: filename.replace(/\.pdf$/i, '').split('_')[0],
         date: '',
         status: 'Ready',
         filename,
@@ -207,7 +205,7 @@ function Frontend() {
         if (data.pdf_filename) {
           const newReport = {
             id: Date.now() + 2,
-            ticker: data.pdf_filename.replace(/\.pdf$/i, '').replace(/[_-]/g, ' '),
+            ticker: data.pdf_filename.replace(/\.pdf$/i, '').split('_')[0],
             date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' }),
             status: 'Ready',
             filename: data.pdf_filename,

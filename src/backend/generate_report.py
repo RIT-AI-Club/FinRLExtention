@@ -18,12 +18,7 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
-# Ensure the script always runs relative to the project root so that
-# relative MCP server paths in mcpservers.yml resolve correctly.
-os.chdir(Path(__file__).parent.parent.parent)
-sys.path.insert(0, str(Path(__file__).parent))
-
-from mcp_client import create_mcp_client
+from mcp_client import MCPClient, create_mcp_client
 from mcp_servers.mcp_formatting.pdf_converter import html_to_pdf
 
 logger = logging.getLogger(__name__)
@@ -60,6 +55,7 @@ async def generate_report(
     save_pdf: bool = True,
     advanced_chart: bool = False,
     output_dir: Path = Path("reports"),
+    client: MCPClient | None = None,
 ) -> dict[str, Path]:
     """
     Run the full pipeline: research → chart → format → save.
@@ -77,7 +73,9 @@ async def generate_report(
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     stem = f"{ticker.upper()}_{timestamp}"
 
-    client = await create_mcp_client()
+    _owned_client = client is None
+    if _owned_client:
+        client = await create_mcp_client()
 
     try:
         # --- 1. Research ---
@@ -182,10 +180,15 @@ async def generate_report(
         return output_paths
 
     finally:
-        await client.close()
+        if _owned_client:
+            await client.close()
 
 
 def main() -> None:
+    # Ensure we run relative to the project root so mcpservers.yml paths resolve.
+    os.chdir(Path(__file__).parent.parent.parent)
+    sys.path.insert(0, str(Path(__file__).parent))
+
     parser = argparse.ArgumentParser(
         description="Generate a financial report for a stock ticker."
     )

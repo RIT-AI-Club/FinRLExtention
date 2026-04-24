@@ -18,7 +18,7 @@ For section 6 (Technical Analysis): Provide SPECIFIC numerical values — exact 
 
 For section 7 (Analyst Consensus): State the EXACT number of buy/hold/sell ratings, the mean price target with the low and high range, and name at least 2 specific analysts or firms with their current rating and price target.
 
-For section 9 (FinRL Relevance): Describe 3–5 specific features a reinforcement learning trading agent should observe for this ticker, explaining why each feature is predictive of future price movement."""
+For section 9 (FinRL Relevance): Describe 3–5 specific features an AI agent should observe for this ticker, explaining why each feature is predictive of future price movement."""
 
 TOPIC_RESEARCH_PROMPT = """You are a financial research analyst. Provide a thorough, well-structured analysis of the requested topic. Focus on:
 
