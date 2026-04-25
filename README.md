@@ -65,7 +65,7 @@ FinRLExtention/
    pip install -r requirements.txt
    ```
 
-3. **Install Playwright Browsers**:
+3. **Install Playwright browser** (required for PDF generation — the pip package alone is not enough):
    ```bash
    playwright install chromium
    ```
@@ -89,14 +89,17 @@ FinRLExtention/
 
    claude:
      api_key: "YOUR_ANTHROPIC_API_KEY"
-     model: "claude-4-6-sonnet"
+     model: "claude-sonnet-4-6"
      temperature: 0.7
+     max_output_tokens: 16000
 
    perplexity:
      api_key: "YOUR_PERPLEXITY_API_KEY"
      model: "sonar"
      temperature: 0.7
    ```
+
+   > The same structure is also required in `src/backend/mcp_servers/mcp_formatting/config.yml` for the formatting server.
 
 2. Verify `config/mcpservers.yml` points to the correct server paths.
 

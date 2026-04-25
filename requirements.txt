@@ -16,6 +16,10 @@ fastmcp>=2.0.0
 
 # Visualization & Charts
 matplotlib>=3.8.0
+numpy>=1.26.0
+
+# Market Data
+yfinance>=0.2.0
 
 # PDF Generation
 playwright>=1.40.0
@@ -23,5 +27,4 @@ playwright>=1.40.0
 # Configuration & Utilities
 pyyaml>=6.0
 anyio>=4.0.0
-tenacity>=8.0.0
 google-protobuf>=4.25.0
