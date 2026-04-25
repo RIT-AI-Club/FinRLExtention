@@ -110,15 +110,12 @@ async def format_report(text_blocks: List[str], images: Optional[List[List[str]]
             logger.error(f"PDF conversion failed (HTML still saved): {pdf_err}", exc_info=True)
             pdf_path = None
 
+        # Return only status to Gemini — no file paths — so the chat reply stays
+        # clean. generate_report.py locates the saved files by scanning the
+        # reports directory for the newest entry after the tool call returns.
         result = {
             "status": "success",
-            "html_path": str(html_path),
-            "pdf_path": str(pdf_path) if pdf_path else None,
-            "message": (
-                f"Report generated successfully. "
-                f"PDF: {pdf_path.name if pdf_path else 'unavailable'}. "
-                f"HTML: {html_path.name}."
-            ),
+            "message": "A comprehensive report has been generated.",
         }
         return json.dumps(result)
 

@@ -171,33 +171,36 @@ async def generate_report(
             logger.warning(f"Formatting attempt {attempt + 1}/4 failed, retrying in {wait}s...")
             await asyncio.sleep(wait)
 
-        # format_report already saved the HTML and PDF to disk. Copy them to
-        # the caller-specified output_dir so generate_report.py's contract
-        # (returning paths under output_dir) still holds.
+        # format_report saves files to reports/ and returns only a status message
+        # (no paths) so Gemini's reply stays clean. Find the files by picking the
+        # newest HTML written to the reports directory after the tool call.
         logger.info("[4/4] Collecting report files")
         output_paths: dict[str, Path] = {}
 
-        server_html = Path(result_data["html_path"])
+        reports_dir = Path("reports")
+        html_candidates = sorted(reports_dir.glob("report_*.html"), key=lambda p: p.stat().st_mtime, reverse=True)
+        if not html_candidates:
+            raise RuntimeError("format_report succeeded but no HTML file found in reports/")
+
+        server_html = html_candidates[0]
         html_path = output_dir / f"{stem}.html"
         if server_html.resolve() != html_path.resolve():
             html_path.write_text(server_html.read_text(encoding="utf-8"), encoding="utf-8")
         output_paths["html"] = html_path
         logger.info(f"HTML at: {html_path}")
 
-        if save_pdf and result_data.get("pdf_path"):
-            server_pdf = Path(result_data["pdf_path"])
+        if save_pdf:
+            server_pdf = server_html.with_suffix(".pdf")
             pdf_path = output_dir / f"{stem}.pdf"
-            if server_pdf.resolve() != pdf_path.resolve():
-                shutil.copy2(server_pdf, pdf_path)
+            if server_pdf.exists():
+                if server_pdf.resolve() != pdf_path.resolve():
+                    shutil.copy2(server_pdf, pdf_path)
+            else:
+                # PDF conversion failed inside the server; fall back to local conversion.
+                await html_to_pdf(html_path.read_text(encoding="utf-8"), output_path=str(pdf_path))
+                logger.info(f"PDF saved (local fallback): {pdf_path}")
             output_paths["pdf"] = pdf_path
             logger.info(f"PDF at: {pdf_path}")
-        elif save_pdf:
-            # PDF conversion failed inside the server; fall back to local conversion.
-            html_content = html_path.read_text(encoding="utf-8")
-            pdf_path = output_dir / f"{stem}.pdf"
-            await html_to_pdf(html_content, output_path=str(pdf_path))
-            output_paths["pdf"] = pdf_path
-            logger.info(f"PDF saved (local fallback): {pdf_path}")
 
         return output_paths
 
