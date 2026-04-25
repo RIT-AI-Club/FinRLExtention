@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tesla, Inc. — TSLA Financial Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+
+<style>
+  /* ============================================================
+     CREATIVE DIRECTION:
+     Hook: "Electric current — high voltage data, cold precision
+            with flashes of red energy. A trading floor at 3am
+            watching a stock that never sleeps."
+     Layout: Terminal-editorial hybrid — monospace data with
+             oversized typographic hero numbers, full-bleed
+             color band separators, diagonal accent lines.
+     Unexpected element: Section numbers rendered at 180px as
+             ghosted background text behind section headers.
+     ============================================================ */
+
+  @page {
+    background: #0a0a0f;
+    margin: 40px;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    width: 794px;
+    margin: 0 auto;
+    padding: 0;
+    background: #0a0a0f;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-family: 'DM Mono', monospace;
+    color: #e8e8f0;
+  }
+
+  /* ---- BREAK INSIDE AVOID ---- */
+  p, h1, h2, h3, h4, h5, h6,
+  img, figure, table, thead, tbody, tr,
+  ul, ol, li,
+  .card, .section, .block, .metric, .chart, .row,
+  [class*="chart"], [class*="section"], [class*="callout"],
+  .summary-statement, .kpi-item, .risk-item, .finrl-item,
+  .analyst-card, .competitor-row, .tech-row {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* ---- TYPOGRAPHY ---- */
+  .font-display {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.04em;
+  }
+
+  /* ---- COVER / HEADER ---- */
+  .cover {
+    background: #0a0a0f;
+    padding: 60px 50px 40px 50px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid #1e1e2e;
+  }
+
+  .cover-diagonal {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 320px;
+    height: 100%;
+    background: linear-gradient(135deg, transparent 40%, #cc0000 40%, #cc0000 41%, transparent 41%);
+    opacity: 0.12;
+  }
+
+  .cover-ticker {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 120px;
+    color: #cc0000;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    opacity: 0.15;
+    position: absolute;
+    right: 40px;
+    top: 30px;
+  }
+
+  .cover-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: #cc0000;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .cover-company {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    color: #ffffff;
+    line-height: 1;
+    letter-spacing: 0.03em;
+    margin-bottom: 4px;
+  }
+
+  .cover-subtitle {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: #6b6b8a;
+    letter-spacing: 0.15em;
+    margin-bottom: 40px;
+  }
+
+  .cover-meta-row {
+    display: flex;
+    gap: 40px;
+    align-items: flex-end;
+    margin-top: 20px;
+  }
+
+  .cover-price-block {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cover-price-label {
+    font-size: 9px;
+    color: #6b6b8a;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .cover-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    color: #ffffff;
+    line-height: 1;
+  }
+
+  .cover-price-change {
+    font-size: 13px;
+    color: #cc0000;
+    margin-top: 4px;
+  }
+
+  .cover-divider {
+    width: 1px;
+    height: 60px;
+    background: #2a2a3e;
+  }
+
+  .cover-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .cover-stat-label {
+    font-size: 9px;
+    color: #6b6b8a;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .cover-stat-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: #e8e8f0;
+    letter-spacing: 0.05em;
+  }
+
+  .cover-date-stamp {
+    position: absolute;
+    bottom: 20px;
+    right: 50px;
+    font-size: 9px;
+    color: #3a3a5c;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  /* ---- SECTION SEPARATOR BAND ---- */
+  .band-separator {
+    width: 794px;
+    height: 4px;
+    background: linear-gradient(90deg, #cc0000 0%, #ff4444 30%, #cc0000 60%, #0a0a0f 100%);
+  }
+
+  /* ---- SECTION GENERIC ---- */
+  .section-wrapper {
+    padding: 48px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .section-wrapper.bg-dark {
+    background: #0a0a0f;
+  }
+
+  .section-wrapper.bg-mid {
+    background: #0f0f1a;
+  }
+
+  .section-wrapper.bg-panel {
+    background: #12121f;
+  }
+
+  .section-wrapper.bg-red-tint {
+    background: #130808;
+  }
+
+  .section-wrapper.bg-charcoal {
+    background: #0d0d18;
+  }
+
+  /* Ghost number behind section header */
+  .ghost-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 180px;
+    color: #cc0000;
+    opacity: 0.04;
+    position: absolute;
+    top: -20px;
+    right: 30px;
+    line-height: 1;
+    pointer-events: none;
+    letter-spacing: -0.05em;
+  }
+
+  /* ---- SECTION HEADERS ---- */
+  .section-eyebrow {
+    font-size: 9px;
+    color: #cc0000;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    color: #ffffff;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    margin-bottom: 28px;
+    position: relative;
+  }
+
+  .section-title::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 2px;
+    background: #cc0000;
+    margin-top: 10px;
+  }
+
+  /* ---- BODY TEXT ---- */
+  .body-text {
+    font-size: 12px;
+    color: #b0b0c8;
+    line-height: 1.7;
+    max-width: 640px;
+  }
+
+  .body-text strong, .highlight {
+    color: #ffffff;
+    font-weight: 500;
+  }
+
+  /* ---- COMPANY OVERVIEW ---- */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  .overview-item {
+    border-left: 2px solid #cc0000;
+    padding-left: 14px;
+  }
+
+  .overview-item-label {
+    font-size: 9px;
+    color: #6b6b8a;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .overview-item-value {
+    font-size: 13px;
+    color: #e8e8f0;
+    line-height: 1.5;
+  }
+
+  .market-cap-hero {
+    margin-top: 32px;
+    padding: 24px;
+    background: #1a0808;
+    border: 1px solid #2a0a0a;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .market-cap-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: #cc0000;
+  }
+
+  .market-cap-label {
+    font-size: 9px;
+    color: #6b6b8a;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    padding-left: 12px;
+  }
+
+  .market-cap-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 80px;
+    color: #cc0000;
+    line-height: 1;
+    padding-left: 12px;
+  }
+
+  .market-cap-sub {
+    font-size: 11px;
+    color: #6b6b8a;
+    padding-left: 12px;
+    margin-top: 4px;
+  }
+
+  /* ---- PRICE ACTION ---- */
+  .price-hero-row {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+
+  .price-main {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 96px;
+    color: #ffffff;
+    line-height: 1;
+  }
+
+  .price-change-badge {
+    background: #cc0000;
+    color: #ffffff;
+    font-size: 14px;
+    padding: 6px 14px;
+    letter-spacing: 0.1em;
+  }
+
+  .price-premarket {
+    font-size: 11px;
+    color: #6b6b8a;
+    letter-spacing: 0.1em;
+  }
+
+  .performance-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 24px;
+  }
+
+  .performance-table th {
+    font-size: 9px;
+    color: #cc0000;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 8px 12px;
+    background: #1a0808;
+    border-bottom: 1px solid #2a0a0a;
+  }
+
+  .performance-table td {
+    font-size: 12px;
+    color: #b0b0c8;
+    padding: 10px 12px;
+    border-bottom: 1px solid #1a1a2e;
+  }
+
+  .performance-table tr:nth-child(even) td {
+    background: #0f0f1a;
+  }
+
+  .positive { color: #4ade80; }
+  .negative { color: #cc0000; }
+
+  /* ---- FINANCIAL SUMMARY ---- */
+  .fin-hero-strip {
+    background: #cc0000;
+    padding: 20px 24px;
+    margin-bottom: 32px;
+    display: flex;
+    gap: 40px;
+    align-items: center;
+  }
+
+  .fin-hero-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .fin-hero-label {
+    font-size: 9px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+
+  .fin-hero-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: #ffffff;
+    letter-spacing: 0.05em;
+  }
+
+  .fin-divider-v {
+    width: 1px;
+    height: 40px;
+    background: rgba(255,255,255,0.2);
+  }
+
+  .fin-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: #1a1a2e;
+    margin-top: 24px;
+  }
+
+  .fin-cell {
+    background: #0f0f1a;
+    padding: 18px 16px;
+  }
+
+  .fin-cell-label {
+    font-size: 9px;
+    color: #6b6b8a;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .fin-cell-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: #e8e8f0;
+    letter-spacing: 0.03em;
+  }
+
+  .fin-cell-sub {
+    font-size: 10px;
+    color: #6b6b8a;
+    margin-top: 4px;
+  }
+
+  .fin-cell.accent {
+    background: #1a0808;
+  }
+
+  .fin-cell.accent .fin-cell-value {
+    color: #cc0000;
+  }
+
+  /* ---- MARGIN BAR CHART ---- */
+  .margin-bar-section {
+    margin-top: 28px;
+  }
+
+  .margin-bar-label {
+    font-size: 10px;
+    color: #6b6b8a;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .margin-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .margin-bar-name {
+    font-size: 11px;
+    color: #b0b0c8;
+    width: 160px;
+    flex-shrink: 0;
+  }
+
+  .margin-bar-track {
+    flex: 1;
+    height: 12px;
+    background: #1a1a2e;
+    position: relative;
+  }
+
+  .margin-bar-fill {
+    height: 100%;
+    background: #cc0000;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .margin-bar-fill.green {
+    background: #4ade80;
+  }
+
+  .margin-bar-pct {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    color: #e8e8f0;
+    width: 50px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ---- GROWTH PROSPECTS ---- */
+  .growth-hero {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 120px;
+    color: #ffffff;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+
+  .growth-hero span {
+    color: #cc0000;
+  }
+
+  .growth-cards-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .growth-card {
+    background: #0a0a0f;
+    border: 1px solid #1e1e2e;
+    padding: 20px;
+    position: relative;
+  }
+
+  .growth-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #cc0000;
+  }
+
+  .growth-card-label {
+    font-size: 9px;
+    color: #6b6b8a;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .growth-card-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40px;
+    color: #cc0000;
+    letter-spacing: 0.03em;
+    line-height: 1;
+  }
+
+  .growth-card-desc {
+    font-size: 11px;
+    color: #6b6b8a;
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  .growth-timeline {
+    margin-top: 28px;
+    padding: 20px;
+    background: #0a0a0f;
+    border: 1px solid #1e1e2e;
+  }
+
+  .growth-timeline-label {
+    font-size: 9px;
+    color: #cc0000;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .timeline-items {
+    display: flex;
+    gap: 0;
+    position: relative;
+  }
+
+  .timeline-items::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #2a2a3e;
+  }
+
+  .timeline-item {
+    flex: 1;
+    padding-top: 24px;
+    position: relative;
+  }
+
+  .timeline-dot {
+    width: 8px;
+    height: 8px;
+    background: #cc0000;
+    border-radius: 50%;
+    position: absolute;
+    top: 4px;
+    left: 0;
+  }
+
+  .timeline-year {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    color: #cc0000;
+    letter-spacing: 0.1em;
+  }
+
+  .timeline-desc {
+    font-size: 10px;
+    color: #6b6b8a;
+    line-height: 1.4;
+    margin-top: 4px;
+    padding-right: 8px;
+  }
+
+  /* ---- COMPETITIVE POSITION ---- */
+  .comp-moat-block {
+    background: #cc0000;
+    padding: 28px 28px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .comp-moat-block::after {
+    content: 'MOAT';
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 100px;
+    color: rgba(255,255,255,0.06);
+    position: absolute;
+    right: 10px;
+    top: -10px;
+    letter-spacing: 0.05em;
+  }
+
+  .comp-moat-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .comp-moat-text {
+    font-size: 13px;
+    color: #ffffff;
+    line-height: 1.6;
+    max-width: 560px;
+  }
+
+  .competitor-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .competitor-table th {
+    font-size: 9px;
+    color: #cc0000;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 10px 14px;
+    background: #1a0808;
+    border-bottom: 2px solid #cc0000;
+  }
+
+  .competitor-table td {
+    font-size: 12px;
+    color: #b0b0c8;
+    padding: 12px 14px;
+    border-bottom: 1px solid #1a1a2e;
+    vertical-align: top;
+  }
+
+  .competitor-table tr:nth-child(even) td {
+    background: #0f0f1a;
+  }
+
+  .competitor-table .tsla-row td {
+    color: #ffffff;
+    background: #1a0808;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    padding: 2px 8px;
+    text-transform: uppercase;
+    background: #cc0000;
+    color: #ffffff;
+  }
+
+  .tag.green {
+    background: #1a3a2a;
+    color: #4ade80;
+  }
+
+  /* ---- TECHNICAL ANALYSIS ---- */
+  .tech-panel-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px;
+    background: #cc0000;
+    margin-bottom: 28px;
+  }
+
+  .tech-panel-cell {
+    background: #0a0a0f;
+    padding: 22px 18px;
+    text-align: center;
+  }
+
+  .tech-panel-cell-label {
+    font-size: 9px;
+    color: #6b6b8a;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .tech-panel-cell-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: #e8e8f0;
+    letter-spacing: 0.05em;
+  }
+
+  .tech-panel-cell-value.na {
+    color: #3a3a5c;
+    font-size: 22px;
+  }
+
+  .tech-momentum-block {
+    background: #0f0f1a;
+    padding: 24px;
+    border-left: 4px solid #cc0000;
+    margin-bottom: 20px;
+  }
+
+  .tech-momentum-label {
+    font-size: 9px;
+    color: #cc0000;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .tech-momentum-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    color: #4ade80;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .tech-momentum-sub {
+    font-size: 11px;
+    color: #6b6b8a;
+    margin-top: 4px;
+  }
+
+  .tech-note {
+    font-size: 11px;
+    color: #3a3a5c;
+    font-style: italic;
+    padding: 12px;
+    border: 1px dashed #1e1e2e;
+    margin-top: 16px;
+  }
+
+  /* ---- ANALYST CONSENSUS ---- */
+  .analyst-rating-hero {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    margin-bottom: 32px;
+  }
+
+  .zacks-badge {
+    width: 100px;
+    height: 100px;
+    background: #cc0000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .zacks-badge-rank {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 56px;
+    color: #ffffff;
+    line-height: 1;
+  }
+
+  .zacks-badge-label {
+    font-size: 9px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .analyst-hold-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    color: #ffffff;
+    letter-spacing: 0.08em;
+  }
+
+  .analyst-hold-sub {
+    font-size: 11px;
+    color: #6b6b8a;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  .analyst-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .analyst-card {
+    background: #0f0f1a;
+    border: 1px solid #1e1e2e;
+    padding: 20px;
+  }
+
+  .analyst-card-firm {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: #ffffff;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  .analyst-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .analyst-card-label {
+    font-size: 9px;
+    color: #6b6b8a;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .analyst-card-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: #e8e8f0;
+    letter-spacing: 0.05em;
+  }
+
+  .analyst-note {
+    margin-top: 20px;
+    padding: 16px;
+    background: #0a0a0f;
+    border: 1px solid #1e1e2e;
+    font-size: 11px;
+    color: #6b6b8a;
+    line-height: 1.6;
+  }
+
+  /* ---- RISKS AND CATALYSTS ---- */
+  .risks-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .risk-col-header {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.08em;
+    margin-bottom: 16px;
+  }
+
+  .risk-col-header.risks {
+    color: #cc0000;
+  }
+
+  .risk-col-header.catalysts {
+    color: #4ade80;
+  }
+
+  .risk-item {
+    padding: 12px 14px;
+    border-left: 3px solid #cc0000;
+    background: #130808;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: #b0b0c8;
+    line-height: 1.5;
+  }
+
+  .catalyst-item {
+    padding: 12px 14px;
+    border-left: 3px solid #4ade80;
+    background: #081308;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: #b0b0c8;
+    line-height: 1.5;
+  }
+
+  .earnings-date-block {
+    background: #cc0000;
+    padding: 16px 20px;
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .earnings-date-label {
+    font-size: 9px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .earnings-date-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    color: #ffffff;
+    letter-spacing: 0.08em;
+  }
+
+  .earnings-date-divider {
+    width: 1px;
+    height: 36px;
+    background: rgba(255,255,255,0.2);
+  }
+
+  /* ---- FINRL SECTION ---- */
+  .finrl-intro {
+    background: #cc0000;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+  }
+
+  .finrl-intro-label {
+    font-size: 9px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .finrl-intro-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: #ffffff;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+  }
+
+  .finrl-item {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 16px;
+    padding: 20px 0;
+    border-bottom: 1px solid #1a1a2e;
+    align-items: start;
+  }
+
+  .finrl-item:last-child {
+    border-bottom: none;
+  }
+
+  .finrl-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: #cc0000;
+    line-height: 1;
+    opacity: 0.6;
+  }
+
+  .finrl-content-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    color: #ffffff;
+    letter-spacing: 0.08em;
+    

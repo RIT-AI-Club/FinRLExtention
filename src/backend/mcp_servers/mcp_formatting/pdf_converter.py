@@ -22,9 +22,15 @@ def _html_to_pdf_sync(html_content: str, output_path: str) -> None:
         try:
             page = browser.new_page()
 
-            # Set the HTML content and wait for it to be loaded.
-            # A 60-second timeout accommodates complex reports or external fonts.
-            page.set_content(html_content, timeout=60000)
+            # Load the HTML, then explicitly wait for:
+            # 1. DOM to be parsed (domcontentloaded)
+            # 2. All web fonts (Google Fonts) to finish loading
+            # 3. A short stabilization pause so font-triggered layout reflows complete
+            # Without these waits the PDF is captured before fonts load, producing
+            # a blank page that shows only the background color.
+            page.set_content(html_content, timeout=60000, wait_until="domcontentloaded")
+            page.evaluate("document.fonts.ready")
+            page.wait_for_timeout(500)
 
             # Generate the PDF with pixel-perfect settings for A4 width (794px).
             # CSS-defined page sizes and backgrounds are preferred.

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(timeout 10 python src/backend/mcp_servers/mcp_formatting/claude_server.py)",
+      "Bash(python -c \"import mcp; print\\(mcp.__version__\\)\")",
+      "Bash(python -c \"from mcp import ClientSession; import inspect; print\\(inspect.signature\\(ClientSession.call_tool\\)\\)\")",
+      "Bash(pip show *)",
+      "Bash(python -c \"from mcp import ClientSession; import inspect; sig = inspect.signature\\(ClientSession.call_tool\\); print\\(sig\\)\")"
+    ]
+  }
+}

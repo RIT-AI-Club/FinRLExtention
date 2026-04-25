@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GOOGL — Alphabet Inc. Financial Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+
+<style>
+  /* ─── CREATIVE DIRECTION ───────────────────────────────────────────────
+     Conceptual hook: "Search engine at 3am — cold electric blue, the hum
+     of a data center, precision without warmth."
+     Layout personality: Terminal-editorial hybrid. Monospace data blocks
+     meet oversized typographic heroes. Information density varies wildly
+     between sections — dense data grids followed by sparse, loud numbers.
+     Unexpected element: Section numbers rendered at 180px, ghosted behind
+     the section title — like a watermark built into the layout.
+  ─────────────────────────────────────────────────────────────────────── */
+
+  @page {
+    background: #0a0e1a;
+    margin: 40px;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    width: 794px;
+    margin: 0 auto;
+    padding: 0;
+    background: #0a0e1a;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-family: 'DM Mono', monospace;
+    color: #c8d8f0;
+  }
+
+  /* ─── BREAK INSIDE AVOID ──────────────────────────────────────────────── */
+  p, h1, h2, h3, h4, h5, h6,
+  img, figure, table, thead, tbody, tr,
+  ul, ol, li,
+  .card, .section, .block, .metric, .chart, .row,
+  [class*="chart"], [class*="section"], [class*="callout"],
+  .summary-statement, .kpi-hero, .data-row, .tag,
+  .risk-item, .feature-item, .comp-row, .ta-row, .analyst-row {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* ─── TYPOGRAPHY ─────────────────────────────────────────────────────── */
+  .font-display {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.04em;
+  }
+
+  /* ─── COLORS ─────────────────────────────────────────────────────────── */
+  /* Primary dark: #0a0e1a  |  Surface: #111827  |  Surface-2: #1a2235
+     Electric blue accent: #4285f4  |  Cyan: #00c4cc  |  Warm amber: #fbbc04
+     Red signal: #ea4335  |  Green signal: #34a853
+     Text primary: #e8f0fe  |  Text secondary: #8aa3cc  |  Text muted: #4a6080 */
+
+  /* ─── HEADER / HERO ──────────────────────────────────────────────────── */
+  .hero {
+    background: #0a0e1a;
+    padding: 60px 0 0 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: #4285f4;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .hero-ticker {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 120px;
+    line-height: 0.9;
+    color: #e8f0fe;
+    letter-spacing: 0.02em;
+    display: block;
+  }
+
+  .hero-company {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: #4285f4;
+    letter-spacing: 0.12em;
+    margin-top: 4px;
+  }
+
+  .hero-divider {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, #4285f4 0%, #00c4cc 40%, transparent 100%);
+    margin: 32px 0 24px 0;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 40px;
+    padding-bottom: 48px;
+  }
+
+  .hero-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .hero-meta-label {
+    font-size: 10px;
+    color: #4a6080;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .hero-meta-value {
+    font-size: 13px;
+    color: #8aa3cc;
+    font-weight: 500;
+  }
+
+  .hero-google-g {
+    position: absolute;
+    right: -20px;
+    top: 20px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 320px;
+    color: #111827;
+    line-height: 1;
+    user-select: none;
+    pointer-events: none;
+    letter-spacing: -0.05em;
+  }
+
+  /* ─── SECTION WRAPPER ────────────────────────────────────────────────── */
+  .section {
+    position: relative;
+    padding: 48px 0;
+  }
+
+  .section-ghost-num {
+    position: absolute;
+    top: -10px;
+    right: 0;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 180px;
+    line-height: 1;
+    color: rgba(66, 133, 244, 0.06);
+    user-select: none;
+    pointer-events: none;
+    letter-spacing: -0.04em;
+  }
+
+  .section-label {
+    font-size: 10px;
+    color: #4285f4;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    color: #e8f0fe;
+    letter-spacing: 0.06em;
+    line-height: 1;
+    margin-bottom: 28px;
+  }
+
+  /* ─── SECTION 1: COMPANY OVERVIEW ────────────────────────────────────── */
+  .overview-section {
+    background: #111827;
+    padding: 48px 40px;
+    margin: 0 -0px;
+  }
+
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 24px;
+  }
+
+  .overview-body {
+    font-size: 13px;
+    line-height: 1.8;
+    color: #8aa3cc;
+  }
+
+  .overview-body strong {
+    color: #c8d8f0;
+    font-weight: 500;
+  }
+
+  .overview-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  .tag {
+    background: #1a2235;
+    border: 1px solid #1e3a5f;
+    color: #4285f4;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    font-weight: 500;
+  }
+
+  .overview-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    justify-content: flex-start;
+  }
+
+  .stat-row {
+    display: flex;
+    flex-direction: column;
+    border-left: 2px solid #4285f4;
+    padding-left: 16px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    color: #4a6080;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .stat-value {
+    font-size: 14px;
+    color: #e8f0fe;
+    font-weight: 500;
+  }
+
+  .stat-value.large {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: #00c4cc;
+    letter-spacing: 0.04em;
+  }
+
+  /* ─── SECTION 2: RECENT PRICE ACTION ─────────────────────────────────── */
+  .price-section {
+    background: #0a0e1a;
+    padding: 48px 0;
+  }
+
+  .price-unavail-band {
+    background: #1a2235;
+    border-left: 4px solid #fbbc04;
+    padding: 20px 24px;
+    margin-bottom: 32px;
+  }
+
+  .price-unavail-label {
+    font-size: 10px;
+    color: #fbbc04;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .price-unavail-text {
+    font-size: 12px;
+    color: #8aa3cc;
+    line-height: 1.7;
+  }
+
+  .price-context-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    border: 1px solid #1e3a5f;
+    margin-bottom: 32px;
+  }
+
+  .price-context-cell {
+    padding: 24px 20px;
+    border-right: 1px solid #1e3a5f;
+  }
+
+  .price-context-cell:last-child {
+    border-right: none;
+  }
+
+  .pcc-label {
+    font-size: 10px;
+    color: #4a6080;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .pcc-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: #e8f0fe;
+    letter-spacing: 0.04em;
+  }
+
+  .pcc-sub {
+    font-size: 11px;
+    color: #4a6080;
+    margin-top: 4px;
+  }
+
+  .chart-full-block {
+    width: 794px;
+    margin-left: -0px;
+    background: #111827;
+    padding: 24px 24px 16px 24px;
+  }
+
+  .chart-caption {
+    font-size: 11px;
+    color: #4a6080;
+    margin-top: 10px;
+    letter-spacing: 0.05em;
+  }
+
+  .chart-caption span {
+    color: #4285f4;
+  }
+
+  /* ─── SECTION 3: FINANCIAL SUMMARY ───────────────────────────────────── */
+  .financial-section {
+    background: #111827;
+    padding: 48px 40px;
+  }
+
+  .fin-hero-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 0;
+    margin-bottom: 32px;
+    border-bottom: 1px solid #1e3a5f;
+    padding-bottom: 32px;
+  }
+
+  .fin-hero-metric {
+    flex: 1;
+  }
+
+  .fin-hero-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 80px;
+    line-height: 1;
+    color: #4285f4;
+    letter-spacing: 0.02em;
+  }
+
+  .fin-hero-desc {
+    font-size: 11px;
+    color: #4a6080;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  .fin-note {
+    background: #0a0e1a;
+    border: 1px solid #1e3a5f;
+    padding: 20px 24px;
+    font-size: 12px;
+    color: #8aa3cc;
+    line-height: 1.8;
+  }
+
+  .fin-note-title {
+    font-size: 10px;
+    color: #ea4335;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .fin-data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 24px;
+  }
+
+  .fin-data-table thead tr {
+    background: #0a0e1a;
+  }
+
+  .fin-data-table thead th {
+    font-size: 10px;
+    color: #4285f4;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 500;
+    border-bottom: 1px solid #1e3a5f;
+  }
+
+  .fin-data-table tbody tr {
+    border-bottom: 1px solid #141e30;
+  }
+
+  .fin-data-table tbody tr:nth-child(even) {
+    background: #0d1520;
+  }
+
+  .fin-data-table tbody tr:nth-child(odd) {
+    background: #111827;
+  }
+
+  .fin-data-table td {
+    font-size: 12px;
+    color: #8aa3cc;
+    padding: 12px 16px;
+  }
+
+  .fin-data-table td:first-child {
+    color: #c8d8f0;
+    font-weight: 500;
+  }
+
+  .fin-data-table td.em-dash {
+    color: #4a6080;
+    font-style: italic;
+  }
+
+  /* ─── SECTION 4: GROWTH PROSPECTS ────────────────────────────────────── */
+  .growth-section {
+    background: #0a0e1a;
+    padding: 48px 0;
+  }
+
+  .growth-pillars {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 24px;
+  }
+
+  .growth-pillar {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid #111827;
+  }
+
+  .growth-pillar-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: #1a2235;
+    min-width: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0d1520;
+    border-right: 2px solid #1e3a5f;
+    flex-shrink: 0;
+  }
+
+  .growth-pillar-content {
+    padding: 20px 24px;
+    flex: 1;
+  }
+
+  .growth-pillar-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: #00c4cc;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+
+  .growth-pillar-text {
+    font-size: 12px;
+    color: #8aa3cc;
+    line-height: 1.75;
+  }
+
+  .growth-milestone-strip {
+    margin-top: 32px;
+    background: #111827;
+    padding: 24px;
+    border-left: 3px solid #00c4cc;
+  }
+
+  .gms-label {
+    font-size: 10px;
+    color: #00c4cc;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .gms-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .gms-item {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .gms-year {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    color: #4285f4;
+    min-width: 48px;
+    letter-spacing: 0.06em;
+  }
+
+  .gms-desc {
+    font-size: 12px;
+    color: #8aa3cc;
+    line-height: 1.6;
+  }
+
+  .data-unavail-note {
+    background: #111827;
+    border-left: 3px solid #fbbc04;
+    padding: 14px 20px;
+    font-size: 12px;
+    color: #8aa3cc;
+    margin-top: 20px;
+  }
+
+  /* ─── SECTION 5: COMPETITIVE POSITION ────────────────────────────────── */
+  .competitive-section {
+    background: #1a2235;
+    padding: 48px 40px;
+  }
+
+  .moat-hero {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 96px;
+    line-height: 0.9;
+    color: #4285f4;
+    letter-spacing: 0.02em;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .moat-hero-sub {
+    font-size: 12px;
+    color: #4a6080;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+
+  .comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 24px;
+  }
+
+  .comp-table thead tr {
+    background: #0a0e1a;
+  }
+
+  .comp-table thead th {
+    font-size: 10px;
+    color: #00c4cc;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 500;
+    border-bottom: 2px solid #00c4cc;
+  }
+
+  .comp-table tbody tr {
+    border-bottom: 1px solid #111827;
+  }
+
+  .comp-table tbody tr.highlight-row {
+    background: #0d1a2e;
+  }
+
+  .comp-table tbody tr:not(.highlight-row) {
+    background: #141e30;
+  }
+
+  .comp-table td {
+    font-size: 12px;
+    color: #8aa3cc;
+    padding: 14px 16px;
+  }
+
+  .comp-table td:first-child {
+    color: #e8f0fe;
+    font-weight: 500;
+  }
+
+  .googl-badge {
+    background: #4285f4;
+    color: #fff;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  .moat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .moat-item {
+    background: #0a0e1a;
+    padding: 18px 20px;
+    border-top: 2px solid #4285f4;
+  }
+
+  .moat-item-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    color: #e8f0fe;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+
+  .moat-item-text {
+    font-size: 11px;
+    color: #4a6080;
+    line-height: 1.65;
+  }
+
+  /* ─── SECTION 6: TECHNICAL ANALYSIS ──────────────────────────────────── */
+  .technical-section {
+    background: #0a0e1a;
+    padding: 48px 0;
+  }
+
+  .ta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    border: 1px solid #1e3a5f;
+    margin-top: 24px;
+  }
+
+  .ta-cell {
+    padding: 24px 20px;
+    border-right: 1px solid #1e3a5f;
+    border-bottom: 1px solid #1e3a5f;
+  }
+
+  .ta-cell:nth-child(3n) {
+    border-right: none;
+  }
+
+  .ta-cell:nth-last-child(-n+3) {
+    border-bottom: none;
+  }
+
+  .ta-cell-label {
+    font-size: 10px;
+    color: #4a6080;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .ta-cell-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: #4a6080;
+    letter-spacing: 0.04em;
+  }
+
+  .ta-cell-value.unavail {
+    font-size: 20px;
+    color: #2a3a50;
+    font-family: 'DM Mono', monospace;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+  }
+
+  .ta-unavail-note {
+    background: #111827;
+    border: 1px solid #1e3a5f;
+    padding: 24px;
+    margin-top: 24px;
+  }
+
+  .ta-unavail-note-label {
+    font-size: 10px;
+    color: #ea4335;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .ta-unavail-note-text {
+    font-size: 12px;
+    color: #4a6080;
+    line-height: 1.75;
+  }
+
+  /* ─── SECTION 7: ANALYST CONSENSUS ───────────────────────────────────── */
+  .analyst-section {
+    background: #111827;
+    padding: 48px 40px;
+  }
+
+  .analyst-unavail-hero {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    color: #1a2235;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    margin-bottom: 24px;
+  }
+
+  .analyst-bar-group {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 24px;
+  }
+
+  .analyst-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .analyst-bar-label {
+    font-size: 11px;
+    color: #8aa3cc;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    min-width: 40px;
+  }
+
+  .analyst-bar-track {
+    flex: 1;
+    height: 8px;
+    background: #1a2235;
+  }
+
+  .analyst-bar-fill {
+    height: 100%;
+  }
+
+  .analyst-bar-fill.buy { background: #34a853; }
+  .analyst-bar-fill.hold { background: #fbbc04; }
+  .analyst-bar-fill.sell { background: #ea4335; }
+
+  .analyst-bar-val {
+    font-size: 11px;
+    color: #4a6080;
+    min-width: 24px;
+    text-align: right;
+  }
+
+  .analyst-data-note {
+    background: #0a0e1a;
+    border-left: 3px solid #fbbc04;
+    padding: 16px 20px;
+    margin-top: 24px;
+    font-size: 12px;
+    color: #8aa3cc;
+    line-height: 1.75;
+  }
+
+  .analyst-note-label {
+    font-size: 10px;
+    color: #fbbc04;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  /* ─── SECTION 8: RISKS & CATALYSTS ───────────────────────────────────── */
+  .risks-section {
+    background: #0a0e1a;
+    padding: 48px 0;
+  }
+
+  .risks-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  .risks-col-header {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.08em;
+    margin-bottom: 16px;
+  }
+
+  .risks-col-header.risk { color: #ea4335; }
+  .risks-col-header.catalyst { color: #34a853; }
+
+  .risk-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+
+  .risk-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+
+  .risk-dot.red { background: #ea4335; }
+  .risk-dot.green { background: #34a853; }
+
+  .risk-text {
+    font-size: 12px;
+    color: #8aa3cc;
+    line-height: 1.7;
+  }
+
+  .risk-text strong {
+    color: #c8d8f0;
+    font-weight: 500;
+  }
+
+  .macro-band {
+    margin-top: 28px;
+    background: #111827;
+    border-top: 2px solid #fbbc04;
+    padding: 20px 24px;
+  }
+
+  .macro-band-label {
+    font-size: 10px;
+    color: #fbbc04;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .macro-band-text {
+    font-size: 12px;
+    color: #8aa3cc;
+    line-height: 1.75;
+  }
+
+  /* ─── SECTION 9: FINRL RELEVANCE ─────────────────────────────────────── */
+  .finrl-section {
+    background: #1a2235;
+    padding: 48px 40px 64px 40px;
+  }
+
+  .finrl-intro {
+    font-size: 13px;
+    color: #8aa3cc;
+    line-height: 1.8;
+    margin-bottom: 32px;
+    border-left: 3px solid #4285f4;
+    padding-left: 20px;
+  }
+
+  .feature-item {
+    background: #0a0e1a;
+    border: 1px solid #1e3a5f;
+    padding: 22px 24px;
+    margin-bottom: 12px;
+    position: relative;
+  }
+
+  .feature-num {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40px;
+    color: #111827;
+    letter-spacing: 0.04em;
+  }
+
+  .feature-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    color: #00c4cc;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  .feature-text {
+    font-size: 12px;
+    color: #8aa3cc;
+    line-height: 1.75;
+    max-width: 580px;
+  }
+
+  .feature-text strong {
+    color: #c8d8f0;
+    font-weight: 500;
+  }
+
+  /* ─── FOOTER ──────────────────────────────────────────────────────────── */
+  .report-footer {
+    background: #0a0e1a;
+    border-top: 1px solid #1e3a5f;
+    padding: 28px 0 40px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .footer-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .footer-ticker {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: #1e3a5f;
+    letter-spacing: 0.06em;
+  }
+
+  .footer-note {
+    font-size: 10px;
+    color: #2a3a50;
+    letter-spacing: 0.1em;
+    max-width: 400px;
+    line-height: 1.6;
+  }
+
+  .footer-right {
+    text-align: right;
+  }
+
+  .footer-label {
+    font-size: 10px;
+    color: #2a3a50;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  /* ─── UTILITY ─────────────────────────────────────────────────────────── */
+  .full-rule {
+    width: 100%;
+    height: 1px;
+    background: #1e3a5f;
+    margin: 0;
+  }
+
+  .accent-rule {
+    width: 60px;
+    height: 3px;
+    background: #4285f4;
+    margin-bottom: 16px;
+  }
+
+  .cyan-rule {
+    width: 60px;
+    height: 3px;
+    background: #00c4cc;
+    margin-bottom: 16px;
+  }
+
+  .amber-rule {
+    width: 60px;
+    height: 3px;
+    background: #fbbc04;
+    margin-bottom: 16px;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     HERO HEADER
+═══════════════════════════════════════════════════════════════════════ -->
+<div class="hero">
+  <div class="hero-google-g">G</div>
+  <div class="hero-eyebrow">Equity Research &nbsp;·&nbsp; Technology Sector &nbsp;·&nbsp; NASDAQ</div>
+  <span class="hero-ticker">GOOGL</span>
+  <div class="hero-company">Alphabet Inc. — Class A Shares</div>
+  <div class="hero-divider"></div>
+  <div class="hero-meta">
+    <div class="hero-meta-item">
+      <span class="hero-meta-label">Exchange</span>
+      <span class="hero-meta-value">NASDAQ</span>
+    </div>
+    <div class="hero-meta-item">
+      <span class="hero-meta-label">Share Class</span>
+      <span class="hero-meta-value">Class A</span>
+    </div>
+    <div class="hero-meta-item">
+      <span class="hero-meta-label">Sector</span>
+      <span class="hero-meta-value">Technology</span>
+    </div>
+    <div class="hero-meta-item">
+      <span class="hero-meta-label">Founded</span>
+      <span class="hero-meta-value">1998</span>
+    </div>
+    <div class="hero-meta-item">
+      <span class="hero-meta-label">CEO</span>
+      <span class="hero-meta-value">Sundar Pichai</span>
+    </div>
+    <div class="hero-meta-item">
+      <span class="hero-meta-label">Report Type</span>
+      <span class="hero-meta-value">Comprehensive Analysis</span>
+    </div>
+  </div>
+</div>
+
+<div class="full-rule"></div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SECTION 1 — COMPANY OVERVIEW
+═══════════════════════════════════════════════════════════════════════ -->
+<div class="overview-section section">
+  <div class="section-ghost-num">01</div>
+  <div class="accent-rule"></div>
+  <div class="section-label">Section 01</div>
+  <div class="section-title">Company Overview</div>
+
+  <div class="overview-grid">
+    <div>
+      <p class="overview-body">
+        Alphabet Inc. is an American multinational technology conglomerate that operates
+        <strong>Google</strong> as its primary subsidiary. The company specializes in
+        <strong>information technology, online advertising, search engine technology,
+        email, cloud computing, software, quantum computing, e-commerce, consumer
+        electronics, and artificial intelligence (AI)</strong>.
+      </p>
+      <p class="overview-body" style="margin-top: 14px;">
+        Founded in <strong>1998</strong> by Larry Page and Sergey Brin, Alphabet was
+        restructured in <strong>2015</strong> with Google as its core internet business.
+        Founders retain approximately <strong>14% ownership</strong> but control
+        <strong>56% voting power</strong> via supervoting stock. The company operates
+        in the technology sector and is recognized as one of the world's largest
+        technology conglomerates — a member of "Big Tech" alongside Amazon, Apple,
+        and Microsoft.
+      </p>
+      <div class="overview-tags">
+        <span class="tag">Search</span>
+        <span class="tag">Advertising</span>
+        <span class="tag">Cloud</span>
+        <span class="tag">AI</span>
+        <span class="tag">Android</span>
+        <span class="tag">YouTube</span>
+        <span class="tag">Gmail</span>
+        <span class="tag">Maps</span>
+        <span class="tag">Quantum Computing</span>
+        <span class="tag">Consumer Electronics</span>
+      </div>
+    </div>
+
+    <div class="overview-stats">
+      <div class="stat-row">
+        <span class="stat-label">Global Search Market Share</span>
+        <span class="stat-value large">70–80%</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Daily Searches Processed (2011 baseline)</span>
+        <span class="stat-value">~3 Billion</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Worldwide Data Centers</span>
+        <span class="stat-value">11+ Global Facilities</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Market Capitalization</span>
+        <span class="stat-value">Among World's Largest (Tech)</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Founders</span>
+        <span class="stat-value">Larry Page &amp; Sergey Brin</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Primary Revenue Source</span>
+        <span class="stat-value">Search-Related Advertising</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SECTION 2 — RECENT PRICE ACTION
+═══════════════════════════════════════════════════════════════════════ -->
+<div class="price-section section">
+  <div class="section-ghost-num">02</div>
+  <div class="accent-rule" style="background: #fbbc04;"></div>
+  <div class="section-label" style="color: #fbbc04;">Section 02</div>
+  <div class="section-title">Recent Price Action</div>
+
+  <div class="price-unavail-band">
+    <div class="price-unavail-label">⚠ Data Availability Notice</div>
+    <p class="price-unavail-text">
+      Specific current price, 52-week high/low, and benchmark comparison figures (vs. S&amp;P 500 or NASDAQ)
+      are unavailable in the provided data sources. Contextual listing information is shown below.
+      Alphabet's public listing traces to Google's 2004 IPO, with shares traded on NASDAQ under the ticker GOOGL (Class A).
+    </p>
+  </div>
+
+  <div class="price-context-grid">
+    <div class="price-context-cell">
+      <div class="pcc-label">Current Price</div>
+      <div class="pcc-value" style="color: #4a6080; font-size: 20px; font-family: 'DM Mono', monospace;">—</div>
+      <div class="pcc-sub">Data unavailable</div>
+    </div>
+    <div class="price-context-cell">
+      <div class="pcc-label">52-Week High / Low</div>
+      <div class="pcc-value" style="color: #4a6080; font-size: 20px; font-family: 'DM Mono', monospace;">— / —</div>
+      <div class="pcc-sub">Data unavailable</div>
+    </div>
+    <div class="price-context-cell">
+      <div class="pcc-label">vs. S&amp;P 500 / NASDAQ</div>
+      <div class="pcc-value" style="color: #4a6080; font-size: 20px; font-family: 'DM Mono', monospace;">—</div>
+      <div class="pcc-sub">Data unavailable</div>
+    </div>
+  </div>
+
+  <!-- CHART PLACEHOLDER -->
+  <div class="chart-full-block">
+    CHART_PLACEHOLDER_0
+    <p class="chart-caption">
+      <span>GOOGL Price Action Chart</span> &nbsp;·&nbsp; Period: As provided by data source &nbsp;·&nbsp; Source: Market data
+    </p>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SECTION 3 — FINANCIAL SUMMARY
+═══════════════════════════════════════════════════════════════════════ -->
+<div class="financial-section section">
+  <div class="section-ghost-num">03</div>
+  <div class="accent-rule" style="background: #34a853;"></div>
+  <div class="section-label" style="color: #34a853;">Section 03</div>
+  <div class="section-title">Financial Summary</div>
+
+  <div class="fin-hero-row">
+    <div class="fin-hero-metric">
+      <div class="fin-hero-number">~80%</div>
+      <div class="fin-hero-desc">Revenue driven by search-related advertising traffic</div>
+    </div>
+    <div style="flex: 1; padding-left: 32px; border-left: 1px solid #1e3a5f;">
+      <p style="font-size: 12px; color: #8aa3cc; line-height: 1.8;">
+        Detailed revenue, earnings, margins, debt, and cash flow figures for the most recent
+        quarter and trailing twelve months are <strong style="color: #ea4335;">unavailable</strong>
+        in the provided sources. Primary revenue historically derives from
+        <strong style="color: #c8d8f0;">search-related advertising</strong>, with Google
+        processing approximately 3 billion searches daily via global data centers.
+      </p>
+    </div>
+  </div>
+
+  <div class="fin-note">
+    <div class="fin-note-title">⚑ Data Limitation</div>
+    Specific quarterly and TTM financial figures (revenue, EPS, gross/operating margins, total debt,
+    free cash flow) are not present in the provided research data. The table below reflects the
+    available structural information only. Missing values are indicated with —.
+  </div>
+
+  <table class="fin-data-table">
+    <thead>
+      <tr>
+        <th>Metric</th>
+        <th>Most Recent Quarter</th>
+        <th>Trailing Twelve Months</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Revenue</td>
+        <td class="em-dash">—</td>
+        <td class="em-dash">—</td>
+        <td style="font-size: 11px; color: #4a6080;">~80% from advertising</td>
+      </tr>
+      <tr>
+        <td>Earnings (EPS)</td>
+        <td class="em-dash">—</td>
+        <td class="em-dash">—</td>
+        <td class="em-dash">—</td>
+      </tr>
+      <tr>
+        <td>Gross Margin</td>
+        <td class="em-dash">—</td>
+        <td class="em-dash">—</td>
+        <td class="em-dash">—</td>
+      </tr>
+      <tr>
+        <td>Operating Margin</td>
+        <td class="em-dash">—</td>
+        <td class="em-dash">—</td>
+        <td class="em-dash">—</td>
+      </tr>
+      <tr>
+        <td>Total Debt</td>
+        <td class="em-dash">—</td>
+        <td class="em-dash">—</td>
+        <td class="em-dash">—</td>
+      </tr>
+      <tr>
+        <td>Free Cash Flow</td>
+        <td class="em-dash">—</td>
+        <td class="em-dash">—</td>
+        <td class="em-dash">—</td>
+      </tr>
+      <tr>
+        <td>Primary Revenue Driver</td>
+        <td colspan="2" style="color: #c8d8f0;">Search-Related Advertising</td>
+        <td style="font-size: 11px; color: #4a6080;">Historically dominant</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SECTION 4 — GROWTH PROSPECTS
+═══════════════════════════════════════════════════════════════════════ -->
+<div class="growth-section section">
+  <div class="section-ghost-num">04</div>
+  <div class="cyan-rule"></div>
+  <div class="section-label" style="color: #00c4cc;">Section 04</div>
+  <div class="section-title">Growth Prospects</div>
+
+  <div class="growth-pillars">
+    <div class="growth-pillar">
+      <div class="growth-pillar-num">A</div>
+      <div class="growth-pillar-content">
+        <div class="growth-pillar-title">Artificial Intelligence Expansion</div>
+        <p class="growth-pillar-text">
+          Growth driven by ongoing AI integration across all product lines, including Gemini/Bard
+          AI features embedded in Search, Android, and Google Workspace. AI adoption signals
+          serve as a proxy for Alphabet's long-term innovation moat and differentiation
+          from pure advertising reliance.
+        </p>
+      </div>
+    </div>
+    <div class="growth-pillar">
+      <div class="growth-pillar-num">B</div>
+      <div class="growth-pillar-content">
+        <div class="growth-pillar-title">Cloud Computing Acceleration</div>
+        <p class="growth-pillar-text">
+          Google Cloud represents a key diversification pillar beyond advertising. Year-over-year
+          cloud revenue growth differentiates Alphabet from pure-play ad businesses and indicates
+          acceleration amid rising enterprise AI demand, often leading to sustained uptrends.
+        </p>
+      </div>
+    </div>
+    <div class="growth-pillar">
+      <div class="growth-pillar-num">C</div>
+      <div class="growth-pillar-content">
+        <div class="growth-pillar-title">Android Ecosystem &amp; Hardware</div>
+        <p class="growth-pillar-text">
+          The Android operating system underpins a vast global device ecosystem. The 2012 Motorola
+          Mobility acquisition signaled hardware ambitions; ongoing Pixel device development and
+          Nest integration represent continued ecosystem deepening and recurring revenue potential.
+        </p>
+      </div>
+    </div>
+    <div class="growth-pillar">
+      <div class="growth-pillar-num">D</div>
+      <div class="growth-pillar-content">
+        <div class="growth-pillar-title">Alphabet Restructuring — Other Bets</div>
+        <p class="growth-pillar-text">
+          The 2015 Alphabet restructuring enabled broader ventures beyond core internet services,
+          including Nest (smart home), Calico (life sciences), and other moonshot projects.
+          These represent long-duration optionality embedded in the holding company structure.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="growth-milestone-strip">
+    <div class="gms-label">Historical Growth Milestones</div>
+    <div class="gms-items">
+      <div class="gms-item">
+        <span class="gms-year">1998</span>
+        <span class="gms-desc">Google founded by Larry Page &amp; Sergey Brin; PageRank algorithm established search dominance</span>
+      </div>
+      <div class="gms-item">
+        <span class="gms-year">2000</span>
+        <span class="gms-desc">Became default search engine for Yahoo!, exponentially expanding reach and query volume</span>
+      </div>
+      <div class="gms-item">
+        <span class="gms-year">2004</span>
+        <span class="gms-desc">Google IPO on NASDAQ; Gmail launched; global advertising platform established</span>
+      </div>
+      <div class="gms-item">
+        <span class="gms-year">2012</span>
+        <span class="gms-desc">Motorola Mobility acquisition for smartphone hardware and patent portfolio</span>
+      </div>
+      <div class="gms-item">
+        <span class="gms-year">2015</span>
+        <span class="gms-desc">Alphabet Inc. restructuring; Sundar Pichai appointed Google CEO; Other Bets separated</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="data-unavail-note">
+    <strong style="color: #fbbc04;">Note:</strong> Specific revenue/earnings growth rates and forward expansion plan details
+    are not available in the provided data sources.
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SECTION 5 — COMPETITIVE POSITION
+═══════════════════════════════════════════════════════════════════════ -->
+<div class="competitive-section section">
+  <div class="section-ghost-num">05</div>
+  <div class="accent-rule"></div>
+  <div class="section-label">Section 05</div>
+  <div class="section-title">Competitive Position</div>
+
+  <span class="moat-hero">70–80%</span>
+  <div class="moat-hero-sub">Global Online Search Market Share — Dominant Structural Position</div>
+
+  <table class="comp-table">
+    <thead>
+      <tr>
+        <th>Company</th>
+        <th>Search / Segment</th>
+        <th>Competitive Relationship</th>
+        <th>Relative Position</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="highlight-row">
+        <td>Alphabet / Google <span class="googl-badge">GOOGL</span></td>
+        <td>Search, Ads, Cloud, AI</td>
+        <td>Market Leader</td>
+        <td style="color: #34a853;">Dominant</td>
+      </tr>
+      <tr>
+        <td>Microsoft (Bing)</td>
+        <td>Search, Cloud (Azure), AI</td>
+        <td>Direct Competitor</td>
+        <td style="color: #fbbc04;">Challenger</td>
+      </tr>
+      <tr>
+        <td>Yahoo!</td>
+        <td>Search (legacy), Content</td>
+        <td>Historical Competitor</td>
+        <td style="color: #4a6080;">Diminished</td>
+      </tr>
+      <tr>
+        <td>Amazon</td>
+        <td>Cloud (AWS), E-commerce Ads</td>
+        <td>Big Tech Peer / Cloud Rival</td>
+        <td style="color: #fbbc04;">Significant</td>
+      </tr>
+      <tr>
+        <td>Apple</td>
+        <td>Devices, Services, AI (Siri)</td>
+        <td>Big Tech Peer / Ecosystem Rival</td>
+        <td style="color: #fbbc04;">Significant</td>
+      </tr>
+      <tr>
+        <td>Emerging AI Search</td>
+        <td>AI-native search challengers</td>
+        <td>Emerging Disruptors</td>
+        <td style="color: #ea4335;">Watch</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="moat-grid">
+    <div class="moat-item">
+      <div class="moat-item-title">PageRank Algorithm</div>
+      <p class="moat-item-text">Proprietary search ranking algorithm built over 25+ years of refinement. Represents a near-insurmountable technical and data moat in organic search quality.</p>
+    </div>
+    <div class="moat-item">
+      <div class="moat-item-title">Global Data Center Network</div>
+      <p class="moat-item-text">11+ worldwide data centers providing infrastructure for Search, Cloud, and AI at scale. Capital intensity creates high barriers to replication.</p>
+    </div>
+    <div class="moat-item">
+      <div class="moat-item-title">Network Effects</div>
+      <p class="moat-item-text">Search and advertising platforms benefit from self-reinforcing network effects: more queries generate better results, attracting more advertisers and users.</p>
+    </div>
+    <div class="moat-item">
+      <div class="moat-item-title">Ecosystem Integration</div>
+      <p class="moat-item-text">Android OS, YouTube, Gmail, Maps, and Chrome form an interlocking ecosystem that deepens user lock-in and cross-platform advertising data collection.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SECTION 6 — TECHNICAL ANALYSIS
+═══════════════════════════════════════════════════════════════════════ -->
+<div class="technical-section section">
+  <div class="section-ghost-num">06</div>
+  <div class="amber-rule"></div>
+  <div class="section-label" style="color: #fbbc04;">Section 06</div>
+  <div class="section-title">Technical Analysis</div>
+
+  <div class="ta-grid">
+    <div class="ta-cell">
+      <div class="ta-cell-label">Support Level (Primary)</div>
+      <div class="ta-cell-value unavail">—</div>
+    </div>
+    <div class="ta-cell">
+      <div class="ta-cell-label">Resistance Level (Primary)</div>
+      <div class="ta-cell-value unavail">—</div>
+    </div>
+    <div class="ta-cell">
+      <div class="ta-cell-label">Support Level (Secondary)</div>
+      <div class="ta-cell-value unavail">—</div>
+    </div>
+    <div class="ta-cell">
+      <div class="ta-cell-label">50-Day Moving Average</div>
+      <div class="ta-cell-value unavail">—</div>
+    </div>
+    <div class="ta-cell">
+      <div class="ta-cell-label">200-Day Moving Average</div>
+      <div class="ta-cell-value unavail">—</div>
+    </div>
+    <div class="ta-cell">
+      <div class="ta-cell-label">Volume vs. 30-Day Avg</div>
+      <div class="ta-cell-value unavail">—</div>
+    </div>
+  </div>
+
+  <div class="ta-unavail-note">
+    <div class="ta-unavail-note-label">⚑ Technical Data Unavailable</div>
+    <p class="ta-unavail-note-text">
+      Specific numerical values for support and resistance price levels, 50-day and 200-day moving
+      averages, and current volume trend versus the 30-day average are not available in the provided
+      research sources. All cells above display — (em dash) as per data integrity protocol.
+      Technical data should be sourced from a real-time market data provider prior to trading decisions.
+    </p>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SECTION 7 — ANALYST CONSENSUS
+═══════════════════════════════════════════════════════════════════════ -->
+<div class="analyst-section section">
+  <div class="section-ghost-num">07</div>
+  <div class="accent-rule" style="background: #00c4cc;"></div>
+  <div class="section-label" style="color: #00c4cc;">Section 07</div>
+  <div class="section-title">Analyst Consensus</div>
+
+  <div class="analyst-unavail-hero">NO RATINGS DATA</div>
+
+  <p style="font-size: 13px; color: #8aa3cc; line-height: 1.8; margin-bottom: 24px;">
+    Analyst ratings distribution (buy / hold / sell counts), mean price target, price target range,
+    and named analyst or firm ratings are <strong style="color: #ea4335;">not available</strong>
+    in the provided research sources. The bar chart below reflects placeholder state.
+  </p>
+
+  <div class="analyst-bar-group">
+    <div class="analyst-bar-row">
+      <span class="analyst-bar-label">Buy</span>
+      <div class="analyst-bar-track">
+        <div class="analyst-bar-fill buy" style="width: 0%;"></div>
+      </div>
+      <span class="analyst-bar-val">—</span>
+    </div>
+    <div class="analyst-bar-row">
+      <span class="analyst-bar-label">Hold</span>
+      <div class="analyst-bar-track">
+        <div class="analyst-bar-fill hold" style="width: 0%;"></div>
+      </div>
+      <span class="analyst-bar-val">—</span>
+    </div>
+    <div class="analyst-bar-row">
+      <span class="analyst-bar-label">Sell</span>
+      <div class="analyst-bar-track">
+        <div class="analyst-bar-fill sell" style="width: 0%;"></div>
+      </div>
+      <span class="analyst-bar-val">—</span>
+    </div>
+  </div>
+
+  <div class="analyst-data-note">
+    <div class="analyst-note-label">⚑ Data Limitation</div>
+    Buy / Hold / Sell rating counts: — &nbsp;|&nbsp; Mean Price Target: — &nbsp;|&nbsp; Target Range: — / —
+    <br>Named analysts / firms: — &nbsp;|&nbsp; Recent rating changes: —
+    <br><br>
+    Source data does not include analyst consensus figures. Consult Bloomberg, FactSet, or sell-side
+    research platforms for current consensus data.
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SECTION 8 — RISKS AND CATALYSTS
+═══════════════════════════════════════════════════════════════════════ -->
+<div class="risks-section section">
+  <div class="section-ghost-num">08</div>
+  <div class="accent-rule" style="background: #ea4335;"></div>
+  <div class="section-label" style="color: #ea4335;">Section 08</div>
+  <div class="section-title">Risks &amp; Catalysts</div>
+
+  <div class="risks-two-col">
+    <div>
+      <div class="risks-col-header risk">↓ Downside Risks</div>
+      <div class="risk-item">
+        <div class="risk-dot red"></div>
+        <p class="risk-text">
+          <strong>Antitrust &amp; Regulatory Scrutiny</strong> — Ongoing antitrust investigations
+          and legal challenges related to Google's dominant search market position represent a
+          material structural risk. Adverse rulings could force behavioral remedies or structural
+          separation.
+        </p>
+      </div>
+      <div class="risk-item">
+        <div class="risk-dot red"></div>
+        <p class="risk-text">
+          <strong>Military Contract Controversies</strong> — Internal and external controversies
+          around government and military contracts have created reputational and operational risk,
+          potentially affecting talent retention and public perception.
+        </p>
+      </div>
+      <div class="risk-item">
+        <div class="risk-dot red"></div>
+        <p class="risk-text">
+          <strong>Regulatory Challenges</strong> — Broader technology regulation across multiple
+          jurisdictions (EU Digital Markets Act, US legislative action) poses ongoing compliance
+          costs and potential limitations on advertising and data practices.
+        </p>
+      </div>
+      <div class="risk-item">
+        <div class="risk-dot red"></div>
+        <p class="risk-text">
+          <strong>Ad Market Cyclicality</strong> — With ~80% of revenue tied to advertising,
+          Alphabet is exposed to macroeconomic ad spend cycles. A recession or significant
+          reduction in digital ad budgets would directly impact top-line revenue.
+        </p>
+      </div>
+    </div>
+
+    <div>
+      <div class="risks-col-header catalyst">↑ Upside Catalysts</div>
+      <div class="risk-item">
+        <div class="risk-dot green"></div>
+        <p class="risk-text">
+          <strong>AI Product Advancement</strong> — Continued development and adoption of
+          Gemini/Bard AI features across Search, Workspace, and Android represents a
+          significant re-rating catalyst as AI monetization matures.
+        </p>
+      </div>
+      <div class="risk-item">
+        <div class="risk-dot green"></div>
+        <p class="risk-text">
+          <strong>Google Cloud Acceleration</strong> — Sustained above-market growth in
+          Google Cloud revenue would demonstrate successful diversification beyond advertising
+          and narrow the gap with AWS and Azure.
+        </p>
+      </div>
+      <div class="risk-item">
+        <div class="risk-dot green"></div>
+        <p class="risk-text">
+          <strong>Earnings Surprises</strong> — Quarterly earnings beats driven by search
+          volume growth or cloud outperformance historically catalyze significant short-term
+          price appreciation.
+        </p>
+      </div>
+      <div class="risk-item">
+        <div class="risk-dot green"></div>
+        <p class="risk-text">
+          <strong>New Product Launches</strong> — Innovation in hardware (Pixel), AI services,
+          and Other Bets ventures provides optionality for multiple expansion if adoption
+          exceeds market expectations.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="macro-band">
+    <div class="macro-band-label">⚑ Upcoming Events &amp; Dates</div>
+    <p class="macro-band-text">
+      Specific upcoming earnings date, regulatory hearing dates, and key event timeline
+      (30–90 day window) are <strong style="color: #fbbc04;">not available</strong> in the provided data sources.
+      Monitor SEC filings, Google IR calendar, and DOJ/FTC dockets for scheduled events.
+      Macro exposure includes global digital advertising cycles, interest rate sensitivity
+      on technology valuations, and geopolitical factors affecting international search revenue.
+    </p>
+  </div>
+</div>
+
+
+<!-- 

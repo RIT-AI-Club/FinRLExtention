@@ -16,6 +16,7 @@ from typing import Any, Optional
 
 import google.generativeai as genai
 import yaml
+from google.generativeai.types.generation_types import StopCandidateException
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
@@ -546,6 +547,23 @@ class MCPClient:
                     function_responses,
                     tools=tools_config,
                 )
+            except StopCandidateException as e:
+                # Gemini hit MALFORMED_FUNCTION_CALL constructing its next tool call
+                # after receiving our tool results. Pull whatever text it produced
+                # from the stopped candidate and return it as the final reply.
+                logger.warning(
+                    "Gemini MALFORMED_FUNCTION_CALL on tool-response turn — "
+                    "extracting text from stopped candidate."
+                )
+                candidate = e.args[0] if e.args else None
+                if candidate is not None:
+                    try:
+                        for part in candidate.content.parts:
+                            if hasattr(part, "text") and part.text:
+                                return part.text
+                    except (AttributeError, IndexError):
+                        pass
+                break
             except Exception as e:
                 logger.error(f"Gemini send_message (tool response) failed: {e}")
                 raise

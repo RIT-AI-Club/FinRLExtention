@@ -14,6 +14,7 @@ import json
 import logging
 import os
 import random
+import shutil
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -142,42 +143,61 @@ async def generate_report(
                 images.append([item.data, chart_caption])
 
         # --- 3. Format into HTML ---
+        # format_report now saves files to disk and returns a JSON result with paths.
         logger.info("[3/4] Formatting HTML report")
-        html_content = None
+        format_result_text = None
         for attempt in range(4):
             format_result = await client.call_tool(
                 "format_report",
                 {"text_blocks": text_blocks, "images": images},
             )
-            html_content = _extract_text(format_result)
+            format_result_text = _extract_text(format_result)
 
-            if not html_content.strip().startswith('{"error"'):
+            try:
+                result_data = json.loads(format_result_text)
+            except json.JSONDecodeError:
+                raise RuntimeError(f"Formatting server returned unexpected response: {format_result_text[:200]}")
+
+            if result_data.get("status") == "success":
                 break
 
-            error_msg = json.loads(html_content).get("error", html_content)
+            error_msg = result_data.get("error", format_result_text)
             if "503" not in error_msg and "unavailable" not in error_msg.lower():
-                raise RuntimeError(f"Formatting server returned an error: {html_content}")
+                raise RuntimeError(f"Formatting server returned an error: {error_msg}")
             if attempt == 3:
-                raise RuntimeError(f"Formatting server failed after 4 attempts: {html_content}")
+                raise RuntimeError(f"Formatting server failed after 4 attempts: {error_msg}")
 
             wait = 2 ** attempt
-            logger.warning(f"Gemini 503 on formatting attempt {attempt + 1}/4, retrying in {wait}s...")
+            logger.warning(f"Formatting attempt {attempt + 1}/4 failed, retrying in {wait}s...")
             await asyncio.sleep(wait)
 
-        # --- 4. Save outputs ---
-        logger.info("[4/4] Saving report files")
+        # format_report already saved the HTML and PDF to disk. Copy them to
+        # the caller-specified output_dir so generate_report.py's contract
+        # (returning paths under output_dir) still holds.
+        logger.info("[4/4] Collecting report files")
         output_paths: dict[str, Path] = {}
 
+        server_html = Path(result_data["html_path"])
         html_path = output_dir / f"{stem}.html"
-        html_path.write_text(html_content, encoding="utf-8")
+        if server_html.resolve() != html_path.resolve():
+            html_path.write_text(server_html.read_text(encoding="utf-8"), encoding="utf-8")
         output_paths["html"] = html_path
-        logger.info(f"HTML saved: {html_path}")
+        logger.info(f"HTML at: {html_path}")
 
-        if save_pdf:
+        if save_pdf and result_data.get("pdf_path"):
+            server_pdf = Path(result_data["pdf_path"])
+            pdf_path = output_dir / f"{stem}.pdf"
+            if server_pdf.resolve() != pdf_path.resolve():
+                shutil.copy2(server_pdf, pdf_path)
+            output_paths["pdf"] = pdf_path
+            logger.info(f"PDF at: {pdf_path}")
+        elif save_pdf:
+            # PDF conversion failed inside the server; fall back to local conversion.
+            html_content = html_path.read_text(encoding="utf-8")
             pdf_path = output_dir / f"{stem}.pdf"
             await html_to_pdf(html_content, output_path=str(pdf_path))
             output_paths["pdf"] = pdf_path
-            logger.info(f"PDF saved: {pdf_path}")
+            logger.info(f"PDF saved (local fallback): {pdf_path}")
 
         return output_paths
 

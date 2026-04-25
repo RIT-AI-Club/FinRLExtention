@@ -103,7 +103,7 @@ class ClaudeAppConfig:
         
         # Set other Claude parameters with defaults
         self.temperature: float = float(claude_config.get("temperature", 0.7))
-        self.default_model: str = claude_config.get("model", "claude-4.6-opus")
+        self.default_model: str = claude_config.get("model", "claude-opus-4-6")
         self.max_output_tokens: int = int(claude_config.get("max_output_tokens", 8192))
 
         # Warn if API key is missing or is still the placeholder

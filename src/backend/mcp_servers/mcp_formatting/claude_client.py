@@ -8,7 +8,7 @@ import logging
 import json
 from pathlib import Path
 from typing import Any, Dict, Optional, List
-from anthropic import AsyncAnthropic, DefaultAioHttpClient
+from anthropic import AsyncAnthropic
 
 from config import claudeConfig
 
@@ -29,10 +29,7 @@ def get_claude_client() -> AsyncAnthropic:
         logger.error("Anthropic API key is not configured. Please set it in config.yml or as a ANTHROPIC_API_KEY environment variable.")
         raise ValueError("Anthropic API key is not configured.")
     
-    return AsyncAnthropic(
-        api_key=claudeConfig.anthropic_api_key,
-        http_client=DefaultAioHttpClient()
-    )
+    return AsyncAnthropic(api_key=claudeConfig.anthropic_api_key)
 
 def _build_user_prompt_parts(
     user_data: Dict[str, Any],
