@@ -1,0 +1,2037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lockheed Martin Corporation — LMT Research Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  @page {
+    background: #0a0e1a;
+    margin: 40px;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    width: 794px;
+    margin: 0 auto;
+    padding: 0;
+    background: #0a0e1a;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-family: 'IBM Plex Mono', monospace;
+    color: #c8d4e8;
+  }
+
+  p, h1, h2, h3, h4, h5, h6,
+  img, figure, table, thead, tbody, tr,
+  ul, ol, li,
+  .card, .section, .block, .metric, .chart, .row,
+  [class*="chart"], [class*="section"], [class*="callout"],
+  .summary-statement, .data-row, .risk-item, .finrl-item,
+  .analyst-bar, .tech-row, .competitor-row {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* ─── HERO HEADER ─── */
+  .hero {
+    background: #0a0e1a;
+    padding: 48px 0 0 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-top-bar {
+    background: #c8a84b;
+    height: 4px;
+    width: 100%;
+    margin-bottom: 40px;
+  }
+
+  .hero-classification {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 4px;
+    color: #c8a84b;
+    text-transform: uppercase;
+    padding: 0 40px;
+    margin-bottom: 16px;
+  }
+
+  .hero-ticker {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 140px;
+    line-height: 0.85;
+    color: #1a2540;
+    padding: 0 40px;
+    letter-spacing: 2px;
+    position: relative;
+  }
+
+  .hero-ticker-overlay {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 140px;
+    line-height: 0.85;
+    color: #c8d4e8;
+    padding: 0 40px;
+    letter-spacing: 2px;
+    margin-top: -118px;
+    clip-path: inset(0 60% 0 0);
+  }
+
+  .hero-company-name {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 3px;
+    color: #6b7fa3;
+    padding: 20px 40px 0 40px;
+    text-transform: uppercase;
+  }
+
+  .hero-price-strip {
+    display: flex;
+    align-items: flex-end;
+    gap: 0;
+    padding: 32px 40px 40px 40px;
+    border-top: 1px solid #1a2540;
+    margin-top: 32px;
+  }
+
+  .hero-price-main {
+    flex: 0 0 auto;
+    margin-right: 40px;
+  }
+
+  .hero-price-label {
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: #c8a84b;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .hero-price-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    line-height: 1;
+    color: #e8f0ff;
+  }
+
+  .hero-price-sub {
+    font-size: 10px;
+    color: #4a5a7a;
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+
+  .hero-stats-grid {
+    display: flex;
+    gap: 32px;
+    flex: 1;
+    align-items: flex-end;
+    padding-bottom: 8px;
+  }
+
+  .hero-stat {
+    flex: 1;
+    border-left: 1px solid #1a2540;
+    padding-left: 16px;
+  }
+
+  .hero-stat-label {
+    font-size: 8px;
+    letter-spacing: 2px;
+    color: #4a5a7a;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .hero-stat-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: #c8d4e8;
+    letter-spacing: 1px;
+  }
+
+  .hero-stat-value.positive {
+    color: #4ec9a0;
+  }
+
+  .hero-stat-value.accent {
+    color: #c8a84b;
+  }
+
+  /* ─── SECTION LABELS ─── */
+  .section-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: #c8a84b;
+    margin-bottom: 4px;
+  }
+
+  /* ─── SECTION 01: COMPANY OVERVIEW ─── */
+  .overview-section {
+    background: #0f1628;
+    padding: 48px 40px;
+    border-top: 1px solid #1a2540;
+  }
+
+  .overview-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 40px;
+    margin-bottom: 36px;
+  }
+
+  .overview-title-block {
+    flex: 1;
+  }
+
+  .overview-section-label {
+    font-size: 8px;
+    letter-spacing: 4px;
+    color: #c8a84b;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .overview-h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    line-height: 0.9;
+    color: #e8f0ff;
+    letter-spacing: 1px;
+  }
+
+  .overview-market-cap {
+    flex: 0 0 auto;
+    text-align: right;
+  }
+
+  .overview-mc-label {
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: #4a5a7a;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .overview-mc-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: #c8a84b;
+    letter-spacing: 1px;
+  }
+
+  .overview-body {
+    font-size: 11px;
+    line-height: 1.8;
+    color: #8a9ab8;
+    margin-bottom: 28px;
+    font-weight: 300;
+  }
+
+  .segments-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-top: 24px;
+  }
+
+  .segment-item {
+    background: #0a0e1a;
+    padding: 14px 18px;
+    border-left: 3px solid #c8a84b;
+  }
+
+  .segment-name {
+    font-size: 10px;
+    font-weight: 600;
+    color: #c8d4e8;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .segment-desc {
+    font-size: 9px;
+    color: #4a5a7a;
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  .overview-footer-strip {
+    display: flex;
+    gap: 0;
+    margin-top: 28px;
+    border-top: 1px solid #1a2540;
+    padding-top: 20px;
+  }
+
+  .overview-footer-item {
+    flex: 1;
+    padding-right: 24px;
+  }
+
+  .overview-footer-label {
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: #4a5a7a;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .overview-footer-value {
+    font-size: 11px;
+    color: #c8d4e8;
+    font-weight: 500;
+  }
+
+  /* ─── SECTION 02: RECENT PRICE ACTION ─── */
+  .price-section {
+    background: #c8a84b;
+    padding: 48px 40px;
+  }
+
+  .price-section-label {
+    font-size: 8px;
+    letter-spacing: 4px;
+    color: #0a0e1a;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: 0.7;
+  }
+
+  .price-section-h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    line-height: 0.9;
+    color: #0a0e1a;
+    letter-spacing: 1px;
+    margin-bottom: 32px;
+  }
+
+  .price-range-visual {
+    background: rgba(0,0,0,0.15);
+    padding: 24px;
+    margin-bottom: 28px;
+  }
+
+  .price-range-label {
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: #0a0e1a;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.7;
+  }
+
+  .price-range-bar-container {
+    position: relative;
+    height: 6px;
+    background: rgba(0,0,0,0.2);
+    margin-bottom: 8px;
+  }
+
+  .price-range-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: #0a0e1a;
+    width: 51%;
+  }
+
+  .price-range-marker {
+    position: absolute;
+    top: -4px;
+    left: 51%;
+    width: 14px;
+    height: 14px;
+    background: #0a0e1a;
+    border-radius: 50%;
+    transform: translateX(-50%);
+  }
+
+  .price-range-endpoints {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+  }
+
+  .price-range-end {
+    font-size: 10px;
+    color: #0a0e1a;
+    font-weight: 500;
+  }
+
+  .price-range-end span {
+    display: block;
+    font-size: 8px;
+    opacity: 0.6;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .price-metrics-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    margin-bottom: 28px;
+  }
+
+  .price-metric-box {
+    background: rgba(0,0,0,0.15);
+    padding: 16px;
+  }
+
+  .price-metric-label {
+    font-size: 8px;
+    letter-spacing: 2px;
+    color: #0a0e1a;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    opacity: 0.7;
+  }
+
+  .price-metric-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: #0a0e1a;
+    letter-spacing: 1px;
+  }
+
+  .price-narrative {
+    font-size: 11px;
+    line-height: 1.8;
+    color: #0a0e1a;
+    font-weight: 300;
+    opacity: 0.85;
+  }
+
+  .chart-container-full {
+    width: 794px;
+    margin-left: -40px;
+    background: #0a0e1a;
+    padding: 32px 40px;
+  }
+
+  .chart-caption {
+    font-size: 9px;
+    color: #4a5a7a;
+    margin-top: 8px;
+    letter-spacing: 1px;
+    font-style: italic;
+  }
+
+  .chart-placeholder {
+    width: 714px;
+    height: 280px;
+    background: #0f1628;
+    border: 1px solid #1a2540;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2a3a5a;
+    font-size: 11px;
+    letter-spacing: 2px;
+  }
+
+  /* ─── SECTION 03: FINANCIAL SUMMARY ─── */
+  .financial-section {
+    background: #0a0e1a;
+    padding: 48px 40px;
+    border-top: 1px solid #1a2540;
+  }
+
+  .financial-section-label {
+    font-size: 8px;
+    letter-spacing: 4px;
+    color: #c8a84b;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .financial-h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    line-height: 0.9;
+    color: #e8f0ff;
+    letter-spacing: 1px;
+    margin-bottom: 40px;
+  }
+
+  .giant-metric {
+    border-top: 1px solid #1a2540;
+    padding: 28px 0;
+    display: flex;
+    align-items: baseline;
+    gap: 24px;
+  }
+
+  .giant-metric-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 96px;
+    line-height: 0.85;
+    color: #c8a84b;
+    letter-spacing: 2px;
+    flex: 0 0 auto;
+  }
+
+  .giant-metric-context {
+    flex: 1;
+  }
+
+  .giant-metric-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #4a5a7a;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .giant-metric-desc {
+    font-size: 11px;
+    color: #6b7fa3;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .financial-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 32px;
+  }
+
+  .financial-table thead tr {
+    background: #c8a84b;
+  }
+
+  .financial-table thead th {
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: #0a0e1a;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  .financial-table tbody tr {
+    border-bottom: 1px solid #0f1628;
+  }
+
+  .financial-table tbody tr:nth-child(even) {
+    background: #0d1220;
+  }
+
+  .financial-table tbody tr:nth-child(odd) {
+    background: #0a0e1a;
+  }
+
+  .financial-table tbody td {
+    font-size: 11px;
+    color: #8a9ab8;
+    padding: 10px 14px;
+    font-weight: 300;
+  }
+
+  .financial-table tbody td:first-child {
+    color: #c8d4e8;
+    font-weight: 500;
+  }
+
+  .financial-table tbody td.highlight {
+    color: #c8a84b;
+    font-weight: 500;
+  }
+
+  .financial-table tbody td.negative {
+    color: #e05a5a;
+  }
+
+  .guidance-block {
+    background: #0f1628;
+    border-left: 4px solid #c8a84b;
+    padding: 20px 24px;
+    margin-top: 28px;
+  }
+
+  .guidance-label {
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: #c8a84b;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .guidance-text {
+    font-size: 12px;
+    color: #c8d4e8;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .guidance-text strong {
+    color: #e8f0ff;
+    font-weight: 600;
+  }
+
+  /* ─── SECTION 04: GROWTH PROSPECTS ─── */
+  .growth-section {
+    background: #111827;
+    padding: 48px 40px;
+  }
+
+  .growth-section-label {
+    font-size: 8px;
+    letter-spacing: 4px;
+    color: #4ec9a0;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .growth-h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    line-height: 0.9;
+    color: #e8f0ff;
+    letter-spacing: 1px;
+    margin-bottom: 36px;
+  }
+
+  .growth-pull-quote {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    line-height: 1;
+    color: #4ec9a0;
+    letter-spacing: 1px;
+    border-top: 2px solid #4ec9a0;
+    border-bottom: 2px solid #4ec9a0;
+    padding: 20px 0;
+    margin-bottom: 36px;
+  }
+
+  .growth-pull-quote span {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: #6b7fa3;
+    display: block;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  .growth-areas {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px;
+    margin-bottom: 28px;
+  }
+
+  .growth-area-item {
+    background: #0a0e1a;
+    padding: 18px 16px;
+    border-top: 2px solid #4ec9a0;
+  }
+
+  .growth-area-name {
+    font-size: 9px;
+    font-weight: 600;
+    color: #4ec9a0;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .growth-area-desc {
+    font-size: 9px;
+    color: #6b7fa3;
+    line-height: 1.5;
+    font-weight: 300;
+  }
+
+  .growth-body {
+    font-size: 11px;
+    line-height: 1.8;
+    color: #8a9ab8;
+    font-weight: 300;
+  }
+
+  /* ─── SECTION 05: COMPETITIVE POSITION ─── */
+  .competitive-section {
+    background: #0f1628;
+    padding: 48px 40px;
+    border-top: 1px solid #1a2540;
+  }
+
+  .competitive-section-label {
+    font-size: 8px;
+    letter-spacing: 4px;
+    color: #c8a84b;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .competitive-h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    line-height: 0.9;
+    color: #e8f0ff;
+    letter-spacing: 1px;
+    margin-bottom: 36px;
+  }
+
+  .market-share-hero {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    margin-bottom: 36px;
+    background: #0a0e1a;
+    padding: 28px;
+  }
+
+  .market-share-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 88px;
+    line-height: 0.85;
+    color: #c8a84b;
+    flex: 0 0 auto;
+  }
+
+  .market-share-context {
+    flex: 1;
+  }
+
+  .market-share-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #4a5a7a;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .market-share-desc {
+    font-size: 12px;
+    color: #8a9ab8;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .competitors-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 28px;
+  }
+
+  .competitors-table thead tr {
+    border-bottom: 2px solid #c8a84b;
+  }
+
+  .competitors-table thead th {
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: #4a5a7a;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: 500;
+  }
+
+  .competitors-table tbody tr {
+    border-bottom: 1px solid #1a2540;
+  }
+
+  .competitors-table tbody tr.lmt-row {
+    background: rgba(200, 168, 75, 0.08);
+  }
+
+  .competitors-table tbody td {
+    font-size: 10px;
+    color: #6b7fa3;
+    padding: 10px 12px;
+    font-weight: 300;
+  }
+
+  .competitors-table tbody td:first-child {
+    color: #c8d4e8;
+    font-weight: 500;
+    font-size: 11px;
+  }
+
+  .competitors-table tbody tr.lmt-row td {
+    color: #c8a84b;
+  }
+
+  .competitors-table tbody tr.lmt-row td:first-child {
+    color: #c8a84b;
+    font-weight: 600;
+  }
+
+  .moat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-top: 24px;
+  }
+
+  .moat-item {
+    background: #0a0e1a;
+    padding: 16px 18px;
+    border-left: 2px solid #1a2540;
+  }
+
+  .moat-item.primary {
+    border-left-color: #c8a84b;
+  }
+
+  .moat-title {
+    font-size: 9px;
+    font-weight: 600;
+    color: #c8d4e8;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .moat-desc {
+    font-size: 9px;
+    color: #4a5a7a;
+    line-height: 1.5;
+    font-weight: 300;
+  }
+
+  /* ─── SECTION 06: TECHNICAL ANALYSIS ─── */
+  .technical-section {
+    background: #0a0e1a;
+    padding: 48px 40px;
+    border-top: 1px solid #1a2540;
+  }
+
+  .technical-section-label {
+    font-size: 8px;
+    letter-spacing: 4px;
+    color: #c8a84b;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .technical-h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    line-height: 0.9;
+    color: #e8f0ff;
+    letter-spacing: 1px;
+    margin-bottom: 36px;
+  }
+
+  .tech-levels-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px;
+    margin-bottom: 32px;
+  }
+
+  .tech-level-box {
+    padding: 20px 18px;
+    background: #0f1628;
+  }
+
+  .tech-level-box.support {
+    border-top: 3px solid #4ec9a0;
+  }
+
+  .tech-level-box.resistance {
+    border-top: 3px solid #e05a5a;
+  }
+
+  .tech-level-box.neutral {
+    border-top: 3px solid #c8a84b;
+  }
+
+  .tech-level-type {
+    font-size: 8px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .tech-level-box.support .tech-level-type { color: #4ec9a0; }
+  .tech-level-box.resistance .tech-level-type { color: #e05a5a; }
+  .tech-level-box.neutral .tech-level-type { color: #c8a84b; }
+
+  .tech-level-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40px;
+    line-height: 1;
+    color: #e8f0ff;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .tech-level-desc {
+    font-size: 9px;
+    color: #4a5a7a;
+    line-height: 1.4;
+    font-weight: 300;
+  }
+
+  .volume-analysis {
+    background: #0f1628;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+
+  .volume-label {
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: #4a5a7a;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .volume-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 10px;
+  }
+
+  .volume-bar-label {
+    font-size: 9px;
+    color: #6b7fa3;
+    width: 120px;
+    flex: 0 0 auto;
+    letter-spacing: 1px;
+  }
+
+  .volume-bar-track {
+    flex: 1;
+    height: 8px;
+    background: #1a2540;
+    position: relative;
+  }
+
+  .volume-bar-fill {
+    height: 100%;
+    background: #c8a84b;
+  }
+
+  .volume-bar-fill.low {
+    background: #e05a5a;
+    width: 21.4%;
+  }
+
+  .volume-bar-fill.avg {
+    background: #4a5a7a;
+    width: 100%;
+  }
+
+  .volume-bar-value {
+    font-size: 10px;
+    color: #c8d4e8;
+    width: 80px;
+    text-align: right;
+    flex: 0 0 auto;
+    font-weight: 500;
+  }
+
+  .tech-narrative {
+    font-size: 11px;
+    line-height: 1.8;
+    color: #8a9ab8;
+    font-weight: 300;
+  }
+
+  /* ─── SECTION 07: ANALYST CONSENSUS ─── */
+  .analyst-section {
+    background: #1a1a2e;
+    padding: 48px 40px;
+  }
+
+  .analyst-section-label {
+    font-size: 8px;
+    letter-spacing: 4px;
+    color: #c8a84b;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .analyst-h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    line-height: 0.9;
+    color: #e8f0ff;
+    letter-spacing: 1px;
+    margin-bottom: 36px;
+  }
+
+  .ratings-visual {
+    display: flex;
+    gap: 0;
+    height: 80px;
+    margin-bottom: 20px;
+  }
+
+  .rating-band {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Bebas Neue', sans-serif;
+  }
+
+  .rating-band.buy {
+    background: #4ec9a0;
+    width: 26.1%;
+  }
+
+  .rating-band.hold {
+    background: #c8a84b;
+    width: 65.2%;
+  }
+
+  .rating-band.sell {
+    background: #e05a5a;
+    width: 4.35%;
+  }
+
+  .rating-band.strong-buy {
+    background: #2a9a70;
+    width: 4.35%;
+  }
+
+  .rating-band-number {
+    font-size: 28px;
+    color: #0a0e1a;
+    line-height: 1;
+  }
+
+  .rating-band-label {
+    font-size: 8px;
+    color: #0a0e1a;
+    letter-spacing: 1px;
+    opacity: 0.8;
+  }
+
+  .ratings-legend {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .ratings-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ratings-legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .ratings-legend-text {
+    font-size: 9px;
+    color: #6b7fa3;
+    letter-spacing: 1px;
+  }
+
+  .analyst-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-bottom: 28px;
+  }
+
+  .analyst-card {
+    background: #0a0e1a;
+    padding: 20px;
+    border-top: 2px solid #1a2540;
+  }
+
+  .analyst-card.featured {
+    border-top-color: #c8a84b;
+  }
+
+  .analyst-firm {
+    font-size: 11px;
+    font-weight: 600;
+    color: #c8d4e8;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .analyst-rating-badge {
+    display: inline-block;
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .analyst-rating-badge.neutral {
+    background: rgba(200, 168, 75, 0.15);
+    color: #c8a84b;
+  }
+
+  .analyst-rating-badge.buy {
+    background: rgba(78, 201, 160, 0.15);
+    color: #4ec9a0;
+  }
+
+  .analyst-rating-badge.hold {
+    background: rgba(200, 168, 75, 0.15);
+    color: #c8a84b;
+  }
+
+  .analyst-note {
+    font-size: 9px;
+    color: #4a5a7a;
+    line-height: 1.5;
+    font-weight: 300;
+  }
+
+  .consensus-summary {
+    background: #0a0e1a;
+    padding: 20px 24px;
+    border-left: 4px solid #c8a84b;
+  }
+
+  .consensus-summary-label {
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: #c8a84b;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .consensus-summary-text {
+    font-size: 11px;
+    color: #8a9ab8;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* ─── SECTION 08: RISKS AND CATALYSTS ─── */
+  .risks-section {
+    background: #0d0a14;
+    padding: 48px 40px;
+  }
+
+  .risks-section-label {
+    font-size: 8px;
+    letter-spacing: 4px;
+    color: #e05a5a;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .risks-h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    line-height: 0.9;
+    color: #e8f0ff;
+    letter-spacing: 1px;
+    margin-bottom: 36px;
+  }
+
+  .risks-catalysts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 28px;
+  }
+
+  .risks-col-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .risks-col-label.risk { color: #e05a5a; }
+  .risks-col-label.catalyst { color: #4ec9a0; }
+
+  .risk-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #1a1020;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .risk-bullet {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex: 0 0 auto;
+    margin-top: 4px;
+  }
+
+  .risk-bullet.risk { background: #e05a5a; }
+  .risk-bullet.catalyst { background: #4ec9a0; }
+
+  .risk-text {
+    font-size: 10px;
+    color: #8a9ab8;
+    line-height: 1.5;
+    font-weight: 300;
+  }
+
+  .risk-text strong {
+    color: #c8d4e8;
+    font-weight: 500;
+  }
+
+  .upcoming-events {
+    background: #1a1020;
+    padding: 24px;
+    margin-top: 8px;
+  }
+
+  .upcoming-label {
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: #e05a5a;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .event-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 0;
+    border-bottom: 1px solid #2a1a30;
+  }
+
+  .event-timing {
+    font-size: 8px;
+    letter-spacing: 2px;
+    color: #c8a84b;
+    text-transform: uppercase;
+    width: 80px;
+    flex: 0 0 auto;
+  }
+
+  .event-desc {
+    font-size: 10px;
+    color: #8a9ab8;
+    font-weight: 300;
+  }
+
+  /* ─── SECTION 09: FINRL RELEVANCE ─── */
+  .finrl-section {
+    background: #0a1a14;
+    padding: 48px 40px;
+    border-top: 2px solid #4ec9a0;
+  }
+
+  .finrl-section-label {
+    font-size: 8px;
+    letter-spacing: 4px;
+    color: #4ec9a0;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .finrl-h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    line-height: 0.9;
+    color: #e8f0ff;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+
+  .finrl-subtitle {
+    font-size: 10px;
+    color: #4a6a5a;
+    letter-spacing: 2px;
+    margin-bottom: 36px;
+    font-weight: 300;
+  }
+
+  .finrl-item {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid #0f2a1a;
+    align-items: start;
+  }
+
+  .finrl-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: #4ec9a0;
+    line-height: 1;
+    opacity: 0.4;
+  }
+
+  .finrl-content {
+    flex: 1;
+  }
+
+  .finrl-feature-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: #c8d4e8;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+
+  .finrl-feature-example {
+    font-size: 9px;
+    color: #4ec9a0;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    font-style: italic;
+  }
+
+  .finrl-feature-desc {
+    font-size: 10px;
+    color: #6b8a7a;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* ─── FOOTER ─── */
+  .report-footer {
+    background: #0a0e1a;
+    border-top: 1px solid #1a2540;
+    padding: 24px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-left {
+    font-size: 8px;
+    color: #2a3a5a;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    line-height: 1.6;
+  }
+
+  .footer-right {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: #1a2540;
+    letter-spacing: 2px;
+  }
+
+  .footer-divider {
+    height: 4px;
+    background: #c8a84b;
+    width: 100%;
+  }
+
+  /* ─── DIAGONAL ACCENT — THE UNEXPECTED ELEMENT ─── */
+  .diagonal-separator {
+    width: 100%;
+    height: 48px;
+    background: #0a0e1a;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .diagonal-separator::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #c8a84b;
+    clip-path: polygon(0 0, 100% 0, 100% 30%, 0 100%);
+  }
+
+  .diagonal-separator.reverse::before {
+    clip-path: polygon(0 100%, 100% 0, 100% 100%);
+    background: #0f1628;
+  }
+
+  .diagonal-separator.green::before {
+    background: #4ec9a0;
+    clip-path: polygon(0 0, 100% 0, 100% 40%, 0 100%);
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- HERO HEADER                                                    -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="hero">
+  <div class="hero-top-bar"></div>
+  <div class="hero-classification">NYSE: LMT &nbsp;·&nbsp; Aerospace &amp; Defense &nbsp;·&nbsp; Research Report &nbsp;·&nbsp; Q1 2026</div>
+  <div class="hero-ticker">LMT</div>
+  <div class="hero-ticker-overlay">LMT</div>
+  <div class="hero-company-name">Lockheed Martin Corporation</div>
+  <div class="hero-price-strip">
+    <div class="hero-price-main">
+      <div class="hero-price-label">Current Price</div>
+      <div class="hero-price-value">$626.03</div>
+      <div class="hero-price-sub">Prev. Close $627.43 &nbsp;·&nbsp; Open $629.51</div>
+    </div>
+    <div class="hero-stats-grid">
+      <div class="hero-stat">
+        <div class="hero-stat-label">52-Week High</div>
+        <div class="hero-stat-value accent">$692.00</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-label">52-Week Low</div>
+        <div class="hero-stat-value">$410.11</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-label">Market Cap</div>
+        <div class="hero-stat-value">~$133–144B</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-label">Beta</div>
+        <div class="hero-stat-value positive">0.18</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 01: COMPANY OVERVIEW                                   -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="overview-section">
+  <div class="overview-header">
+    <div class="overview-title-block">
+      <div class="overview-section-label">01 &nbsp;/&nbsp; Company Overview</div>
+      <div class="overview-h2">Global Security<br>&amp; Aerospace</div>
+    </div>
+    <div class="overview-market-cap">
+      <div class="overview-mc-label">Market Cap</div>
+      <div class="overview-mc-value">$133–144B</div>
+    </div>
+  </div>
+
+  <p class="overview-body">
+    Lockheed Martin Corporation (NYSE: LMT) is a global security, aerospace, and defense company engaged in the research, design, development, manufacture, integration, and sustainment of advanced technology systems, products, and services. Formed in 1995 from the merger of Lockheed and Martin Marietta, the company is headquartered in Bethesda, Maryland, and operates across four primary business segments serving U.S. forces and allied nations worldwide. Revenue per employee stands at $610,146, reflecting the high-value, technology-intensive nature of its operations.
+  </p>
+
+  <div class="segments-grid">
+    <div class="segment-item">
+      <div class="segment-name">Aeronautics</div>
+      <div class="segment-desc">F-35 Lightning II military aircraft, F-16 Block 70 production for allied air forces under U.S. Foreign Military Sales program</div>
+    </div>
+    <div class="segment-item">
+      <div class="segment-name">Missiles &amp; Fire Control</div>
+      <div class="segment-desc">PAC-3 MSE interceptors, Precision Strike Missile (PrSM), hypersonic weapons development</div>
+    </div>
+    <div class="segment-item">
+      <div class="segment-name">Rotary &amp; Mission Systems</div>
+      <div class="segment-desc">Helicopters, naval systems, cyber solutions, all-domain mission integration</div>
+    </div>
+    <div class="segment-item">
+      <div class="segment-name">Space</div>
+      <div class="segment-desc">Satellites, space transportation, space exploration technologies, AI-enabled systems</div>
+    </div>
+  </div>
+
+  <div class="overview-footer-strip">
+    <div class="overview-footer-item">
+      <div class="overview-footer-label">Founded</div>
+      <div class="overview-footer-value">1995 (Merger)</div>
+    </div>
+    <div class="overview-footer-item">
+      <div class="overview-footer-label">Headquarters</div>
+      <div class="overview-footer-value">Bethesda, Maryland</div>
+    </div>
+    <div class="overview-footer-item">
+      <div class="overview-footer-label">Sector</div>
+      <div class="overview-footer-value">Aerospace &amp; Defense</div>
+    </div>
+    <div class="overview-footer-item">
+      <div class="overview-footer-label">Revenue / Employee</div>
+      <div class="overview-footer-value">$610,146</div>
+    </div>
+    <div class="overview-footer-item">
+      <div class="overview-footer-label">Exchange</div>
+      <div class="overview-footer-value">NYSE: LMT</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 02: RECENT PRICE ACTION                                -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="price-section">
+  <div class="price-section-label">02 &nbsp;/&nbsp; Recent Price Action</div>
+  <div class="price-section-h2">Price &amp; Market<br>Dynamics</div>
+
+  <div class="price-range-visual">
+    <div class="price-range-label">52-Week Range — Current Position</div>
+    <div class="price-range-bar-container">
+      <div class="price-range-fill"></div>
+      <div class="price-range-marker"></div>
+    </div>
+    <div class="price-range-endpoints">
+      <div class="price-range-end">$410.11 <span>52-Week Low</span></div>
+      <div class="price-range-end" style="text-align:center;">$626.03 <span>Current</span></div>
+      <div class="price-range-end" style="text-align:right;">$692.00 <span>52-Week High</span></div>
+    </div>
+  </div>
+
+  <div class="price-metrics-row">
+    <div class="price-metric-box">
+      <div class="price-metric-label">Current Price</div>
+      <div class="price-metric-value">$626.03</div>
+    </div>
+    <div class="price-metric-box">
+      <div class="price-metric-label">Prev. Close</div>
+      <div class="price-metric-value">$627.43</div>
+    </div>
+    <div class="price-metric-box">
+      <div class="price-metric-label">Avg. Daily Vol.</div>
+      <div class="price-metric-value">1.59M</div>
+    </div>
+    <div class="price-metric-box">
+      <div class="price-metric-label">Beta</div>
+      <div class="price-metric-value">0.18</div>
+    </div>
+  </div>
+
+  <p class="price-narrative">
+    LMT currently trades at $626.03, positioned roughly in the middle of its 52-week range of $410.11 to $692.00. The stock exhibits exceptionally low volatility with a beta of 0.18, reflecting its defensive characteristics driven by stable, long-term government defense contracts. Compared to S&P 500 benchmarks, LMT has demonstrated relative strength during market downturns, consistent with its low-beta, contract-backed revenue profile. Recent volume of 339,601 shares traded well below the 30-day average of 1.59 million, indicating a consolidation phase following post-earnings profit-taking.
+  </p>
+</div>
+
+<!-- Chart — full width, outside any grid -->
+<div class="chart-container-full">
+  CHART_PLACEHOLDER_0
+  <p class="chart-caption">LMT Price Action &amp; Volume · Trailing 12 Months · Source: Market Data</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 03: FINANCIAL SUMMARY                                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="financial-section">
+  <div class="financial-section-label">03 &nbsp;/&nbsp; Financial Summary</div>
+  <div class="financial-h2">The Numbers</div>
+
+  <div class="giant-metric">
+    <div class="giant-metric-number">$18B</div>
+    <div class="giant-metric-context">
+      <div class="giant-metric-label">Q1 2026 Sales</div>
+      <div class="giant-metric-desc">Quarterly revenue of $18.0 billion, up sequentially, driven by continued F-35 deliveries, PAC-3 MSE production ramp, and sustained government contract execution across all four segments.</div>
+    </div>
+  </div>
+
+  <table class="financial-table">
+    <thead>
+      <tr>
+        <th>Metric</th>
+        <th>Q1 2026</th>
+        <th>TTM / Annual</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Sales / Revenue</td>
+        <td class="highlight">$18.0B</td>
+        <td>$75.0B</td>
+        <td>Up sequentially Q1 2026</td>
+      </tr>
+      <tr>
+        <td>Net Earnings</td>
+        <td class="highlight">$1.49B</td>
+        <td>—</td>
+        <td>Q1 2026 reported</td>
+      </tr>
+      <tr>
+        <td>Diluted EPS</td>
+        <td class="highlight">$6.44</td>
+        <td>$21.49</td>
+        <td>TTM annual EPS</td>
+      </tr>
+      <tr>
+        <td>Cash from Operations</td>
+        <td>$220M</td>
+        <td>—</td>
+        <td>Q1 2026</td>
+      </tr>
+      <tr>
+        <td>Free Cash Flow</td>
+        <td class="negative">$(291)M</td>
+        <td>$6.5–6.8B (guidance)</td>
+        <td>Negative Q1; annual target reaffirmed</td>
+      </tr>
+      <tr>
+        <td>Gross Profit Margin</td>
+        <td>—</td>
+        <td>10.2%</td>
+        <td>vs. peer median</td>
+      </tr>
+      <tr>
+        <td>Operating Margin</td>
+        <td>11.4%</td>
+        <td>10.2%</td>
+        <td>Down from 13.2% YoY</td>
+      </tr>
+      <tr>
+        <td>Net Income Margin</td>
+        <td>—</td>
+        <td>6.7%</td>
+        <td>$5.0B net income to shareholders</td>
+      </tr>
+      <tr>
+        <td>P/E Ratio</td>
+        <td>—</td>
+        <td>29.20</td>
+        <td>TTM; forward P/E 20.5x</td>
+      </tr>
+      <tr>
+        <td>P/B Ratio</td>
+        <td>—</td>
+        <td>21.38</td>
+        <td>Book value/share $29.21 (2025)</td>
+      </tr>
+      <tr>
+        <td>P/S Ratio</td>
+        <td>—</td>
+        <td>1.88</td>
+        <td>Price-to-Sales</td>
+      </tr>
+      <tr>
+        <td>Backlog</td>
+        <td>—</td>
+        <td>$186.4B</td>
+        <td>+7.8% YoY at quarter end</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="guidance-block">
+    <div class="guidance-label">2026 Full-Year Guidance — Reaffirmed</div>
+    <div class="guidance-text">
+      Sales: <strong>$77.5–$80.0 billion</strong> &nbsp;·&nbsp; Free Cash Flow: <strong>$6.5–$6.8 billion</strong><br>
+      Management reaffirmed full-year guidance following Q1 2026 results, signaling confidence in execution despite quarterly negative free cash flow of $(291)M. Stable government-backed revenue supports strong annual cash generation.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 04: GROWTH PROSPECTS                                   -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="growth-section">
+  <div class="growth-section-label">04 &nbsp;/&nbsp; Growth Prospects</div>
+  <div class="growth-h2">Trajectory</div>
+
+  <div class="growth-pull-quote">
+    $77.5–$80.0B
+    <span>2026 Full-Year Sales Guidance Range</span>
+  </div>
+
+  <div class="growth-areas">
+    <div class="growth-area-item">
+      <div class="growth-area-name">Hypersonics</div>
+      <div class="growth-area-desc">Next-generation hypersonic weapons development under DoD programs; emerging high-priority capability</div>
+    </div>
+    <div class="growth-area-item">
+      <div class="growth-area-name">Space &amp; AI</div>
+      <div class="growth-area-desc">Space exploration technologies, AI-enabled systems, and autonomy integration across platforms</div>
+    </div>
+    <div class="growth-area-item">
+      <div class="growth-area-name">Missile Defense</div>
+      <div class="growth-area-desc">PAC-3 MSE accelerated production; $4.7B UCA contract; quadrupled PrSM capacity framework</div>
+    </div>
+    <div class="growth-area-item">
+      <div class="growth-area-name">Cyber &amp; IT</div>
+      <div class="growth-area-desc">Expanding cybersecurity and IT solutions portfolio within Rotary &amp; Mission Systems segment</div>
+    </div>
+    <div class="growth-area-item">
+      <div class="growth-area-name">F-35 Program</div>
+      <div class="growth-area-desc">Record annual deliveries; projected $1 trillion lifetime revenue for Lockheed and subcontractors</div>
+    </div>
+    <div class="growth-area-item">
+      <div class="growth-area-name">Allied Nations</div>
+      <div class="growth-area-desc">F-16 Block 70 FMS program; multi-year allied contracts providing long-term revenue visibility</div>
+    </div>
+  </div>
+
+  <p class="growth-body">
+    Lockheed Martin's growth trajectory is anchored by multi-year government contracts and a $186.4 billion backlog (up 7.8% year-over-year), providing exceptional revenue visibility. The 2015 Sikorsky Aircraft acquisition continues to bolster rotorcraft capabilities within the Rotary &amp; Mission Systems segment. The Trump administration's push for a $1.5 trillion defense budget provides structural tailwinds for sustained demand across all segments. Earnings growth aligns with reaffirmed free cash flow targets of $6.5–$6.8 billion for 2026, with the PrSM framework agreement enabling a multi-year contract up to seven years pending congressional authorization.
+  </p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 05: COMPETITIVE POSITION                               -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="competitive-section">
+  <div class="competitive-section-label">05 &nbsp;/&nbsp; Competitive Position</div>
+  <div class="competitive-h2">Market Dominance</div>
+
+  <div class="market-share-hero">
+    <div class="market-share-number">22.32%</div>
+    <div class="market-share-context">
+      <div class="market-share-label">Aerospace &amp; Defense Industry Market Share — Q4 2025</div>
+      <div class="market-share-desc">Lockheed Martin commands 22.32% market share within the Aerospace &amp; Defense industry, establishing it as the clear sector leader and the world's largest defense contractor. The company receives approximately 10% of the Pentagon's total budget, reflecting its entrenched position with government agencies.</div>
+    </div>
+  </div>
+
+  <table class="competitors-table">
+    <thead>
+      <tr>
+        <th>Company</th>
+        <th>Ticker</th>
+        <th>Segment Overlap</th>
+        <th>Analyst Consensus Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="lmt-row">
+        <td>Lockheed Martin ★</td>
+        <td>LMT</td>
+        <td>Fighters, Missiles, Space, Rotary</td>
+        <td>2.30</td>
+      </tr>
+      <tr>
+        <td>Boeing</td>
+        <td>BA</td>
+        <td>Aerospace, Defense, Commercial</td>
+        <td>2.79 (favored)</td>
+      </tr>
+      <tr>
+        <td>Northrop Grumman</td>
+        <td>NOC</td>
+        <td>Space, Bombers, Cyber</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>RTX (Raytheon)</td>
+        <td>RTX</td>
+        <td>Missiles, Sensors, Engines</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>General Dynamics</td>
+        <td>GD</td>
+        <td>Land Systems, Submarines, IT</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>L3Harris Technologies</td>
+        <td>LHX</td>
+        <td>Communications, ISR</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>Huntington Ingalls</td>
+        <td>HII</td>
+        <td>Naval Shipbuilding</td>
+        <td>—</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="moat-grid">
+    <div class="moat-item primary">
+      <div class="moat-title">Long-Term Gov't Contracts</div>
+      <div class="moat-desc">Multi-decade platform programs like F-35 create predictable, locked-in revenue streams that competitors cannot easily displace</div>
+    </div>
+    <div class="moat-item primary">
+      <div class="moat-title">Scale &amp; Technological Lead</div>
+      <div class="moat-desc">$117B market cap and decades of R&amp;D investment create barriers to entry that smaller competitors cannot overcome</div>
+    </div>
+    <div class="moat-item">
+      <div class="moat-title">Pentagon Budget Share</div>
+      <div class="moat-desc">~10% of Pentagon budget flows to LMT, reflecting deep institutional relationships and sole-source contract positions</div>
+    </div>
+    <div class="moat-item">
+      <div class="moat-title">Global Allied Delivery</div>
+      <div class="moat-desc">F-35 and F-16 FMS programs extend reach to allied nations, diversifying revenue beyond U.S. DoD dependency</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 06: TECHNICAL ANALYSIS                                 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="technical-section">
+  <div class="technical-section-label">06 &nbsp;/&nbsp; Technical Analysis</div>
+  <div class="technical-h2">Price Structure</div>
+
+  <div class="tech-levels-grid">
+    <div class="tech-level-box support">
+      <div class="tech-level-type">Primary Support</div>
+      <div class="tech-level-price">$625.05</div>
+      <div class="tech-level-desc">50-day moving average; current price of $626.03 is trading just above this level, making it a critical near-term support zone</div>
+    </div>
+    <div class="tech-level-box support">
+      <div class="tech-level-type">Secondary Support</div>
+      <div class="tech-level-price">$410.11</div>
+      <div class="tech-level-desc">52-week low; deep structural support level; a breach would signal a major trend reversal</div>
+    </div>
+    <div class="tech-level-box resistance">
+      <div class="tech-level-type">Key Resistance</div>
+      <div class="tech-level-price">$692.00</div>
+      <div class="tech-level-desc">52-week high and recent peak; positive catalysts (PAC-3 ramp, F-35 deliveries) could test this level</div>
+    </div>
+  </div>
+
+  <div class="volume-analysis">
+    <div class="volume-label">Volume Analysis — Recent vs. 30-Day Average</div>
+    <div class="volume-bar-row">
+      <div class="volume-bar-label">Recent Session</div>
+      <div class="volume-bar-track">
+        <div class="volume-bar-fill low"></div>
+      </div>
+      <div class="volume-bar-value">339,601</div>
+    </div>
+    <div class="volume-bar-row">
+      <div class="volume-bar-label">30-Day Avg.</div>
+      <div class="volume-bar-track">
+        <div class="volume-bar-fill avg"></div>
+      </div>
+      <div class="volume-bar-value">1,590,000</div>
+    </div>
+  </div>
+
+  <p class="tech-narrative">
+    LMT's 50-day moving average of $625.05 represents the most critical near-term technical level, with the current price of $626.03 trading just $0.98 above it — a razor-thin margin that warrants close monitoring. The 200-day moving average is not specified in available data but can be inferred as elevated given the upward trend from the 52-week low of $410.11. Recent volume of 339,601 shares represents approximately 21.4% of the 30-day average of 1.59 million shares, indicating significantly below-average participation consistent with a consolidation phase and potential post-earnings "sell-the-news" dynamics. A volume spike above the 30-day average would signal institutional re-engagement and could precede a test of the $692.00 resistance level.
+  </p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 07: ANALYST CONSENSUS                                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="analyst-section">
+  <div class="analyst-section-label">07 &nbsp;/&nbsp; Analyst Consensus</div>
+  <div class="analyst-h2">Street View</div>
+
+  <div class="ratings-visual">
+    <div class="rating-band strong-buy">
+      <div class="rating-band-number">1</div>
+      <div class="rating-band-label">Strong Buy</div>
+    </div>
+    <div class="rating-band buy">
+      <div class="rating-band-number">6</div>
+      <div class="rating-band-label">Buy</div>
+    </div>
+    <div class="rating-band hold">
+      <div class="rating-band-number">15</div>
+      <div class="rating-band-label">Hold</div>
+    </div>
+    <div class="rating-band sell">
+      <div class="rating-band-number">1</div>
+      <div class="rating-band-label">Sell</div>
+    </div>
+  </div>
+
+  <div class="ratings-legend">
+    <div class="ratings-legend-item">
+      <div class="ratings-legend-dot" style="background:#2a9a70;"></div>
+      <div class="ratings-legend-text">1 Strong Buy</div>
+    </div>
+    <div class="ratings-legend-item">
+      <div class="ratings-legend-dot" style="background:#4ec9a0;"></div>
+      <div class="ratings-legend-text">6 Buy</div>
+    </div>
+    <div class="ratings-legend-item">
+      <div class="ratings-legend-dot" style="background:#c8a84b;"></div>
+      <div class="ratings-legend-text">15 Hold</div>
+    </div>
+    <div class="ratings-legend-item">
+      <div class="ratings-legend-dot" style="background:#e05a5a;"></div>
+      <div class="ratings-legend-text">1 Sell</div>
+    </div>
+    <div class="ratings-legend-item">
+      <div class="ratings-legend-dot" style="background:#4a5a7a;"></div>
+      <div class="ratings-legend-text">Total: 23 Analysts</div>
+    </div>
+  </div>
+
+  <div class="analyst-cards">
+    <div class="analyst-card featured">
+      <div class="analyst-firm">UBS</div>
+      <div class="analyst-rating-badge neutral">Neutral</div>
+      <div class="analyst-note">UBS maintained a Neutral rating on LMT, indicating institutional caution despite strong Q1 2026 fundamentals and new contract awards. Mixed signals suggest limited near-term upside momentum despite positive catalysts including the $4.7B PAC-3 UCA.</div>
+    </div>
+    <div class="analyst-card featured">
+      <div class="analyst-firm">StockTitan Coverage</div>
+      <div class="analyst-rating-badge buy">Buy-Equivalent</div>
+      <div class="analyst-note">Optimistic views tied to Q1 2026 results and guidance reaffirmation. Coverage implies bullish positioning based on PAC-3 MSE production ramp, PrSM framework agreement, and record F-35 deliveries supporting multi-year revenue visibility.</div>
+    </div>
+  </div>
+
+  <div class="consensus-summary">
+    <div class="consensus-summary-label">Consensus Price Target</div>
+    <div class="consensus-summary-text">
+      Analyst consensus price target of <strong style="color:#c8a84b;">$513.47</strong> (per available aggregated data) suggests potential upside of 5.74% from reference price levels. Simply Wall St assigns LMT a valuation score of <strong style="color:#c8a84b;">5/6</strong>, indicating strong relative value positioning. The wide divergence in intrinsic value estimates ($395.68 DCF to $827.50 relative valuation) reflects methodological differences. The majority Hold positioning (15 of 23 analysts) reflects balanced risk/reward at current levels near the 50-day moving average.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 08: RISKS AND CATALYSTS                                -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="risks-section">
+  <div class="risks-section-label">08 &nbsp;/&nbsp; Risks &amp; Catalysts</div>
+  <div class="risks-h2">Watch List</div>
+
+  <div class="risks-catalysts-grid">
+    <div>
+      <div class="risks-col-label risk">⚠ Risks</div>
+      <div class="risk-item">
+        <div class="risk-bullet risk"></div>
+        <div class="risk-text"><strong>DoD Budget Constraints</strong> — U.S. Department of Defense budget pressures could delay or reduce contract awards despite the $1.5T defense budget push</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-bullet risk"></div>
+        <div class="risk-text"><strong>Geopolitical Shifts</strong> — Changes in U.S. foreign policy or alliance structures could reduce international arms sales demand</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-bullet risk"></div>
+        <div class="risk-text"><strong>India Tariff Headwind</strong> — India has paused plans to buy U.S. weapons following Trump's tariffs, potentially constraining international revenue growth</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-bullet risk"></div>
+        <div class="risk-text"><strong>Valuation Risk</strong> — High P/E of 29.20 and P/B of 21.38 leave limited margin of safety; interest rate sensitivity on premium valuation</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-bullet risk"></div>
+        <div class="risk-text"><strong>Margin Compression</strong> — Operating margins declined from 13.2% to 11.4% YoY; supply chain and production cost pressures in aerospace</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-bullet risk"></div>
+        <div class="risk-text"><strong>Export Controls</strong> — Regulatory risks involving export controls for allied nations could delay FMS program deliveries</div>
+      </div>
+    </div>
+    <div>
+      <div class="risks-col-label catalyst">✦ Catalysts</div>
+      <div class="risk-item">
+        <div class="risk-bullet catalyst"></div>
+        <div class="risk-text"><strong>Q2 2026 Earnings</strong> — Expected mid-2026; EPS beats and guidance raises could drive momentum above $692 resistance</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-bullet catalyst"></div>
+        <div class="risk-text"><strong>PAC-3 MSE Ramp</strong> — $4.7B UCA contract accelerating production; validates $7B+ in company capacity investments</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-bullet catalyst"></div>
+        <div class="risk-text"><strong>PrSM Multi-Year Contract</strong> — Congressional authorization of up to 7-year PrSM contract would provide exceptional revenue visibility</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-bullet catalyst"></div>
+        <div class="risk-text"><strong>F-35 Delivery Momentum</strong> — Record annual deliveries and global fleet expansion; $1T projected lifetime program revenue</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-bullet catalyst"></div>
+        <div class="risk-text"><strong>Defense Budget Expansion</strong> — Trump administration's $1.5T defense budget push provides structural sector tailwinds</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-bullet catalyst"></div>
+        <div class="risk-text"><strong>Hypersonic &amp; Space Awards</strong> — New hypersonic weapons and space technology contracts could expand addressable market</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="upcoming-events">
+    <div class="upcoming-label">Key Events to Watch — Next 30–90 Days</div>
+    <div class="event-row">
+      <div class="event-timing">30 Days</div>
+      <div class="event-desc">Monitor F-35 delivery updates and international FMS program momentum amid tariff headwinds</div>
+    </div>
+    <div class="event-row">
+      <div class="event-timing">60 Days</div>
+      <div class="event-desc">Congressional action on PrSM multi-year contract authorization; analyst sentiment shifts post-contract clarity</div>
+    </div>
+    <div class="event-row">
+      <div class="event-timing">90 Days</div>
+      <div class="event-desc">Q2 2026 earnings release (expected mid-2026); PAC-3 MSE production ramp progress; hypersonic contract announcements</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 09: FINRL RELEVANCE                                    -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="finrl-section">
+  <div class="finrl-section-label">09 &nbsp;/&nbsp; FinRL Relevance</div>
+  <div class="finrl-h2">RL Agent<br>Observable Features</div>
+  <div class="finrl-subtitle">Predictive signals for reinforcement learning-based trading strategies targeting LMT</div>
+
+  <div class="finrl-item">
+    <div class="finrl-number">01</div>
+    <div class="finrl-content">
+      <div class="finrl-feature-name">Free Cash Flow Surprises vs. Guidance</div>
+      <div class="finrl-feature-example">Q1 2026: $(291)M actual vs. $6.5–$6.8B annual target</div>
+      <div class="finrl-feature-desc">Deviations between quarterly free cash flow and annual guidance signal execution risks or strengths. For a defense contractor with stable contract revenue, FCF surprises are highly predictive of short-term reversals, as institutional investors recalibrate annual cash generation expectations. The agent should track the ratio of quarterly FCF to annualized guidance as a regime indicator.</div>
+    </div>
+  </div>
+
+  <div class="finrl-item">
+    <div class="finrl-number">02</div>
+    <div class="finrl-content">
+      <div class="finrl-feature-name">Volume Relative to 30-Day Average</div>
+      <div class="finrl-feature-example">Recent: 339,601 vs. 30-day avg. 1,590,000 (21.4% of average)</div>
+      <div class="finrl-feature-desc">Volume spikes above the 30-day average indicate institutional buying on defense news catalysts, forecasting potential breakouts above resistance levels like $692.00. Conversely, sustained below-average volume (as currently observed) signals consolidation. This ratio is particularly predictive for LMT given its low retail participation and institutional-dominated order flow.</div>
+    </div>
+  </div>
+
+  <div class="finrl-item">
+    <div class="finrl-number">03</div>
+    <div class="finrl-content">
+      <div class="finrl-feature-name">50-Day vs. 200-Day Moving Average Crossovers</div>
+      <div class="finrl-feature-example">50-day MA: $625.05 — current price $626.03 (delta: +$0.98)</div>
+      <div class="finrl-feature-desc">Golden cross and death cross signals are particularly predictive for low-volatility, low-beta stocks like LMT, where trend persistence is stronger than in high-beta names. Crossovers correlate to 5–10% directional moves on policy catalysts. The agent should encode the price-to-50DMA spread as a continuous feature, with the current near-zero spread ($0.98) flagging elevated breakout/breakdown risk.</div>
+    </div>
+  </div>
+
+  <div class="finrl-item">
+    <div class="finrl-number">04</div>
+    <div class="finrl-content">
+      <div class="finrl-feature-name">EPS Beats and Guidance Reaffirmations</div>
+      <div class="finrl-feature-example">Q1 2026 diluted EPS: $6.44; TTM EPS: $21.49; guidance reaffirmed</div>
+      <div class="finrl-feature-desc">Quarterly EPS beats drive momentum in defense stocks, as LMT's high revenue visibility makes consensus estimates reliable baselines. Guidance reaffirmations (as seen in Q1 2026) reduce uncertainty premium and support valuation multiples. The agent should encode the EPS surprise magnitude and guidance revision direction as binary and continuous features respectively for 1–3 month return prediction.</div>
+    </div>
+  </div>
+
+  <div class="finrl-item">
+    <div class="finrl-number">05</div>
+    <div class="finrl-content">
+      <div class="finrl-feature-name">Beta-Adjusted S&amp;P 500 Correlation</div>
+      <div class="finrl-feature-example">LMT beta: 0.18 — extreme low-beta defensive characteristic</div>
+      <div class="finrl-feature-desc">LMT's 0.18 beta means relative strength during broad market downturns predicts outperformance on a risk-adjusted basis. This feature is critical for regime-switching RL policies: when the S&amp;P 500 enters a drawdown regime, an agent holding LMT should expect positive alpha. The agent should track rolling 30-day beta and the LMT/SPX relative return ratio as regime-detection inputs for position sizing decisions.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- FOOTER                                                         -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="footer-divider"></div>
+<div class="report-footer">
+  <div class="footer-left">
+    Lockheed Martin Corporation &nbsp;·&nbsp; NYSE: LMT<br>
+    Research Report &nbsp;·&nbsp; Q1 2026 Data<br>
+    For informational purposes only &nbsp;·&nbsp; Not investment advice
+  </div>
+  <div class="footer-right">LMT</div>
+</div>
+
+</body>
+</html>

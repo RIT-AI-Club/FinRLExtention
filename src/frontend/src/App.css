@@ -148,9 +148,9 @@
 .main-chat-area {
   flex-grow: 1;
   display: flex;
-  flex-direction: column; /* Stacks items vertically */
-  align-items: center;    /* Centers everything horizontally */
-  background-color: #16161a; /* Your original dark background */
+  flex-direction: column;
+  align-items: center;
+  background-color: #16161a;
   color: white;
   padding: 20px;
 }
@@ -172,10 +172,10 @@
   width: 100%;
   max-width: 800px;
   display: flex;
-  justify-content: flex-start; /* Pushes items to the left side */
+  justify-content: flex-start;
   align-items: center;
-  gap: 16px; /* This is the exact, permanent distance between the ☰ and the h1 */
-  margin-bottom: 20px;
+  gap: 16px;
+  margin-bottom: 40px;
 }
 
 .chat-header h1 {
@@ -500,4 +500,204 @@
 }
 .sidebar-content::-webkit-scrollbar-thumb:hover {
   background-color: #888888;
+}
+
+/* Status bubbles — compact progress updates during report generation */
+.chat-message.progress {
+  background-color: #1e1e2a;
+  border: 1px solid #2e2e3e;
+  color: #8b8ba8;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  padding: 5px 10px;
+  max-width: 85%;
+  align-self: flex-start;
+  margin-bottom: 4px;
+}
+
+.chat-message.progress.warn {
+  color: #d29922;
+  border-color: #3a3010;
+}
+
+.progress-prefix {
+  color: #58a6ff;
+  margin-right: 5px;
+}
+
+/* Narrow chat area when PDF viewer is open */
+.chat-area-narrow {
+  flex: 0 0 420px;
+  min-width: 0;
+}
+
+/* PDF Viewer Panel */
+.pdf-viewer-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #1e1e2f;
+  border-left: 1px solid #2e2e3e;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.pdf-viewer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: #16161a;
+  color: #ccc;
+  font-size: 0.9rem;
+  font-family: var(--font-sans);
+  border-bottom: 1px solid #2e2e3e;
+  flex-shrink: 0;
+}
+
+.pdf-viewer-title {
+  font-weight: 500;
+  color: #eee;
+}
+
+.pdf-viewer-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pdf-download-link {
+  color: #8b8ba8;
+  text-decoration: none;
+  font-size: 0.85rem;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid #3e3e50;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.pdf-download-link:hover {
+  color: #fff;
+  border-color: #666;
+}
+
+.pdf-viewer-close {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.pdf-viewer-close:hover {
+  color: #fff;
+  background: #2e2e3e;
+}
+
+.pdf-viewer-frame {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: #525659;
+}
+
+/* Center the ticker form / spinner in the space below the header */
+.ticker-form,
+.spinner-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ticker input form */
+.ticker-form {
+  gap: 16px;
+  width: 100%;
+  max-width: 480px;
+}
+
+.ticker-form-label {
+  font-size: 15px;
+  color: #aaa;
+  margin: 0;
+  font-family: var(--font-sans);
+}
+
+.ticker-input-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.ticker-input {
+  flex: 1;
+  background-color: #333333;
+  border: 1px solid #444;
+  color: white;
+  padding: 12px 16px;
+  font-size: 18px;
+  font-family: var(--font-sans);
+  border-radius: 12px;
+  outline: none;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ticker-input::placeholder {
+  color: #666;
+  font-size: 15px;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.ticker-input:focus {
+  border-color: #666;
+}
+
+.ticker-error {
+  color: #e05c5c;
+  font-size: 13px;
+  margin: 0;
+  font-family: var(--font-sans);
+}
+
+.ticker-suggestions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Spinner */
+.spinner-container {
+  gap: 16px;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #333;
+  border-top-color: #888;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+.spinner-label {
+  font-size: 16px;
+  color: #ccc;
+  margin: 0;
+  font-family: var(--font-sans);
+}
+
+.spinner-sublabel {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+  font-family: var(--font-sans);
 }

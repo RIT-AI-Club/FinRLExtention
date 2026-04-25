@@ -56,6 +56,7 @@ async def generate_report(
     advanced_chart: bool = False,
     output_dir: Path = Path("reports"),
     client: MCPClient | None = None,
+    progress_callback=None,
 ) -> dict[str, Path]:
     """
     Run the full pipeline: research → chart → format → save.
@@ -78,15 +79,25 @@ async def generate_report(
         client = await create_mcp_client()
 
     try:
+        async def _emit(msg: str):
+            logger.info(msg)
+            if progress_callback:
+                await progress_callback(msg, "info")
+
+        async def _warn(msg: str):
+            logger.warning(msg)
+            if progress_callback:
+                await progress_callback(msg, "warn")
+
         # --- 1. Research ---
-        logger.info(f"[1/4] Researching stock: {ticker}")
+        await _emit(f"[1/4] Researching stock: {ticker}")
         stock_result, news_result = await asyncio.gather(
             client.call_tool("research_stock", {"ticker": ticker}),
             client.call_tool("research_news", {"ticker": ticker}),
         )
         text_blocks = [_extract_text(stock_result), _extract_text(news_result)]
 
-        logger.info(f"[1b/4] Supplemental research for: {ticker}")
+        await _emit(f"[1b/4] Supplemental research for: {ticker}")
         sector_result, valuation_result = await asyncio.gather(
             client.call_tool("research_topic", {
                 "query": (
@@ -104,19 +115,19 @@ async def generate_report(
             }),
         )
         text_blocks.extend([_extract_text(sector_result), _extract_text(valuation_result)])
-        logger.info(
+        await _emit(
             f"Research complete: {len(text_blocks)} blocks, "
             f"{sum(len(b) for b in text_blocks):,} total characters"
         )
 
         # --- 2. Chart generation ---
-        logger.info(f"[2/4] Generating chart for: {ticker}")
+        await _emit(f"[2/4] Generating chart for: {ticker}")
         try:
             dates, prices = _fetch_real_prices(ticker)
             chart_caption = f"{ticker.upper()} — 90-Day Closing Price (Real Data)"
-            logger.info(f"Fetched {len(dates)} real price points for {ticker}")
+            await _emit(f"Fetched {len(dates)} real price points for {ticker}")
         except Exception as e:
-            logger.warning(f"yfinance fetch failed ({e}), using dummy prices")
+            await _warn(f"yfinance fetch failed ({e}), using dummy prices")
             base = datetime.now()
             dates = [(base - timedelta(days=i)).strftime("%Y-%m-%d") for i in range(90)]
             dates.reverse()
@@ -140,7 +151,7 @@ async def generate_report(
                 images.append([item.data, chart_caption])
 
         # --- 3. Format into HTML ---
-        logger.info("[3/4] Formatting HTML report")
+        await _emit("[3/4] Formatting HTML report")
         html_content = None
         for attempt in range(4):
             format_result = await client.call_tool(
@@ -159,23 +170,23 @@ async def generate_report(
                 raise RuntimeError(f"Formatting server failed after 4 attempts: {html_content}")
 
             wait = 2 ** attempt
-            logger.warning(f"Gemini 503 on formatting attempt {attempt + 1}/4, retrying in {wait}s...")
+            await _warn(f"Gemini 503 on formatting attempt {attempt + 1}/4, retrying in {wait}s...")
             await asyncio.sleep(wait)
 
         # --- 4. Save outputs ---
-        logger.info("[4/4] Saving report files")
+        await _emit("[4/4] Saving report files")
         output_paths: dict[str, Path] = {}
 
         html_path = output_dir / f"{stem}.html"
         html_path.write_text(html_content, encoding="utf-8")
         output_paths["html"] = html_path
-        logger.info(f"HTML saved: {html_path}")
+        await _emit(f"HTML saved: {html_path}")
 
         if save_pdf:
             pdf_path = output_dir / f"{stem}.pdf"
             await html_to_pdf(html_content, output_path=str(pdf_path))
             output_paths["pdf"] = pdf_path
-            logger.info(f"PDF saved: {pdf_path}")
+            await _emit(f"PDF saved: {pdf_path}")
 
         return output_paths
 

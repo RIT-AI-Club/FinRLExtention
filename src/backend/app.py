@@ -1,11 +1,12 @@
 import sys
 import os
-import re
+import asyncio
+import json
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -14,22 +15,14 @@ import glob, traceback
 from mcp_client import MCPClient, create_mcp_client
 from generate_report import generate_report as _run_generate_report
 
-_REPORT_KEYWORDS = frozenset(['report', 'generate', 'analyze', 'analysis', 'create'])
-
-
-def _detect_report_ticker(message: str) -> str | None:
-    """Return uppercase ticker if the message is a report generation request, else None."""
-    lower = message.lower()
-    if not any(kw in lower for kw in _REPORT_KEYWORDS):
-        return None
-    match = re.search(r'\b([A-Z]{2,5})\b', message)
-    return match.group(1) if match else None
-
 PDF_OUTPUT_DIR = "reports"
 os.makedirs(PDF_OUTPUT_DIR, exist_ok=True)
 
 # Resolved absolute path used for all security checks
 PDF_OUTPUT_DIR_ABS = Path(PDF_OUTPUT_DIR).resolve()
+
+# Maps job_id -> asyncio.Queue for SSE progress streaming.
+_progress_queues: dict[str, asyncio.Queue] = {}
 
 client: MCPClient | None = None
 
@@ -62,6 +55,11 @@ class ChatRequest(BaseModel):
     history: list[dict] = []
 
 
+class GenerateReportRequest(BaseModel):
+    ticker: str
+    job_id: str | None = None
+
+
 def _guard_client() -> MCPClient:
     """Return the MCP client or raise a 503 if startup failed."""
     if client is None:
@@ -69,46 +67,108 @@ def _guard_client() -> MCPClient:
     return client
 
 
+@app.get("/api/report/progress/{job_id}")
+async def report_progress(job_id: str):
+    """SSE stream that emits progress log messages while a report is being generated."""
+    async def event_generator():
+        deadline, waited = 10.0, 0.0
+        while job_id not in _progress_queues:
+            if waited >= deadline:
+                yield 'data: {"done": true}\n\n'
+                return
+            await asyncio.sleep(0.1)
+            waited += 0.1
+
+        q = _progress_queues[job_id]
+        try:
+            while True:
+                try:
+                    item = await asyncio.wait_for(q.get(), timeout=15.0)
+                except asyncio.TimeoutError:
+                    yield ": keepalive\n\n"
+                    continue
+                if item is None:
+                    yield 'data: {"done": true}\n\n'
+                    return
+                yield f"data: {json.dumps(item)}\n\n"
+        finally:
+            _progress_queues.pop(job_id, None)
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+@app.post("/api/report/generate")
+async def generate_report_endpoint(req: GenerateReportRequest):
+    """Run the generate_report pipeline directly for a given ticker."""
+    mcp = _guard_client()
+    ticker = req.ticker.strip().upper()
+
+    q: asyncio.Queue | None = None
+    if req.job_id:
+        q = asyncio.Queue()
+        _progress_queues[req.job_id] = q
+
+    async def progress_callback(msg: str, level: str = "info"):
+        if q is not None:
+            await q.put({"msg": msg, "level": level})
+
+    try:
+        paths = await _run_generate_report(
+            ticker=ticker,
+            save_pdf=True,
+            output_dir=PDF_OUTPUT_DIR_ABS,
+            client=mcp,
+            progress_callback=progress_callback,
+        )
+        return {
+            "html_filename": paths["html"].name if "html" in paths else None,
+            "pdf_filename": paths["pdf"].name if "pdf" in paths else None,
+        }
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if q is not None:
+            await q.put(None)
+
+
 @app.post("/api/chat")
 async def chat(req: ChatRequest):
     mcp = _guard_client()
-
-    ticker = _detect_report_ticker(req.message)
-    if ticker:
-        try:
-            paths = await _run_generate_report(
-                ticker=ticker,
-                save_pdf=True,
-                output_dir=PDF_OUTPUT_DIR_ABS,
-                client=mcp,
-            )
-            pdf_filename = paths["pdf"].name if "pdf" in paths else None
-            return {
-                "reply": f"Report for {ticker} has been generated.",
-                "pdf_filename": pdf_filename,
-            }
-        except Exception as e:
-            traceback.print_exc()
-            raise HTTPException(status_code=500, detail=str(e))
-
-    # Non-report chat: use the Gemini agentic loop and detect any incidentally generated PDFs.
-    files_before = {p: os.path.getmtime(p) for p in glob.glob(f"{PDF_OUTPUT_DIR_ABS}/*.pdf")}
     try:
         reply = await mcp.process_message(req.message, req.history)
-
-        files_after = set(glob.glob(f"{PDF_OUTPUT_DIR_ABS}/*.pdf"))
-        new_files = [p for p in files_after if p not in files_before]
-        pdf_filename: str | None = None
-        if new_files:
-            pdf_filename = os.path.basename(max(new_files, key=os.path.getmtime))
-
-        return {"reply": reply, "pdf_filename": pdf_filename}
-
+        return {"reply": reply}
     except HTTPException:
         raise
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/report/view/{filename}")
+async def view_pdf(filename: str):
+    """Serve a report PDF inline for embedded display in an iframe."""
+    candidate = (PDF_OUTPUT_DIR_ABS / filename).resolve()
+    if not str(candidate).startswith(str(PDF_OUTPUT_DIR_ABS) + os.sep):
+        raise HTTPException(status_code=400, detail="Invalid filename")
+    if not candidate.exists():
+        raise HTTPException(status_code=404, detail="Report not found")
+    return FileResponse(str(candidate), media_type="application/pdf")
+
+
+@app.get("/api/report/html/{filename}")
+async def serve_html(filename: str):
+    """Serve a generated report HTML file directly in the browser."""
+    candidate = (PDF_OUTPUT_DIR_ABS / filename).resolve()
+    if not str(candidate).startswith(str(PDF_OUTPUT_DIR_ABS) + os.sep):
+        raise HTTPException(status_code=400, detail="Invalid filename")
+    if not candidate.exists():
+        raise HTTPException(status_code=404, detail="Report not found")
+    return FileResponse(str(candidate), media_type="text/html")
 
 
 @app.get("/api/report/download/{filename}")
@@ -133,7 +193,7 @@ async def download(filename: str):
 @app.get("/api/reports")
 async def list_reports():
     files = sorted(
-        glob.glob(f"{PDF_OUTPUT_DIR_ABS}/*.pdf"),
+        glob.glob(f"{PDF_OUTPUT_DIR_ABS}/*.html"),
         key=os.path.getmtime,
         reverse=True,
     )

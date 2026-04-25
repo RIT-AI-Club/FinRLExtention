@@ -1,0 +1,1975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apple Inc. (AAPL) — Financial Research Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  @page {
+    background: #0a0a0f;
+    margin: 40px;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    width: 794px;
+    margin: 0 auto;
+    padding: 0;
+    background: #0a0a0f;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-family: 'DM Mono', monospace;
+    color: #e8e4dc;
+  }
+
+  p, h1, h2, h3, h4, h5, h6,
+  img, figure, table, thead, tbody, tr,
+  ul, ol, li,
+  .card, .section, .block, .metric, .chart, .row,
+  [class*="chart"], [class*="section"], [class*="callout"],
+  .summary-statement, .kpi-item, .risk-item, .feature-item,
+  .competitor-row, .analyst-row, .tech-row {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    background: #0a0a0f;
+    padding: 60px 0 0 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: #6b9fff;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .hero-ticker {
+    font-family: 'Playfair Display', serif;
+    font-size: 120px;
+    font-weight: 900;
+    color: #f0ece4;
+    line-height: 0.85;
+    letter-spacing: -4px;
+    display: block;
+  }
+
+  .hero-company {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 6px;
+    color: #6b9fff;
+    text-transform: uppercase;
+    margin-top: 18px;
+    margin-bottom: 40px;
+  }
+
+  .hero-price-band {
+    background: #6b9fff;
+    padding: 20px 32px;
+    display: flex;
+    align-items: baseline;
+    gap: 24px;
+    margin: 0 -0px;
+  }
+
+  .hero-price-main {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    font-weight: 900;
+    color: #0a0a0f;
+    line-height: 1;
+  }
+
+  .hero-price-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: #0a0a0f;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  .hero-price-change {
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    color: #0a0a0f;
+    font-weight: 500;
+    margin-left: auto;
+  }
+
+  .hero-meta-strip {
+    background: #111118;
+    padding: 16px 32px;
+    display: flex;
+    gap: 40px;
+    border-bottom: 1px solid #1e1e2e;
+  }
+
+  .hero-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .hero-meta-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #555570;
+    text-transform: uppercase;
+  }
+
+  .hero-meta-value {
+    font-size: 13px;
+    color: #e8e4dc;
+    font-weight: 500;
+  }
+
+  /* ─── SECTION DIVIDERS ─── */
+  .section-divider {
+    height: 4px;
+    background: linear-gradient(90deg, #6b9fff 0%, #a78bfa 50%, #6b9fff 100%);
+    margin: 0;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #6b9fff;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #1e1e2e;
+  }
+
+  /* ─── SECTION 01: COMPANY OVERVIEW ─── */
+  .overview-section {
+    background: #0d0d14;
+    padding: 48px 40px;
+    border-left: 3px solid #6b9fff;
+  }
+
+  .overview-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    font-weight: 900;
+    color: #f0ece4;
+    line-height: 1.05;
+    margin-bottom: 28px;
+    letter-spacing: -1px;
+  }
+
+  .overview-body {
+    font-size: 13px;
+    line-height: 1.8;
+    color: #a8a4a0;
+    max-width: 600px;
+    margin-bottom: 32px;
+  }
+
+  .overview-stats {
+    display: flex;
+    gap: 0;
+    border: 1px solid #1e1e2e;
+  }
+
+  .overview-stat {
+    flex: 1;
+    padding: 20px 24px;
+    border-right: 1px solid #1e1e2e;
+  }
+
+  .overview-stat:last-child {
+    border-right: none;
+  }
+
+  .overview-stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #6b9fff;
+    display: block;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .overview-stat-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: #555570;
+    text-transform: uppercase;
+  }
+
+  .product-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 24px;
+  }
+
+  .product-tag {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #6b9fff;
+    border: 1px solid #6b9fff;
+    padding: 5px 12px;
+  }
+
+  /* ─── SECTION 02: PRICE ACTION ─── */
+  .price-section {
+    background: #f0ece4;
+    padding: 48px 40px;
+  }
+
+  .price-section .section-label {
+    color: #0a0a0f;
+  }
+
+  .price-section .section-label::after {
+    background: #c8c4bc;
+  }
+
+  .price-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: #333;
+    letter-spacing: 1px;
+    margin-bottom: 32px;
+    font-style: italic;
+  }
+
+  .price-giant-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 200px;
+    font-weight: 900;
+    color: #0a0a0f;
+    line-height: 0.8;
+    letter-spacing: -8px;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .price-giant-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: #888;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+
+  .price-metrics-row {
+    display: flex;
+    gap: 0;
+    margin-bottom: 32px;
+    border: 1px solid #c8c4bc;
+  }
+
+  .price-metric {
+    flex: 1;
+    padding: 18px 20px;
+    border-right: 1px solid #c8c4bc;
+  }
+
+  .price-metric:last-child {
+    border-right: none;
+  }
+
+  .price-metric-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #888;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .price-metric-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #0a0a0f;
+  }
+
+  .price-metric-value.negative {
+    color: #c0392b;
+  }
+
+  .price-metric-value.positive {
+    color: #1a7a4a;
+  }
+
+  .price-narrative {
+    font-size: 12px;
+    line-height: 1.8;
+    color: #444;
+    border-left: 3px solid #0a0a0f;
+    padding-left: 20px;
+  }
+
+  .chart-container {
+    width: 794px;
+    background: #f0ece4;
+    padding: 0 40px 40px 40px;
+  }
+
+  .chart-caption {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: #888;
+    margin-top: 10px;
+    letter-spacing: 1px;
+  }
+
+  /* ─── SECTION 03: FINANCIAL SUMMARY ─── */
+  .financial-section {
+    background: #0a0a0f;
+    padding: 48px 40px;
+  }
+
+  .financial-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 900;
+    color: #f0ece4;
+    margin-bottom: 32px;
+    letter-spacing: -1px;
+  }
+
+  .fin-hero-row {
+    display: flex;
+    gap: 0;
+    margin-bottom: 32px;
+  }
+
+  .fin-hero-item {
+    flex: 1;
+    background: #111118;
+    padding: 28px 24px;
+    border: 1px solid #1e1e2e;
+    margin-right: -1px;
+  }
+
+  .fin-hero-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 38px;
+    font-weight: 900;
+    color: #6b9fff;
+    display: block;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .fin-hero-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #555570;
+    text-transform: uppercase;
+  }
+
+  .fin-hero-sub {
+    font-size: 11px;
+    color: #a78bfa;
+    margin-top: 4px;
+  }
+
+  .margins-bar-section {
+    margin-bottom: 32px;
+  }
+
+  .margins-title {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: #555570;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .margin-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+
+  .margin-bar-label {
+    font-size: 10px;
+    color: #a8a4a0;
+    width: 140px;
+    flex-shrink: 0;
+    letter-spacing: 1px;
+  }
+
+  .margin-bar-track {
+    flex: 1;
+    height: 8px;
+    background: #1e1e2e;
+    position: relative;
+  }
+
+  .margin-bar-fill {
+    height: 100%;
+    background: #6b9fff;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
+  .margin-bar-fill.purple {
+    background: #a78bfa;
+  }
+
+  .margin-bar-fill.teal {
+    background: #34d399;
+  }
+
+  .margin-bar-value {
+    font-size: 12px;
+    color: #e8e4dc;
+    width: 50px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .geo-section {
+    background: #111118;
+    padding: 24px;
+    border: 1px solid #1e1e2e;
+  }
+
+  .geo-title {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: #555570;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .geo-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .geo-name {
+    font-size: 10px;
+    color: #a8a4a0;
+    width: 160px;
+    flex-shrink: 0;
+  }
+
+  .geo-bar-track {
+    flex: 1;
+    height: 6px;
+    background: #1e1e2e;
+    position: relative;
+  }
+
+  .geo-bar-fill {
+    height: 100%;
+    background: #a78bfa;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
+  .geo-pct {
+    font-size: 11px;
+    color: #e8e4dc;
+    width: 40px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ─── SECTION 04: GROWTH PROSPECTS ─── */
+  .growth-section {
+    background: #1a1a2e;
+    padding: 48px 40px;
+  }
+
+  .growth-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 900;
+    color: #a78bfa;
+    line-height: 1;
+    margin-bottom: 8px;
+    letter-spacing: -2px;
+  }
+
+  .growth-subheading {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: #555570;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 36px;
+  }
+
+  .growth-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .growth-card {
+    background: #0d0d1a;
+    border: 1px solid #2a2a4a;
+    padding: 24px;
+  }
+
+  .growth-card-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 900;
+    color: #a78bfa;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .growth-card-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #555570;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .growth-card-body {
+    font-size: 11px;
+    color: #7070a0;
+    line-height: 1.7;
+  }
+
+  .growth-pullquote {
+    border-left: 4px solid #a78bfa;
+    padding: 20px 24px;
+    background: #0d0d1a;
+    margin-top: 0;
+  }
+
+  .growth-pullquote-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-style: italic;
+    color: #c8c4e0;
+    line-height: 1.6;
+  }
+
+  /* ─── SECTION 05: COMPETITIVE POSITION ─── */
+  .competitive-section {
+    background: #f5f0e8;
+    padding: 48px 40px;
+  }
+
+  .competitive-section .section-label {
+    color: #0a0a0f;
+  }
+
+  .competitive-section .section-label::after {
+    background: #c8c4bc;
+  }
+
+  .competitive-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 900;
+    color: #0a0a0f;
+    margin-bottom: 32px;
+    letter-spacing: -1px;
+  }
+
+  .moat-strip {
+    background: #0a0a0f;
+    padding: 20px 28px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .moat-label {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: #6b9fff;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .moat-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-style: italic;
+    color: #f0ece4;
+  }
+
+  .competitor-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 28px;
+  }
+
+  .competitor-table thead tr {
+    background: #0a0a0f;
+  }
+
+  .competitor-table thead th {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #6b9fff;
+    text-transform: uppercase;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 400;
+  }
+
+  .competitor-table tbody tr:nth-child(odd) {
+    background: #ede8e0;
+  }
+
+  .competitor-table tbody tr:nth-child(even) {
+    background: #e5e0d8;
+  }
+
+  .competitor-table tbody td {
+    font-size: 11px;
+    color: #222;
+    padding: 12px 16px;
+    border-bottom: 1px solid #d0ccc4;
+  }
+
+  .competitor-table tbody td:first-child {
+    font-weight: 500;
+    color: #0a0a0f;
+  }
+
+  .share-bar-inline {
+    display: inline-block;
+    height: 8px;
+    background: #6b9fff;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+
+  .share-bar-inline.apple {
+    background: #0a0a0f;
+  }
+
+  .market-share-visual {
+    background: #0a0a0f;
+    padding: 24px 28px;
+  }
+
+  .ms-title {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: #555570;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .ms-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .ms-name {
+    font-size: 10px;
+    color: #a8a4a0;
+    width: 100px;
+    flex-shrink: 0;
+  }
+
+  .ms-bar-track {
+    flex: 1;
+    height: 10px;
+    background: #1e1e2e;
+    position: relative;
+  }
+
+  .ms-bar-fill {
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
+  .ms-pct {
+    font-size: 11px;
+    color: #e8e4dc;
+    width: 40px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ─── SECTION 06: TECHNICAL ANALYSIS ─── */
+  .technical-section {
+    background: #080810;
+    padding: 48px 40px;
+    border-top: 1px solid #1e1e2e;
+  }
+
+  .technical-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 900;
+    color: #34d399;
+    margin-bottom: 32px;
+    letter-spacing: -1px;
+  }
+
+  .tech-levels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin-bottom: 32px;
+    border: 1px solid #1e2e1e;
+  }
+
+  .tech-level-item {
+    padding: 24px 28px;
+    border-right: 1px solid #1e2e1e;
+    border-bottom: 1px solid #1e2e1e;
+  }
+
+  .tech-level-item:nth-child(2n) {
+    border-right: none;
+  }
+
+  .tech-level-item:nth-child(3),
+  .tech-level-item:nth-child(4) {
+    border-bottom: none;
+  }
+
+  .tech-level-type {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: #34d399;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .tech-level-type.resistance {
+    color: #f87171;
+  }
+
+  .tech-level-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 900;
+    color: #f0ece4;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .tech-level-desc {
+    font-size: 10px;
+    color: #555570;
+    line-height: 1.6;
+  }
+
+  .ma-section {
+    background: #0d0d14;
+    padding: 24px 28px;
+    border: 1px solid #1e1e2e;
+    margin-bottom: 24px;
+  }
+
+  .ma-title {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: #555570;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .ma-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #1e1e2e;
+  }
+
+  .ma-row:last-child {
+    border-bottom: none;
+  }
+
+  .ma-name {
+    font-size: 11px;
+    color: #a8a4a0;
+    letter-spacing: 1px;
+  }
+
+  .ma-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #34d399;
+  }
+
+  .ma-note {
+    font-size: 10px;
+    color: #555570;
+    text-align: right;
+  }
+
+  .volume-note {
+    font-size: 12px;
+    color: #7070a0;
+    line-height: 1.7;
+    padding: 16px 0;
+    border-top: 1px solid #1e1e2e;
+  }
+
+  /* ─── SECTION 07: ANALYST CONSENSUS ─── */
+  .analyst-section {
+    background: #6b9fff;
+    padding: 48px 40px;
+  }
+
+  .analyst-section .section-label {
+    color: #0a0a0f;
+  }
+
+  .analyst-section .section-label::after {
+    background: rgba(0,0,0,0.2);
+  }
+
+  .analyst-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    font-weight: 900;
+    color: #0a0a0f;
+    margin-bottom: 32px;
+    letter-spacing: -1px;
+  }
+
+  .consensus-badge {
+    display: inline-block;
+    background: #0a0a0f;
+    color: #6b9fff;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    margin-bottom: 32px;
+  }
+
+  .ratings-visual {
+    display: flex;
+    gap: 0;
+    margin-bottom: 32px;
+    height: 80px;
+  }
+
+  .ratings-bar-buy {
+    background: #0a0a0f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .ratings-bar-hold {
+    background: #3a6acc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .ratings-bar-sell {
+    background: #1a3a8a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .ratings-bar-pct {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: #6b9fff;
+  }
+
+  .ratings-bar-buy .ratings-bar-pct {
+    color: #6b9fff;
+  }
+
+  .ratings-bar-hold .ratings-bar-pct,
+  .ratings-bar-sell .ratings-bar-pct {
+    color: #f0ece4;
+  }
+
+  .ratings-bar-label {
+    font-size: 8px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #f0ece4;
+  }
+
+  .ratings-bar-buy .ratings-bar-label {
+    color: #a8a4a0;
+  }
+
+  .analyst-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .analyst-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.15);
+  }
+
+  .analyst-row:last-child {
+    border-bottom: none;
+  }
+
+  .analyst-firm {
+    font-size: 13px;
+    font-weight: 500;
+    color: #0a0a0f;
+  }
+
+  .analyst-rating-badge {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    background: #0a0a0f;
+    color: #6b9fff;
+  }
+
+  .target-range {
+    background: #0a0a0f;
+    padding: 20px 24px;
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .target-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #555570;
+    text-transform: uppercase;
+  }
+
+  .target-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 900;
+    color: #6b9fff;
+  }
+
+  /* ─── SECTION 08: RISKS & CATALYSTS ─── */
+  .risks-section {
+    background: #12080a;
+    padding: 48px 40px;
+  }
+
+  .risks-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 900;
+    color: #f0ece4;
+    margin-bottom: 8px;
+    letter-spacing: -1px;
+  }
+
+  .risks-subheading {
+    font-size: 11px;
+    color: #7a4050;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 36px;
+  }
+
+  .risks-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .risks-col-title {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: #f87171;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #2a1018;
+  }
+
+  .risks-col-title.catalyst {
+    color: #34d399;
+    border-bottom-color: #0a2018;
+  }
+
+  .risk-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+  }
+
+  .risk-dot {
+    width: 6px;
+    height: 6px;
+    background: #f87171;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+
+  .risk-dot.catalyst {
+    background: #34d399;
+  }
+
+  .risk-text {
+    font-size: 11px;
+    color: #a8a4a0;
+    line-height: 1.7;
+  }
+
+  .earnings-callout {
+    background: #1a0810;
+    border: 1px solid #3a1020;
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .earnings-date-big {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 900;
+    color: #f87171;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .earnings-callout-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #7a4050;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .earnings-callout-desc {
+    font-size: 11px;
+    color: #a8a4a0;
+    line-height: 1.6;
+  }
+
+  /* ─── SECTION 09: FINRL RELEVANCE ─── */
+  .finrl-section {
+    background: #0d1a0d;
+    padding: 48px 40px;
+  }
+
+  .finrl-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 900;
+    color: #34d399;
+    margin-bottom: 8px;
+    letter-spacing: -1px;
+  }
+
+  .finrl-subheading {
+    font-size: 11px;
+    color: #2a5a2a;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 36px;
+  }
+
+  .feature-item {
+    display: flex;
+    gap: 24px;
+    padding: 24px 0;
+    border-bottom: 1px solid #1a2e1a;
+    align-items: flex-start;
+  }
+
+  .feature-item:last-child {
+    border-bottom: none;
+  }
+
+  .feature-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 900;
+    color: #1a3a1a;
+    line-height: 1;
+    flex-shrink: 0;
+    width: 60px;
+  }
+
+  .feature-content {
+    flex: 1;
+  }
+
+  .feature-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #34d399;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .feature-body {
+    font-size: 12px;
+    color: #6a8a6a;
+    line-height: 1.7;
+  }
+
+  .feature-highlight {
+    color: #34d399;
+    font-weight: 500;
+  }
+
+  /* ─── FOOTER ─── */
+  .footer {
+    background: #0a0a0f;
+    padding: 32px 40px;
+    border-top: 1px solid #1e1e2e;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-ticker {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 900;
+    color: #1e1e2e;
+    letter-spacing: -1px;
+  }
+
+  .footer-note {
+    font-size: 9px;
+    color: #333350;
+    letter-spacing: 2px;
+    text-align: right;
+    line-height: 1.8;
+  }
+
+  /* ─── VALUATION SECTION ─── */
+  .valuation-strip {
+    background: #111118;
+    padding: 32px 40px;
+    border-top: 1px solid #1e1e2e;
+    border-bottom: 1px solid #1e1e2e;
+  }
+
+  .val-row {
+    display: flex;
+    gap: 0;
+    align-items: stretch;
+  }
+
+  .val-item {
+    flex: 1;
+    padding: 0 24px;
+    border-right: 1px solid #1e1e2e;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .val-item:first-child {
+    padding-left: 0;
+  }
+
+  .val-item:last-child {
+    border-right: none;
+  }
+
+  .val-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #555570;
+    text-transform: uppercase;
+  }
+
+  .val-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: #e8e4dc;
+  }
+
+  .val-note {
+    font-size: 10px;
+    color: #555570;
+    line-height: 1.5;
+  }
+
+  /* ─── DIAGONAL ACCENT ─── */
+  .diagonal-accent {
+    height: 6px;
+    background: repeating-linear-gradient(
+      -45deg,
+      #6b9fff,
+      #6b9fff 4px,
+      #0a0a0f 4px,
+      #0a0a0f 8px
+    );
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- HERO -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="hero">
+  <div style="padding: 0 40px;">
+    <div class="hero-eyebrow">Financial Research Report · Technology Sector · Equity Analysis</div>
+    <span class="hero-ticker">AAPL</span>
+    <div class="hero-company">Apple Inc. — Cupertino, California</div>
+  </div>
+  <div class="hero-price-band">
+    <div>
+      <div class="hero-price-label">Current Price</div>
+      <div class="hero-price-main">$213.55</div>
+    </div>
+    <div style="margin-left: 32px;">
+      <div class="hero-price-label">Session Change</div>
+      <div class="hero-price-main" style="font-size: 32px;">+0.52%</div>
+    </div>
+    <div class="hero-price-change">After-Hours: $213.56 &nbsp;·&nbsp; Market Cap: $3.77T</div>
+  </div>
+  <div class="hero-meta-strip">
+    <div class="hero-meta-item">
+      <span class="hero-meta-label">All-Time High</span>
+      <span class="hero-meta-value">$288.62</span>
+    </div>
+    <div class="hero-meta-item">
+      <span class="hero-meta-label">YTD Performance</span>
+      <span class="hero-meta-value" style="color: #f87171;">−14.72%</span>
+    </div>
+    <div class="hero-meta-item">
+      <span class="hero-meta-label">S&P 500 YTD</span>
+      <span class="hero-meta-value" style="color: #f87171;">−20.12%</span>
+    </div>
+    <div class="hero-meta-item">
+      <span class="hero-meta-label">Shares Outstanding</span>
+      <span class="hero-meta-value">14,935.83M</span>
+    </div>
+    <div class="hero-meta-item">
+      <span class="hero-meta-label">Trailing P/E</span>
+      <span class="hero-meta-value">34.5×</span>
+    </div>
+    <div class="hero-meta-item">
+      <span class="hero-meta-label">Dividend Yield</span>
+      <span class="hero-meta-value">0.38%</span>
+    </div>
+  </div>
+</div>
+
+<div class="diagonal-accent"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 01: COMPANY OVERVIEW -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="overview-section">
+  <div class="section-label">01 &nbsp; Company Overview</div>
+  <div class="overview-heading">Designing the<br>World's Most<br>Valuable Ecosystem</div>
+  <div class="overview-body">
+    Apple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and services. Operating in the technology sector, Apple's vertically integrated model — from custom silicon to retail experience — creates one of the most defensible competitive positions in global markets. With over 2.2 billion active devices worldwide, the company's installed base generates compounding services revenue that now represents approximately 21% of total sales.
+  </div>
+
+  <div class="overview-stats">
+    <div class="overview-stat">
+      <span class="overview-stat-num">$3.77T</span>
+      <span class="overview-stat-label">Market Capitalization</span>
+    </div>
+    <div class="overview-stat">
+      <span class="overview-stat-num">2.2B+</span>
+      <span class="overview-stat-label">Active Devices</span>
+    </div>
+    <div class="overview-stat">
+      <span class="overview-stat-num">66.66%</span>
+      <span class="overview-stat-label">Hardware Market Share</span>
+    </div>
+    <div class="overview-stat">
+      <span class="overview-stat-num">~21%</span>
+      <span class="overview-stat-label">Services Mix of Revenue</span>
+    </div>
+  </div>
+
+  <div class="product-tags">
+    <span class="product-tag">iPhone</span>
+    <span class="product-tag">iPad</span>
+    <span class="product-tag">Mac</span>
+    <span class="product-tag">Apple Watch</span>
+    <span class="product-tag">App Store</span>
+    <span class="product-tag">Apple Music</span>
+    <span class="product-tag">Cloud Services</span>
+    <span class="product-tag">Apple Intelligence</span>
+    <span class="product-tag">Spatial Computing</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 02: RECENT PRICE ACTION -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="price-section">
+  <div class="section-label">02 &nbsp; Recent Price Action</div>
+  <div class="price-heading">A volatile but structurally upward trajectory — outperforming the S&P 500 over five years despite a sharp YTD correction</div>
+
+  <span class="price-giant-num">$213</span>
+  <div class="price-giant-label">Current Trading Price · USD</div>
+
+  <div class="price-metrics-row">
+    <div class="price-metric">
+      <div class="price-metric-label">All-Time High</div>
+      <div class="price-metric-value">$288.62</div>
+    </div>
+    <div class="price-metric">
+      <div class="price-metric-label">Pullback from ATH</div>
+      <div class="price-metric-value negative">−10%</div>
+    </div>
+    <div class="price-metric">
+      <div class="price-metric-label">YTD Return</div>
+      <div class="price-metric-value negative">−14.72%</div>
+    </div>
+    <div class="price-metric">
+      <div class="price-metric-label">S&P 500 YTD</div>
+      <div class="price-metric-value negative">−20.12%</div>
+    </div>
+    <div class="price-metric">
+      <div class="price-metric-label">4-Week Gain</div>
+      <div class="price-metric-value positive">+4.72%</div>
+    </div>
+    <div class="price-metric">
+      <div class="price-metric-label">12-Week Gain</div>
+      <div class="price-metric-value positive">+7.77%</div>
+    </div>
+  </div>
+
+  <div class="price-narrative">
+    Apple reached an all-time high of $288.62 in December 2025, followed by a 10% pullback in January 2026 reflecting broader tech sector volatility. Despite a YTD decline of −14.72%, AAPL continues to outperform the S&P 500's −20.12% drawdown over the same period. The 4-week and 12-week recovery gains of 4.72% and 7.77% respectively suggest stabilization near current levels, with the stock trading at $213.55 in the most recent session — up 0.52% — with after-hours at $213.56.
+  </div>
+</div>
+
+<!-- CHART — full width, outside any grid -->
+<div class="chart-container">
+  CHART_PLACEHOLDER_0
+  <div class="chart-caption">AAPL Price Action — Recent Trading History &nbsp;·&nbsp; Data as provided &nbsp;·&nbsp; Source: Market data</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 03: FINANCIAL SUMMARY -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="financial-section">
+  <div class="section-label" style="color: #6b9fff;">03 &nbsp; Financial Summary</div>
+  <div class="financial-heading">Q4 CY2025 — Record Quarter</div>
+
+  <div class="fin-hero-row">
+    <div class="fin-hero-item">
+      <span class="fin-hero-num">$143.8B</span>
+      <div class="fin-hero-label">Total Revenue</div>
+      <div class="fin-hero-sub">+15.7% YoY · Beat by 4.1%</div>
+    </div>
+    <div class="fin-hero-item">
+      <span class="fin-hero-num">$2.84</span>
+      <div class="fin-hero-label">GAAP EPS</div>
+      <div class="fin-hero-sub">+6.4% above consensus</div>
+    </div>
+    <div class="fin-hero-item">
+      <span class="fin-hero-num">$50.85B</span>
+      <div class="fin-hero-label">Operating Profit</div>
+      <div class="fin-hero-sub">+7.3% beat vs. estimates</div>
+    </div>
+  </div>
+
+  <div class="margins-bar-section">
+    <div class="margins-title">Margin Profile</div>
+
+    <div class="margin-bar-row">
+      <div class="margin-bar-label">Gross Margin</div>
+      <div class="margin-bar-track">
+        <div class="margin-bar-fill" style="width: 48.2%;"></div>
+      </div>
+      <div class="margin-bar-value">48.2%</div>
+    </div>
+
+    <div class="margin-bar-row">
+      <div class="margin-bar-label">Operating Margin</div>
+      <div class="margin-bar-track">
+        <div class="margin-bar-fill purple" style="width: 35.4%;"></div>
+      </div>
+      <div class="margin-bar-value">35.4%</div>
+    </div>
+
+    <div class="margin-bar-row">
+      <div class="margin-bar-label">Free Cash Flow Margin</div>
+      <div class="margin-bar-track">
+        <div class="margin-bar-fill teal" style="width: 35.9%;"></div>
+      </div>
+      <div class="margin-bar-value">35.9%</div>
+    </div>
+
+    <div class="margin-bar-row">
+      <div class="margin-bar-label">Prior FCF Margin</div>
+      <div class="margin-bar-track">
+        <div class="margin-bar-fill teal" style="width: 21.7%; opacity: 0.4;"></div>
+      </div>
+      <div class="margin-bar-value" style="color: #555570;">21.7%</div>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 16px; margin-bottom: 24px;">
+    <div style="flex: 1; background: #111118; border: 1px solid #1e1e2e; padding: 20px 24px;">
+      <div style="font-size: 9px; letter-spacing: 3px; color: #555570; text-transform: uppercase; margin-bottom: 8px;">Products Revenue</div>
+      <div style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: #f0ece4;">$113.7B</div>
+      <div style="font-size: 10px; color: #a78bfa; margin-top: 4px;">Beat estimates by 5.2%</div>
+    </div>
+    <div style="flex: 1; background: #111118; border: 1px solid #1e1e2e; padding: 20px 24px;">
+      <div style="font-size: 9px; letter-spacing: 3px; color: #555570; text-transform: uppercase; margin-bottom: 8px;">Services Revenue</div>
+      <div style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: #f0ece4;">$30.01B</div>
+      <div style="font-size: 10px; color: #f87171; margin-top: 4px;">Slight miss vs. estimates</div>
+    </div>
+    <div style="flex: 1; background: #111118; border: 1px solid #1e1e2e; padding: 20px 24px;">
+      <div style="font-size: 9px; letter-spacing: 3px; color: #555570; text-transform: uppercase; margin-bottom: 8px;">Gross Margin (Prior)</div>
+      <div style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: #f0ece4;">46.9%</div>
+      <div style="font-size: 10px; color: #34d399; margin-top: 4px;">Expanded to 48.2% (+130bps)</div>
+    </div>
+  </div>
+
+  <div class="geo-section">
+    <div class="geo-title">TTM Geographic Revenue Split</div>
+
+    <div class="geo-row">
+      <div class="geo-name">Americas</div>
+      <div class="geo-bar-track">
+        <div class="geo-bar-fill" style="width: 42.7%; background: #6b9fff;"></div>
+      </div>
+      <div class="geo-pct">42.7%</div>
+    </div>
+
+    <div class="geo-row">
+      <div class="geo-name">Europe</div>
+      <div class="geo-bar-track">
+        <div class="geo-bar-fill" style="width: 25.9%; background: #a78bfa;"></div>
+      </div>
+      <div class="geo-pct">25.9%</div>
+    </div>
+
+    <div class="geo-row">
+      <div class="geo-name">Greater China</div>
+      <div class="geo-bar-track">
+        <div class="geo-bar-fill" style="width: 17.1%; background: #f87171;"></div>
+      </div>
+      <div class="geo-pct">17.1%</div>
+    </div>
+
+    <div class="geo-row">
+      <div class="geo-name">Rest of Asia-Pacific</div>
+      <div class="geo-bar-track">
+        <div class="geo-bar-fill" style="width: 7.8%; background: #34d399;"></div>
+      </div>
+      <div class="geo-pct">7.8%</div>
+    </div>
+
+    <div class="geo-row">
+      <div class="geo-name">Japan</div>
+      <div class="geo-bar-track">
+        <div class="geo-bar-fill" style="width: 6.4%; background: #fbbf24;"></div>
+      </div>
+      <div class="geo-pct">6.4%</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 04: GROWTH PROSPECTS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="growth-section">
+  <div class="section-label" style="color: #a78bfa;">04 &nbsp; Growth Prospects</div>
+  <div class="growth-heading">+15.7%</div>
+  <div class="growth-subheading">Revenue Growth YoY — Q4 CY2025</div>
+
+  <div class="growth-grid">
+    <div class="growth-card">
+      <span class="growth-card-num">$138.4–141.2B</span>
+      <div class="growth-card-label">Q1 2026 Revenue Estimate</div>
+      <div class="growth-card-body">Analyst projections focus on holiday iPhone 17 sales performance and continued services expansion. The range reflects uncertainty around hardware demand and AI monetization timelines.</div>
+    </div>
+
+    <div class="growth-card">
+      <span class="growth-card-num">~$28B</span>
+      <div class="growth-card-label">Services / Quarter (Target)</div>
+      <div class="growth-card-body">High-margin recurring services revenue from the 2.2 billion device installed base. Services now represent ~21% of total sales and are the primary margin expansion driver.</div>
+    </div>
+
+    <div class="growth-card">
+      <span class="growth-card-num">2.2B+</span>
+      <div class="growth-card-label">Active Device Ecosystem</div>
+      <div class="growth-card-body">The installed base creates a compounding flywheel: more devices drive more services revenue, which funds R&D for better devices. Upgrade records set in Q1 FY2026 confirm ecosystem stickiness.</div>
+    </div>
+
+    <div class="growth-card">
+      <span class="growth-card-num">7–13%</span>
+      <div class="growth-card-label">Analyst Upside Estimate Range</div>
+      <div class="growth-card-body">Emerging markets, spatial computing, on-device AI (Apple Intelligence), and Siri/Gemini integration expected in February 2026 support modest but durable upside from prior price levels.</div>
+    </div>
+  </div>
+
+  <div class="growth-pullquote">
+    <div class="growth-pullquote-text">"Apple Intelligence products drove the 15.7% revenue surge — the company is no longer just a hardware maker. It is becoming the operating system of daily life for 2.2 billion people."</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 05: COMPETITIVE POSITION -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="competitive-section">
+  <div class="section-label">05 &nbsp; Competitive Position</div>
+  <div class="competitive-heading">The Walled Garden Advantage</div>
+
+  <div class="moat-strip">
+    <div class="moat-label">Competitive Moat</div>
+    <div class="moat-text">Brand loyalty · Ecosystem integration · 60% ROIC · 80% of global smartphone profits on 18% unit share</div>
+  </div>
+
+  <table class="competitor-table">
+    <thead>
+      <tr>
+        <th>Competitor</th>
+        <th>Segment</th>
+        <th>Unit Share (Smartphones)</th>
+        <th>Key Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Apple (AAPL)</td>
+        <td>Premium Hardware + Services</td>
+        <td><span class="share-bar-inline apple" style="width: 54px;"></span>~18%</td>
+        <td>~80% of global smartphone profits; 40%+ gross margins</td>
+      </tr>
+      <tr>
+        <td>Samsung Electronics</td>
+        <td>Smartphones, Tablets, Wearables</td>
+        <td><span class="share-bar-inline" style="width: 60px;"></span>20%</td>
+        <td>Largest unit share; lower margins vs. Apple</td>
+      </tr>
+      <tr>
+        <td>Xiaomi</td>
+        <td>Lower-Price Android</td>
+        <td><span class="share-bar-inline" style="width: 42px;"></span>14%</td>
+        <td>Aggressive pricing in emerging markets</td>
+      </tr>
+      <tr>
+        <td>Oppo</td>
+        <td>Chinese Mid-Tier</td>
+        <td><span class="share-bar-inline" style="width: 30px;"></span>10%</td>
+        <td>Strong in Asia-Pacific mid-tier segment</td>
+      </tr>
+      <tr>
+        <td>Vivo</td>
+        <td>Chinese Mid-Tier</td>
+        <td><span class="share-bar-inline" style="width: 24px;"></span>8%</td>
+        <td>Growing presence in Southeast Asia</td>
+      </tr>
+      <tr>
+        <td>Huawei</td>
+        <td>Former Premium Rival</td>
+        <td><span class="share-bar-inline" style="width: 0px;"></span>N/A</td>
+        <td>U.S. sanctions created market vacuum Apple exploited</td>
+      </tr>
+      <tr>
+        <td>Google / Alphabet</td>
+        <td>Services / AI</td>
+        <td>—</td>
+        <td>Primary competitor in AI assistant and services layer</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="market-share-visual">
+    <div class="ms-title">Hardware Market Share — Computer Hardware Industry (Q4 2025)</div>
+
+    <div class="ms-row">
+      <div class="ms-name" style="color: #6b9fff;">Apple</div>
+      <div class="ms-bar-track">
+        <div class="ms-bar-fill" style="width: 66.66%; background: #6b9fff;"></div>
+      </div>
+      <div class="ms-pct">66.66%</div>
+    </div>
+
+    <div class="ms-row">
+      <div class="ms-name">All Others</div>
+      <div class="ms-bar-track">
+        <div class="ms-bar-fill" style="width: 33.34%; background: #2a2a4a;"></div>
+      </div>
+      <div class="ms-pct">33.34%</div>
+    </div>
+
+    <div style="margin-top: 16px; font-size: 10px; color: #555570; line-height: 1.6;">
+      Revenue growth: Apple 9.63% vs. industry average 4.98% — signaling continued market share gains in Technology Hardware, Storage &amp; Peripherals.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 06: TECHNICAL ANALYSIS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="technical-section">
+  <div class="section-label" style="color: #34d399;">06 &nbsp; Technical Analysis</div>
+  <div class="technical-heading">Key Levels &amp; Moving Averages</div>
+
+  <div class="tech-levels">
+    <div class="tech-level-item">
+      <div class="tech-level-type resistance">Resistance</div>
+      <span class="tech-level-price">$288.62</span>
+      <div class="tech-level-desc">All-time high reached December 2025. Primary resistance level — a break above would signal resumption of the long-term uptrend.</div>
+    </div>
+
+    <div class="tech-level-item">
+      <div class="tech-level-type resistance">Secondary Resistance</div>
+      <span class="tech-level-price">~$260</span>
+      <div class="tech-level-desc">Implied support-turned-resistance near the 10% pullback level from the December 2025 ATH. Key zone to reclaim before testing $288.</div>
+    </div>
+
+    <div class="tech-level-item">
+      <div class="tech-level-type">Support</div>
+      <span class="tech-level-price">~$213</span>
+      <div class="tech-level-desc">Current trading level acting as near-term support. The 4-week and 12-week recovery gains suggest buyers are defending this zone.</div>
+    </div>
+
+    <div class="tech-level-item">
+      <div class="tech-level-type">Current Price</div>
+      <span class="tech-level-price">$213.55</span>
+      <div class="tech-level-desc">Most recent session close, up 0.52%. After-hours at $213.56. Stock is consolidating near the 50-day moving average range.</div>
+    </div>
+  </div>
+
+  <div class="ma-section">
+    <div class="ma-title">Moving Averages</div>
+
+    <div class="ma-row">
+      <div class="ma-name">50-Day Moving Average</div>
+      <div>
+        <div class="ma-value">~$213–220</div>
+        <div class="ma-note">Based on recent trading around $213.55</div>
+      </div>
+    </div>
+
+    <div class="ma-row">
+      <div class="ma-name">200-Day Moving Average</div>
+      <div>
+        <div class="ma-value" style="color: #a78bfa;">~$230–240</div>
+        <div class="ma-note">Inferred from 4-week (+4.72%) and 12-week (+7.77%) gains<br>offsetting YTD −14.72% decline</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="volume-note">
+    <strong style="color: #34d399;">Volume Trend:</strong> Volume trends show stability with no sharp spikes recently. The 4-week price gain of 4.72% occurred on moderate volume versus the 30-day average, suggesting accumulation rather than speculative momentum. Specific volume data indicates no abnormal activity — a constructive sign for the current consolidation pattern near $213.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 07: ANALYST CONSENSUS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="analyst-section">
+  <div class="section-label">07 &nbsp; Analyst Consensus</div>
+  <div class="analyst-heading">Wall Street View</div>
+
+  <div class="consensus-badge">Consensus: Overweight</div>
+
+  <div class="ratings-visual">
+    <div class="ratings-bar-buy" style="width: 70%;">
+      <div class="ratings-bar-pct">70%</div>
+      <div class="ratings-bar-label">Buy</div>
+    </div>
+    <div class="ratings-bar-hold" style="width: 26.2%;">
+      <div class="ratings-bar-pct" style="color: #f0ece4;">26.2%</div>
+      <div class="ratings-bar-label">Hold</div>
+    </div>
+    <div class="ratings-bar-sell" style="width: 3.8%;">
+      <div class="ratings-bar-pct" style="font-size: 14px; color: #f0ece4;">3.8%</div>
+      <div class="ratings-bar-label" style="font-size: 7px;">Sell</div>
+    </div>
+  </div>
+
+  <div style="font-size: 10px; color: rgba(0,0,0,0.5); margin-bottom: 24px; letter-spacing: 1px;">Based on 53 analyst ratings · Buy: 70% · Hold: 69.8% (of non-buy) · Sell: 3.8%</div>
+
+  <div class="analyst-rows">
+    <div class="analyst-row">
+      <div>
+        <div class="analyst-firm">Zacks Investment Research</div>
+        <div style="font-size: 10px; color: rgba(0,0,0,0.5); margin-top: 3px;">Short-term timeliness rank implies Strong Buy · Annualized return 23.62%</div>
+      </div>
+      <div class="analyst-rating-badge">Strong Buy</div>
+    </div>
+
+    <div class="analyst-row">
+      <div>
+        <div class="analyst-firm">Tippie College of Business (UIowa)</div>
+        <div style="font-size: 10px; color: rgba(0,0,0,0.5); margin-top: 3px;">Student analysis · 7–13% upside from prior levels (~$228–$242)</div>
+      </div>
+      <div class="analyst-rating-badge">Hold</div>
+    </div>
+
+    <div class="analyst-row">
+      <div>
+        <div class="analyst-firm">GuruFocus</div>
+        <div style="font-size: 10px; color: rgba(0,0,0,0.5); margin-top: 3px;">GF Score 97/100 · Flags 4 warnings · P/E near 1-year lows in mid-2025 (~29–31 at $200/share)</div>
+      </div>
+      <div class="analyst-rating-badge">Positive</div>
+    </div>
+  </div>
+
+  <div class="target-range">
+    <div>
+      <div class="target-label">Price Target Range</div>
+      <div class="target-value">$228 – $242</div>
+    </div>
+    <div style="width: 1px; background: #1e1e2e; align-self: stretch;"></div>
+    <div>
+      <div class="target-label">Implied Upside (from prior levels)</div>
+      <div class="target-value">7 – 13%</div>
+    </div>
+    <div style="width: 1px; background: #1e1e2e; align-self: stretch;"></div>
+    <div>
+      <div class="target-label">Shiller P/E (CAPE)</div>
+      <div class="target-value" style="color: #f87171;">50.44</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 08: RISKS & CATALYSTS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="risks-section">
+  <div class="section-label" style="color: #f87171;">08 &nbsp; Risks &amp; Catalysts</div>
+  <div class="risks-heading">Tension in the Numbers</div>
+  <div class="risks-subheading">Upcoming events · Macro exposure · Regulatory headwinds</div>
+
+  <div class="earnings-callout">
+    <div class="earnings-date-big">Jan 29<br><span style="font-size: 18px;">2026</span></div>
+    <div>
+      <div class="earnings-callout-label">Next Earnings Release</div>
+      <div class="earnings-callout-desc">Q1 2026 earnings report. Key focus areas: iPhone 17 margins, Apple Intelligence R&D spend, services growth trajectory (~$28B/quarter target), and guidance for the March quarter. Siri/Gemini integration update expected February 2026.</div>
+    </div>
+  </div>
+
+  <div style="height: 24px;"></div>
+
+  <div class="risks-two-col">
+    <div>
+      <div class="risks-col-title">Key Risks</div>
+
+      <div class="risk-item">
+        <div class="risk-dot"></div>
+        <div class="risk-text"><strong style="color: #e8e4dc;">China Exposure (17.1% revenue)</strong> — Geopolitical tensions and U.S.-China trade dynamics create material revenue risk in Apple's third-largest market.</div>
+      </div>
+
+      <div class="risk-item">
+        <div class="risk-dot"></div>
+        <div class="risk-text"><strong style="color: #e8e4dc;">Valuation Premium</strong> — Trailing P/E of 34.5× is 32% above the 10-year median of 26.25. Shiller CAPE at 50.44 signals stretched valuation with mean reversion risk.</div>
+      </div>
+
+      <div class="risk-item">
+        <div class="risk-dot"></div>
+        <div class="risk-text"><strong style="color: #e8e4dc;">iPhone 17 Air Concerns</strong> — High R&D and logistics costs from the iPhone 17 Air, with some analyst concern about demand relative to expectations.</div>
+      </div>
+
+      <div class="risk-item">
+        <div class="risk-dot"></div>
+        <div class="risk-text"><strong style="color: #e8e4dc;">Regulatory Scrutiny</strong> — EU Digital Markets Act (DMA) and potential U.S. antitrust actions targeting App Store practices raise compliance cost risks.</div>
+      </div>
+
+      <div class="risk-item">
+        <div class="risk-dot"></div>
+        <div class="risk-text"><strong style="color: #e8e4dc;">Macro Headwinds</strong> — Tariffs on China supply chains, persistent high interest rates, and consumer spending sensitivity tied to employment conditions.</div>
+      </div>
+
+      <div class="risk-item">
+        <div class="risk-dot"></div>
+        <div class="risk-text"><strong style="color: #e8e4dc;">Mac Mini Supply Constraints</strong> — Marked-up Mac minis flooding eBay amid shortages signal potential demand frustration and resale inflation (April 2026).</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="risks-col-title catalyst">Key Catalysts</div>
+
+      <div class="risk-item">
+        <div class="risk-dot catalyst"></div>
+        <div class="risk-text"><strong style="color: #e8e4dc;">Q1 2026 Earnings (Jan 29)</strong> — iPhone 17 holiday sales results and services guidance could re-rate the stock if beats are sustained.</div>
+      </div>
+
+      <div class="risk-item">
+        <div class="risk-dot catalyst"></div>
+        <div class="risk-text"><strong style="color: #e8e4dc;">Siri/Gemini Update (Feb 2026)</strong> — AI assistant upgrade could accelerate Apple Intelligence adoption and services monetization.</div>
+      </div>
+
+      <div class="risk-item">
+        <div class="risk-dot catalyst"></div>
+        <div class="risk-text"><strong style="color: #e8e4dc;">Services Growth Momentum</strong> — ~$30B/quarter services revenue with high margins provides durable earnings quality regardless of hardware cycles.</div>
+      </div>
+
+      <div class="risk-item">
+        <div class="risk-dot catalyst"></div>
+        <div class="risk-text"><strong style="color: #e8e4dc;">Spatial Computing Expansion</strong> — New product categories and on-device intelligence represent long-duration growth optionality not yet priced into consensus.</div>
+      </div>
+
+      <div class="risk-item">
+        <div class="risk-dot catalyst"></div>
+        <div class="risk-text"><strong style="color: #e8e4dc;">Buyback Capacity</strong> — FCF margin of 35.9% (up from 21.7%) provides substantial capital return capacity, supporting EPS growth even in flat revenue environments.</div>
+      </div>
+
+      <div class="risk-item">
+        <div class="risk-dot catalyst"></div>
+        <div class="risk-text"><strong style="color: #e8e4dc;">Emerging Market Penetration</strong> — Modest but growing presence in underpenetrated markets supports long-term installed base expansion beyond 2.2 billion devices.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SECTION 09: FINRL RELEVANCE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="finrl-section">
+  <div class="section-label" style="color: #34d399;">09 &nbsp; FinRL Relevance</div>
+  <div class="finrl-heading">Observable Features for RL Trading Agents</div>
+  <div class="finrl-subheading">Reinforcement Learning · AAPL · Predictive Signal Analysis</div>
+
+  <div class="feature-item">
+    <div class="feature-num">01</div>
+    <div class="feature-content">
+      <div class="feature-title">Earnings Surprises — Revenue &amp; EPS Beats</div>
+      <div class="feature-body">Q4 CY2025 delivered a <span class="feature-highlight">4.1% revenue beat</span> and <span class="feature-highlight">6.4% EPS beat</span> versus consensus. Historical earnings beats drive short-term momentum and volume spikes, signaling bullish continuation. An RL agent can use the magnitude and direction of earnings surprises as a high-signal feature for post-announcement positioning — particularly effective in the 3–5 day window following the release date.</div>
+    </div>
+  </div>
+
+  <div class="feature-item">
+    <div class="feature-num">02</div>
+    <div class="feature-content">
+      <div class="feature-title">Services Revenue Growth vs. Products Revenue</div>
+      <div class="feature-body">High-margin services at <span class="feature-highlight">~$30B/quarter</span> provide earnings stability and predict upside during hardware slowdowns. The services-to-products revenue ratio correlates with gross margin expansion (currently <span class="feature-highlight">48.2%</span>, up from 46.9%). An RL agent tracking this ratio can anticipate margin-driven re-ratings and identify periods where hardware weakness is offset by services durability.</div>
+    </div>
+  </div>
+
+  <div class="feature-item">
+    <div class="feature-num">03</div>
+    <div class="feature-content">
+      <div class="feature-title">Relative Strength vs. S&P 500 (YTD / 52-Week)</div>
+      <div class="feature-body">AAPL's YTD performance of <span class="feature-highlight">−14.72%</span> versus the S&P 500's <span class="feature-highlight">−20.12%</span> demonstrates persistent relative outperformance. This relative strength indicator is useful for both mean-reversion and trend-following strategies in volatile tech environments. An RL agent can use the rolling spread between AAPL and SPX returns as a regime-detection feature — widening spread signals potential rotation catalyst.</div>
+    </div>
+  </div>
+
+  <div class="feature-item">
+    <div class="feature-num">04</div>
+    <div class="feature-content">
+      <div class="feature-title">Free Cash Flow Margin &amp; Geographic Revenue Shifts</div>
+      <div class="feature-body">FCF margin expanded dramatically from <span class="feature-highlight">21.7% to 35.9%</span>, tracking buyback and dividend capacity. Geographic revenue concentration — particularly <span class="feature-highlight">Greater China at 17.1%</span> — predicts volatility around U.S.-China geopolitical events, tariff announcements, and trade policy shifts. An RL agent can use FCF margin as a quality signal and China revenue share as a geopolitical risk weighting factor.</div>
+    </div>
+  </div>
+
+  <div class="feature-item">
+    <div class="feature-num">05</div>
+    <div class="feature-content">
+      <div class="feature-title">Price Pullbacks from All-Time Highs with Volume Confirmation</div>
+      <div class="feature-body">The <span class="feature-highlight">10% pullback from $288.62</span> (December 2025 ATH) to current levels near $213 creates a measurable support/resistance framework. Volume trends confirming or denying price moves versus the 30-day average provide entry/exit signals. An RL agent can use the ATH-to-current drawdown percentage combined with volume-relative-to-average as a mean-reversion entry signal — particularly effective when the 4-week recovery (+4.72%) begins to accelerate.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- VALUATION STRIP -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="valuation-strip">
+  <div style="font-size: 9px; letter-spacing: 4px; color: #555570; text-transform: uppercase; margin-bottom: 20px;">Valuation Summary</div>
+  <div class="val-row">
+    <div class="val-item">
+      <div class="val-label">Trailing P/E</div>
+      <div class="val-num">34.5×</div>
+      <div class="val-note">32% above 10-year median of 26.25</div>
+    </div>
+    <div class="val-item">
+      <div class="val-label">Shiller CAPE</div>
+      <div class="val-num" style="color: #f87171;">50.44</div>
+      <div class="val-note">Signals stretched valuation vs. inflation-adjusted earnings</div>
+    </div>
+    <div class="val-item">
+      <div class="val-label">ROE</div>
+      <div class="val-num" style="color: #34d399;">160%</div>
+      <div class="val-note">Exceptional capital efficiency</div>
+    </div>
+    <div class="val-item">
+      <div class="val-label">ROIC</div>
+      <div class="val-num" style="color: #34d399;">60%</div>
+      <div class="val-note">Reflects deep competitive moat</div>
+    </div>
+    <div class="val-item">
+      <div class="val-label">Enterprise Value</div>
+      <div class="val-num">~$4.03T</div>
+      <div class="val-note">Market cap $3.77T + net debt</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- FOOTER -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="footer">
+  <div class="footer-ticker">AAPL</div>
+  <div class="footer-note">
+    Apple Inc. · Financial Research Report<br>
+    Data sourced from company filings, market data providers, and analyst research<br>
+    For informational purposes only · Not investment advice
+  </div>
+</div>
+
+</body>
+</html>
