@@ -1,34 +1,48 @@
-# Ignore all VSCode configuration files
-vscode/*
+# ---- Secrets -------------------------------------------------------------
+# Every config.yml holds API keys. Both the root config/config.yml and the
+# per-server one under mcp_formatting/ must stay out of the repo.
+config.yml
+config/api_key.yml
 
-# Allow specific configuration files if needed
+# ---- Python --------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Virtual environments
+venv/
+.venv/
+env/
+.virtualenv/
+
+# ---- Node / frontend -----------------------------------------------------
+node_modules/
+dist/
+dist-ssr/
+# Vite dependency-optimizer cache
+_metadata.json
+
+# ---- Generated output ----------------------------------------------------
+# Reports are pipeline artifacts, not source. reports/.gitkeep is committed
+# so the directory survives a fresh clone.
+reports/*.html
+reports/*.pdf
+latest_report.html
+
+# Chart images written by the chart-server test scripts
+src/backend/charts/*
+!src/backend/charts/.gitkeep
+
+# ---- Editor --------------------------------------------------------------
+# Ignore VS Code config by default, but allow the shared settings files.
+.vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
 
-# Ignore workspace files
-!*.code-workspace
-
-# Ignore built Visual Studio Code extensions
+# Workspace files and built extensions
+*.code-workspace
 *.vsix
-
-config/api_key.yml
-config.yml
-
-# Ignore pycache files
-pycache/__pycache__/
-*.py[cod]
-
-# Ignore virtual environment folders
-venv/
-env/
-.virtualenv/
-
-node_modules/
-
-# Output files
-*.pdf
-latest_report.html
-
