@@ -1,20 +1,54 @@
-# React + Vite
+# FinRLExtention Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite chat interface for the FinRLExtention report pipeline. Ask about a
+ticker, watch the backend assemble the report, then preview or download the
+resulting PDF without leaving the page.
 
-Currently, two official plugins are available:
+## Running
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+npm run dev
+```
 
-## React Compiler
+Dev server: `http://localhost:5173`. The FastAPI backend must be running on
+port 8000 — start it from the project root first:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+python -m uvicorn src.backend.app:app --reload --port 8000
+```
 
-## Expanding the ESLint configuration
+| Script | Purpose |
+| --- | --- |
+| `npm run dev` | Vite dev server with HMR |
+| `npm run build` | Production build to `dist/` |
+| `npm run preview` | Serve the production build locally |
+| `npm run lint` | ESLint |
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Layout
 
-## React-pdf
+| File | Role |
+| --- | --- |
+| `src/main.jsx` | Entry point — mounts `App`. |
+| `src/App.jsx` | Thin shell around `Frontend`. |
+| `src/Frontend.jsx` | Everything that matters: conversation state, sidebar, ticker suggestions, backend calls. |
+| `src/PdfPreviewOverlay.jsx` | Full-screen PDF reader — `react-pdf`, zoom, keyboard nav, page tracking via `IntersectionObserver`. |
+| `src/App.css` | Component styles. |
+| `src/index.css` | Base page styles. |
 
-run `npm install react-pdf` in src/frontend to install it
+## Talking to the backend
+
+`API_BASE` is hardcoded to `http://localhost:8000` in both `Frontend.jsx` and
+`PdfPreviewOverlay.jsx`. Change it in both places when pointing at a deployed
+backend, and set `FRONTEND_ORIGIN` on the backend so CORS allows the new origin.
+
+Three endpoints are used:
+
+- `POST /api/chat` — sends `{message, history}`. Only prior turns go in
+  `history`; the current message is passed separately. A response carrying a
+  `pdf_filename` means a report was generated.
+- `GET /api/reports` — populates the sidebar report list.
+- `GET /api/report/download/{filename}` — backs both preview and download.
+
+Conversations live in React state only. Reloading the page clears them; the
+report list survives because it is re-fetched from the backend.

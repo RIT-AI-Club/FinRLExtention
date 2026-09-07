@@ -2,8 +2,8 @@
 MCP Client with Gemini API Backend
 
 This module provides an MCP (Model Context Protocol) client that uses
-Google's Gemini API as the underlying LLM for processing requests and
-handling tool calls.
+Google's Gemini API (via the google-genai SDK) as the underlying LLM for
+processing requests and handling tool calls.
 """
 import asyncio
 import json
@@ -14,16 +14,37 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional
 
-import google.generativeai as genai
 import yaml
+from google import genai
+from google.genai import errors as genai_errors
+from google.genai import types
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 logger = logging.getLogger(__name__)
 
-# Gemini finish_reason codes
-_FINISH_REASON_MALFORMED_FUNCTION_CALL = 12
-_FINISH_REASON_STOP = 1
+# Retry policy for Gemini rate limiting (HTTP 429)
+_GEMINI_RATE_LIMIT_MAX_RETRIES = 5
+_GEMINI_RATE_LIMIT_BASE_DELAY = 2.0  # seconds, doubles each retry
+
+
+async def _send_message_with_retry(
+    chat: "genai.chats.AsyncChat",
+    content: Any,
+) -> types.GenerateContentResponse:
+    """Send a message to Gemini, retrying with exponential backoff on 429s."""
+    for attempt in range(_GEMINI_RATE_LIMIT_MAX_RETRIES):
+        try:
+            return await chat.send_message(content)
+        except genai_errors.ClientError as e:
+            if e.code != 429 or attempt == _GEMINI_RATE_LIMIT_MAX_RETRIES - 1:
+                raise
+            wait = _GEMINI_RATE_LIMIT_BASE_DELAY * (2 ** attempt)
+            logger.warning(
+                f"Gemini rate limit hit (429), retrying in {wait:.0f}s "
+                f"(attempt {attempt + 1}/{_GEMINI_RATE_LIMIT_MAX_RETRIES})... {e}"
+            )
+            await asyncio.sleep(wait)
 
 
 @dataclass
@@ -41,115 +62,29 @@ class GeminiConfig:
     """Configuration for Gemini API."""
 
     api_key: str
-    model: str = "gemini-2.5-flash"
+    model: str = "gemini-3.5-flash"
     temperature: float = 0.7
     max_output_tokens: int = 8192
 
 
-def _fc_args_to_python(fc: Any) -> dict[str, Any]:
-    """
-    Extract function-call arguments from a Gemini FunctionCall object as a
-    plain Python dict, bypassing proto-plus wrapper types entirely.
+_REPORT_ASSISTANT_SYSTEM_INSTRUCTION = """You are a financial report assistant with access to \
+tools for stock research, chart generation, and report formatting.
 
-    The most reliable path is fc._pb.args (a raw google.protobuf.Struct),
-    which MessageToDict converts perfectly — including nested lists/numbers.
-    Multiple fallbacks handle edge cases.
-    """
-    if fc is None:
-        return {}
+When the user asks for a report, write-up, or analysis of a stock or company, you MUST use the \
+available tools rather than answering from your own knowledge:
+1. Call the research tools (e.g. research_stock, research_news, research_topic) to gather \
+current data.
+2. Call the chart tool (e.g. generate_line_chart) to produce a price chart.
+3. Call the report formatting tool (format_report) as the final step, passing it the gathered \
+text and chart data — this is what actually produces the polished report and saves it as a \
+downloadable PDF.
 
-    # Primary: raw protobuf Struct via fc._pb.args
-    try:
-        from google.protobuf.json_format import MessageToDict
-        result = MessageToDict(fc._pb.args, preserving_proto_field_name=True)
-        logger.debug(f"fc_args converted via _pb.args: {result}")
-        return result
-    except Exception as e:
-        logger.debug(f"_pb.args MessageToDict failed ({e}), trying manual walk")
+Never write the report yourself as plain text or markdown — a "report" is only real once \
+format_report has produced it. After format_report succeeds, just tell the user their report is \
+ready; do not repeat its HTML output back to them.
 
-    # Fallback A: manual walk of fc._pb.args Struct fields
-    try:
-        return _struct_to_python(fc._pb.args)
-    except Exception as e:
-        logger.debug(f"Manual struct walk failed ({e}), trying proto-plus iteration")
-
-    # Fallback B: proto-plus MapComposite iteration
-    try:
-        return {k: _value_to_python(v) for k, v in (fc.args or {}).items()}
-    except Exception as e:
-        logger.warning(f"All fc.args conversion paths failed: {e}. Returning empty dict.")
-        return {}
-
-
-def _struct_to_python(struct: Any) -> dict:
-    """Convert a google.protobuf.Struct to a plain Python dict."""
-    return {k: _value_to_python(v) for k, v in struct.fields.items()}
-
-
-def _value_to_python(value: Any) -> Any:
-    """
-    Convert a google.protobuf.Value (oneof) or any proto-plus wrapper
-    to its Python equivalent.
-    """
-    # google.protobuf.Value (oneof) — most common case for fc._pb.args values
-    try:
-        from google.protobuf import struct_pb2
-        if isinstance(value, struct_pb2.Value):
-            kind = value.WhichOneof("kind")
-            if kind == "null_value":
-                return None
-            if kind == "bool_value":
-                return bool(value.bool_value)
-            if kind == "number_value":
-                v = value.number_value
-                return int(v) if v == int(v) else v
-            if kind == "string_value":
-                return value.string_value
-            if kind == "list_value":
-                return [_value_to_python(i) for i in value.list_value.values]
-            if kind == "struct_value":
-                return _struct_to_python(value.struct_value)
-            return None
-        if isinstance(value, struct_pb2.ListValue):
-            return [_value_to_python(i) for i in value.values]
-        if isinstance(value, struct_pb2.Struct):
-            return _struct_to_python(value)
-    except ImportError:
-        pass
-
-    # proto-plus RepeatedComposite / RepeatedScalar
-    try:
-        from proto.marshal.collections.repeated import RepeatedComposite, RepeatedScalar
-        if isinstance(value, (RepeatedComposite, RepeatedScalar)):
-            return [_value_to_python(i) for i in value]
-    except ImportError:
-        pass
-
-    # proto-plus MapComposite
-    try:
-        from proto.marshal.collections.maps import MapComposite
-        if isinstance(value, MapComposite):
-            return {k: _value_to_python(v) for k, v in value.items()}
-    except ImportError:
-        pass
-
-    # Any other protobuf Message
-    try:
-        from google.protobuf.message import Message as PbMessage
-        from google.protobuf.json_format import MessageToDict
-        if isinstance(value, PbMessage):
-            return MessageToDict(value, preserving_proto_field_name=True)
-    except ImportError:
-        pass
-
-    # Plain Python containers
-    if isinstance(value, dict):
-        return {k: _value_to_python(v) for k, v in value.items()}
-    if isinstance(value, (list, tuple)):
-        return [_value_to_python(i) for i in value]
-
-    # Primitive scalar
-    return value
+For questions that are not report requests (e.g. "what tools do you have"), answer directly \
+without calling tools."""
 
 
 class MCPClient:
@@ -176,7 +111,7 @@ class MCPClient:
         self.sessions: dict[str, ClientSession] = {}
         self.tools: dict[str, dict[str, Any]] = {}
         self.tool_to_server: dict[str, str] = {}
-        self._model: Optional[genai.GenerativeModel] = None
+        self._client: Optional[genai.Client] = None
         self._exit_stack = AsyncExitStack()
 
     def _get_default_config_path(self) -> Path:
@@ -203,7 +138,7 @@ class MCPClient:
 
         self.gemini_config = GeminiConfig(
             api_key=api_key,
-            model=gemini_cfg.get("model", "gemini-2.5-flash"),
+            model=gemini_cfg.get("model", "gemini-3.5-flash"),
             temperature=gemini_cfg.get("temperature", 0.7),
             max_output_tokens=gemini_cfg.get("max_output_tokens", 8192),
         )
@@ -237,17 +172,8 @@ class MCPClient:
         if not self.gemini_config:
             raise RuntimeError("Config not loaded. Call load_config() first.")
 
-        genai.configure(api_key=self.gemini_config.api_key)
-
-        self._model = genai.GenerativeModel(
-            model_name=self.gemini_config.model,
-            generation_config=genai.GenerationConfig(
-                temperature=self.gemini_config.temperature,
-                max_output_tokens=self.gemini_config.max_output_tokens,
-            ),
-        )
-
-        logger.info(f"Initialized Gemini model: {self.gemini_config.model}")
+        self._client = genai.Client(api_key=self.gemini_config.api_key)
+        logger.info(f"Initialized Gemini client for model: {self.gemini_config.model}")
 
     async def connect_to_server(self, server_config: MCPServerConfig) -> ClientSession:
         """
@@ -325,60 +251,26 @@ class MCPClient:
         logger.info(f"Discovered {len(self.tools)} tools from {len(self.sessions)} servers")
         return self.tools
 
-    # Fields supported by Gemini's Schema proto
-    _GEMINI_SCHEMA_FIELDS = {
-        "type", "format", "description", "nullable",
-        "enum", "items", "properties", "required",
-    }
-
-    def _sanitize_schema(self, schema: dict[str, Any]) -> dict[str, Any]:
+    def _build_gemini_tools(self) -> list[types.Tool]:
         """
-        Strip fields unsupported by Gemini, ensure arrays always have an
-        'items' sub-schema, and recurse into nested properties.
+        Convert discovered MCP tools into Gemini tool declarations.
+
+        MCP tool schemas are already standard JSON Schema, so they're passed
+        straight through via parameters_json_schema — no manual schema
+        translation needed.
         """
-        schema = {k: v for k, v in schema.items() if k in self._GEMINI_SCHEMA_FIELDS}
+        if not self.tools:
+            return []
 
-        # Arrays must have an items definition
-        if schema.get("type") == "array" and "items" not in schema:
-            schema["items"] = {"type": "string"}
-
-        if "items" in schema:
-            schema["items"] = self._sanitize_schema(schema["items"])
-
-        if "properties" in schema:
-            schema["properties"] = {
-                k: self._sanitize_schema(v)
-                for k, v in schema["properties"].items()
-            }
-
-        return schema
-
-    def _convert_tools_to_gemini_format(self) -> list[dict[str, Any]]:
-        """Convert MCP tools to Gemini function declarations format."""
-        gemini_tools = []
-
-        for tool_name, tool_info in self.tools.items():
-            input_schema = tool_info.get("input_schema", {})
-
-            properties = {
-                k: self._sanitize_schema(v)
-                for k, v in input_schema.get("properties", {}).items()
-            }
-            required = input_schema.get("required", [])
-
-            parameters = {
-                "type": "object",
-                "properties": properties,
-                "required": required,
-            }
-
-            gemini_tools.append({
-                "name": tool_name,
-                "description": tool_info.get("description", ""),
-                "parameters": parameters,
-            })
-
-        return gemini_tools
+        declarations = [
+            types.FunctionDeclaration(
+                name=tool_name,
+                description=tool_info.get("description", ""),
+                parameters_json_schema=tool_info.get("input_schema") or {"type": "object", "properties": {}},
+            )
+            for tool_name, tool_info in self.tools.items()
+        ]
+        return [types.Tool(function_declarations=declarations)]
 
     async def call_tool(self, tool_name: str, arguments: dict[str, Any]) -> Any:
         """
@@ -406,32 +298,25 @@ class MCPClient:
         return result
 
     @staticmethod
-    def _extract_function_calls(response) -> list:
+    def _extract_function_calls(response: types.GenerateContentResponse) -> list[types.FunctionCall]:
         """
-        Return a list of function_call objects from a Gemini response,
-        safely handling candidates whose finish_reason is MALFORMED_FUNCTION_CALL.
+        Return the list of function calls from a Gemini response, safely
+        handling candidates whose finish_reason is MALFORMED_FUNCTION_CALL.
         """
         try:
             candidate = response.candidates[0]
-        except (IndexError, AttributeError):
+        except (IndexError, AttributeError, TypeError):
             return []
 
-        finish_reason = getattr(candidate, "finish_reason", None)
-        # finish_reason 12 == MALFORMED_FUNCTION_CALL — nothing to parse
-        if finish_reason == _FINISH_REASON_MALFORMED_FUNCTION_CALL:
+        if candidate.finish_reason == types.FinishReason.MALFORMED_FUNCTION_CALL:
             logger.warning(
-                "Gemini returned MALFORMED_FUNCTION_CALL (finish_reason=12). "
+                "Gemini returned MALFORMED_FUNCTION_CALL. "
                 "The model could not construct a valid tool call. "
                 "Check that the tool schema is correct and all required fields are present."
             )
             return []
 
-        parts = getattr(candidate.content, "parts", None) or []
-        return [
-            part.function_call
-            for part in parts
-            if hasattr(part, "function_call") and part.function_call.name
-        ]
+        return response.function_calls or []
 
     async def process_message(
         self,
@@ -448,40 +333,28 @@ class MCPClient:
         Returns:
             The assistant's response.
         """
-        if not self._model:
+        if not self._client:
             self._initialize_gemini()
 
         history = conversation_history or []
-        gemini_tools = self._convert_tools_to_gemini_format()
 
-        tools_config = None
-        if gemini_tools:
-            tools_config = [
-                genai.protos.Tool(
-                    function_declarations=[
-                        genai.protos.FunctionDeclaration(
-                            name=t["name"],
-                            description=t["description"],
-                            parameters=self._dict_to_gemini_schema(t["parameters"]),
-                        )
-                        for t in gemini_tools
-                    ]
-                )
-            ]
-
-        chat = self._model.start_chat(
-            history=self._convert_history_to_gemini(history)
+        chat = self._client.aio.chats.create(
+            model=self.gemini_config.model,
+            config=types.GenerateContentConfig(
+                system_instruction=_REPORT_ASSISTANT_SYSTEM_INSTRUCTION,
+                temperature=self.gemini_config.temperature,
+                max_output_tokens=self.gemini_config.max_output_tokens,
+                tools=self._build_gemini_tools() or None,
+                automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
+            ),
+            history=self._convert_history_to_gemini(history),
         )
 
         # ------------------------------------------------------------------ #
         # Initial send                                                         #
         # ------------------------------------------------------------------ #
         try:
-            response = await asyncio.to_thread(
-                chat.send_message,
-                message,
-                tools=tools_config,
-            )
+            response = await _send_message_with_retry(chat, message)
         except Exception as e:
             logger.error(f"Gemini send_message failed: {e}")
             raise
@@ -499,13 +372,11 @@ class MCPClient:
             if not function_calls:
                 break
 
-            function_responses: list[genai.protos.Part] = []
+            function_response_parts: list[types.Part] = []
 
             for fc in function_calls:
                 tool_name = fc.name
-
-                # Convert proto args to plain Python types before passing to MCP
-                arguments: dict[str, Any] = _fc_args_to_python(fc)
+                arguments: dict[str, Any] = fc.args or {}
 
                 logger.debug(f"Tool call: {tool_name}({json.dumps(arguments, default=str)})")
 
@@ -519,33 +390,19 @@ class MCPClient:
                             for item in content
                         )
 
-                    function_responses.append(
-                        genai.protos.Part(
-                            function_response=genai.protos.FunctionResponse(
-                                name=tool_name,
-                                response={"result": content},
-                            )
-                        )
+                    function_response_parts.append(
+                        types.Part.from_function_response(name=tool_name, response={"result": content})
                     )
 
                 except Exception as e:
                     logger.error(f"Tool call failed for {tool_name}: {e}")
-                    function_responses.append(
-                        genai.protos.Part(
-                            function_response=genai.protos.FunctionResponse(
-                                name=tool_name,
-                                response={"error": str(e)},
-                            )
-                        )
+                    function_response_parts.append(
+                        types.Part.from_function_response(name=tool_name, response={"error": str(e)})
                     )
 
             # Send all tool results back in one turn
             try:
-                response = await asyncio.to_thread(
-                    chat.send_message,
-                    function_responses,
-                    tools=tools_config,
-                )
+                response = await _send_message_with_retry(chat, function_response_parts)
             except Exception as e:
                 logger.error(f"Gemini send_message (tool response) failed: {e}")
                 raise
@@ -553,76 +410,22 @@ class MCPClient:
         # ------------------------------------------------------------------ #
         # Extract final text                                                   #
         # ------------------------------------------------------------------ #
-        response_text = ""
-        try:
-            for part in response.candidates[0].content.parts:
-                if hasattr(part, "text") and part.text:
-                    response_text += part.text
-        except (IndexError, AttributeError):
-            pass
+        response_text = response.text or ""
 
         if not response_text:
             logger.warning("No text content in final Gemini response.")
 
         return response_text
 
-    # ---------------------------------------------------------------------- #
-    # Schema helpers                                                           #
-    # ---------------------------------------------------------------------- #
-
-    def _dict_to_gemini_schema(self, schema: dict[str, Any]) -> "genai.protos.Schema":
-        """Recursively convert a sanitized schema dict to a genai.protos.Schema."""
-        kwargs: dict[str, Any] = {
-            "type": self._map_json_type_to_gemini(schema.get("type", "string")),
-        }
-        if "description" in schema:
-            kwargs["description"] = schema["description"]
-        if "items" in schema:
-            kwargs["items"] = self._dict_to_gemini_schema(schema["items"])
-        if "properties" in schema:
-            kwargs["properties"] = {
-                k: self._dict_to_gemini_schema(v)
-                for k, v in schema["properties"].items()
-            }
-        if "required" in schema:
-            kwargs["required"] = schema["required"]
-        if "enum" in schema:
-            kwargs["enum"] = schema["enum"]
-        return genai.protos.Schema(**kwargs)
-
-    def _map_json_type_to_gemini(self, json_type: str) -> int:
-        """Map JSON schema types to Gemini proto types."""
-        type_mapping = {
-            "string": genai.protos.Type.STRING,
-            "number": genai.protos.Type.NUMBER,
-            "integer": genai.protos.Type.INTEGER,
-            "boolean": genai.protos.Type.BOOLEAN,
-            "array": genai.protos.Type.ARRAY,
-            "object": genai.protos.Type.OBJECT,
-        }
-        return type_mapping.get(json_type, genai.protos.Type.STRING)
-
-    def _convert_history_to_gemini(
-        self,
-        history: list[dict[str, Any]],
-    ) -> list[genai.protos.Content]:
-        """Convert conversation history to Gemini format."""
-        gemini_history = []
-
-        for msg in history:
-            role = msg.get("role", "user")
-            content = msg.get("content", "")
-
-            gemini_role = "user" if role == "user" else "model"
-
-            gemini_history.append(
-                genai.protos.Content(
-                    role=gemini_role,
-                    parts=[genai.protos.Part(text=content)],
-                )
+    def _convert_history_to_gemini(self, history: list[dict[str, Any]]) -> list[types.Content]:
+        """Convert conversation history (role/content dicts) to Gemini Content objects."""
+        return [
+            types.Content(
+                role="user" if msg.get("role", "user") == "user" else "model",
+                parts=[types.Part.from_text(text=msg.get("content", ""))],
             )
-
-        return gemini_history
+            for msg in history
+        ]
 
     async def close(self) -> None:
         """Close all server connections."""

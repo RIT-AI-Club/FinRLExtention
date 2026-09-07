@@ -4,6 +4,8 @@ This module handles communication with the Anthropic Claude API, including
 constructing prompts with data and reference images.
 """
 
+import asyncio
+import base64
 import logging
 import json
 from pathlib import Path
@@ -34,11 +36,18 @@ def get_claude_client() -> AsyncAnthropic:
         http_client=DefaultAioHttpClient()
     )
 
-def _build_user_prompt_parts(
+def _read_reference_image(img_path: Path) -> Optional[bytes]:
+    """Blocking read of a reference image, meant to run off the event loop via asyncio.to_thread."""
+    if not img_path.exists():
+        return None
+    return img_path.read_bytes()
+
+
+async def _build_user_prompt_parts(
     user_data: Dict[str, Any],
     reference_image_paths: Optional[List[str]] = None,
     prompt: Optional[str] = None,
-    color_scheme: str = None
+    color_scheme: Optional[str] = None
 ) -> List[Dict[str, Any]]:
     """
     Constructs the list of content blocks for the Claude API request payload.
@@ -69,18 +78,18 @@ def _build_user_prompt_parts(
         parts.append({"type": "text", "text": "### VISUAL REFERENCE GALLERY ###"})
         for i, img_path_str in enumerate(reference_image_paths):
             img_path = Path(img_path_str)
-            if not img_path.exists():
+            image_bytes = await asyncio.to_thread(_read_reference_image, img_path)
+            if image_bytes is None:
                 logger.warning(f"Reference image not found, skipping: {img_path}")
                 continue
             logger.info(f"Attaching reference image: {img_path.name}")
-            image_bytes = img_path.read_bytes()
             parts.extend([
                 {
                     "type": "image",
                     "source": {
                         "type": "base64",
                         "media_type": "image/png",
-                        "data": __import__("base64").b64encode(image_bytes).decode(),
+                        "data": base64.b64encode(image_bytes).decode(),
                     },
                 },
                 {"type": "text", "text": f"REFERENCE IMAGE {i+1}: Analyze the spatial rhythm and layout balance of this image. Use it to inform the 'Couture' editorial vibe of your HTML."},
@@ -153,13 +162,13 @@ async def generate_html(
         Exception: For other API call failures.
     """
     logger.info("Building request for Claude API.")
-    user_parts = _build_user_prompt_parts(user_data, reference_image_paths, prompt, color_scheme)
 
     # Use parameters if provided, otherwise fall back to config values
     final_model = model or claudeConfig.default_model
 
     logger.info(f"Sending request to Claude model '{final_model}'...")
     try:
+        user_parts = await _build_user_prompt_parts(user_data, reference_image_paths, prompt, color_scheme)
         async with client.messages.stream(
             model=final_model,
             messages=[{"role": "user", "content": user_parts}],
@@ -175,21 +184,13 @@ async def generate_html(
         logger.error(f"Claude API call failed: {e}", exc_info=True)
         raise
     finally:
-        await client.close()
+        try:
+            await client.close()
+        except Exception:
+            logger.warning("Failed to close Claude client", exc_info=True)
 
-    # Extract HTML from response
-    try:
-        if response:
-            return response
-        
-        # Fallback for cases where the response is structured differently
-        text_parts = [part.text for part in response.candidates[0].content.parts if hasattr(part, "text")]
-        if text_parts:
-            return "".join(text_parts)
-            
-        raise ValueError("Empty response text from Claude API.")
-        
-    except (IndexError, AttributeError, ValueError) as e:
-        logger.error(f"Failed to extract text from Claude response: {e}", exc_info=True)
-        logger.debug(f"Full Claude response object for debugging: {response}")
-        raise ValueError("Could not parse HTML from Claude response.") from e
+    if not response:
+        logger.error("Empty response text from Claude API.")
+        raise ValueError("Could not parse HTML from Claude response: empty response text.")
+
+    return response

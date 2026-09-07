@@ -1,27 +1,41 @@
 # FinRLExtention Dependencies
+#
+# Lower bounds are the versions this project is known to run on; upper bounds
+# cap the next major so a fresh `pip install` can't silently pull a breaking
+# release. Only packages the code imports directly are listed — transitive
+# deps (aiohttp, anyio, protobuf, soupsieve, ...) resolve on their own.
 
 # Web Framework
-fastapi>=0.110.0
-uvicorn>=0.27.0
-pydantic>=2.6.0
+fastapi>=0.136,<1.0
+uvicorn>=0.45,<1.0
+pydantic>=2.13,<3
 
 # AI APIs
-google-generativeai>=0.8.0
-anthropic>=0.30.0
-openai>=1.0.0  # Used for Perplexity API compatibility
+google-genai>=1.73,<2         # Gemini — orchestrating MCP client
+anthropic[aiohttp]>=0.96,<1   # Claude — formatting server (uses DefaultAioHttpClient)
+openai>=3.8,<4                # Perplexity speaks the OpenAI API dialect
 
 # MCP (Model Context Protocol)
-mcp>=1.0.0
-fastmcp>=2.0.0
+mcp>=1.27,<2
+fastmcp>=3.2,<4
 
 # Visualization & Charts
-matplotlib>=3.8.0
+matplotlib>=3.10,<4
+numpy>=2.4,<3
+
+# Market data
+# Optional, but without it generate_report.py silently falls back to a random
+# walk instead of real closing prices — see the README.
+yfinance>=0.2.40,<1.0
 
 # PDF Generation
-playwright>=1.40.0
+# Also needs the browser binary: `playwright install chromium`
+playwright>=1.58,<2
 
-# Configuration & Utilities
-pyyaml>=6.0
-anyio>=4.0.0
-tenacity>=8.0.0
-google-protobuf>=4.25.0
+# Configuration
+pyyaml>=6.0,<7
+
+# Tests
+pytest>=9.0,<10
+beautifulsoup4>=4.14,<5
+tinycss2>=1.5,<2

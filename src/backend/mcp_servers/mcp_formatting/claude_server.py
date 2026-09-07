@@ -2,31 +2,37 @@
 
 import json
 import logging
+from datetime import datetime
 from typing import List, Optional
 from pathlib import Path
 from mcp.server.fastmcp import FastMCP
 
 from config import claudeConfig
 from claude_client import get_claude_client, generate_html
+from pdf_converter import html_to_pdf
 from prompts import REPORT_PROMPT
 
 logger = logging.getLogger(__name__)
 mcp = FastMCP("formatting")
 
 @mcp.tool()
-async def format_report(text_blocks: List[str], images: Optional[List[List[str]]], color_scheme: Optional[str] = None, prompt: Optional[str] = None) -> str:
+async def format_report(text_blocks: List[str], images: Optional[List[List[str]]], color_scheme: Optional[str] = None, prompt: Optional[str] = None, ticker: Optional[str] = None) -> str:
     """
-    Formats text and images into a professional HTML report using an AI model.
+    Formats text and images into a professional HTML report using an AI model,
+    and saves the result as a downloadable PDF in the reports/ directory.
 
     Args:
         text_blocks: A list of text content strings to include in the report.
-        images: A list of tuples, where each tuple contains image data 
+        images: A list of tuples, where each tuple contains image data
                 (filename) and its corresponding caption.
         color_scheme: A string containing the main color scheme to format the report.
         prompt: A string containing a custom prompt for the AI model.
+        ticker: Optional stock ticker used to name the saved report file.
 
     Returns:
-        A string containing the generated HTML report, or a JSON error string.
+        The generated HTML (for the caller's own use), or a JSON error string.
+        The report is already saved as a PDF the user can download — do not
+        paste this HTML back to the user; just tell them the report is ready.
     """
     if not text_blocks:
         error_msg = "No text blocks provided. At least one text block is required."
@@ -89,6 +95,17 @@ async def format_report(text_blocks: List[str], images: Optional[List[List[str]]
 
         with open("latest_report.html", "w", encoding="utf-8") as f:
             f.write(report)
+
+        reports_dir = Path("reports")
+        reports_dir.mkdir(parents=True, exist_ok=True)
+        stem = f"{(ticker or 'report').upper()}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        pdf_path = reports_dir / f"{stem}.pdf"
+        try:
+            await html_to_pdf(report, output_path=str(pdf_path))
+            logger.info(f"Saved report PDF: {pdf_path}")
+        except Exception as e:
+            logger.error(f"Failed to save report PDF: {e}", exc_info=True)
+
         return report
 
     except Exception as e:

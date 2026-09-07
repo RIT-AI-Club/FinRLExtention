@@ -1,11 +1,13 @@
 [project]
 name = "chart-mcp-server"
 version = "0.1.0"
-description = "Add your description here"
+description = "MCP server that renders line and candlestick stock charts with Matplotlib"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.11"
+# Kept in sync with the root requirements.txt — this server is normally
+# launched from the project virtualenv, not installed on its own.
 dependencies = [
-    "fastmcp>=2.14.5",
-    "google-generativeai>=0.8.6",
-    "matplotlib>=3.10.8",
+    "fastmcp>=3.2,<4",
+    "matplotlib>=3.10,<4",
+    "numpy>=2.4,<3",
 ]
