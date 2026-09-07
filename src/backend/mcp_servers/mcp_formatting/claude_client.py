@@ -137,20 +137,18 @@ async def generate_html(
     prompt: Optional[str] = None,
     reference_image_paths: Optional[List[str]] = None,
     model: Optional[str] = None,
-    temperature: Optional[float] = None,
     max_output_tokens: Optional[int] = None,
     color_scheme: str = None
 ) -> str:
     """
     Generate HTML content using the Claude API.
-    
+
     Args:
         client: Initialized Claude client.
         user_data: List of dictionaries with text_blocks and images.
         system_prompt: System instruction for the AI.
         reference_image_paths: Optional list of paths to reference images for style.
         model: Claude model to use (overrides config if provided).
-        temperature: Generation temperature (overrides config if provided).
         max_output_tokens: Max output tokens (overrides config if provided).
         color_scheme: A string containing the main color scheme for the report.
         prompt: A string containing a custom prompt for the AI model.
@@ -169,10 +167,12 @@ async def generate_html(
     logger.info(f"Sending request to Claude model '{final_model}'...")
     try:
         user_parts = await _build_user_prompt_parts(user_data, reference_image_paths, prompt, color_scheme)
+        # No temperature/top_p/top_k: the anthropic 1.x SDK removed them from
+        # messages.stream(), and current models reject them anyway (Sonnet 5
+        # rejects non-default values; Opus 4.7+ 400 on any value at all).
         async with client.messages.stream(
             model=final_model,
             messages=[{"role": "user", "content": user_parts}],
-            temperature=temperature if temperature is not None else claudeConfig.temperature,
             max_tokens=max_output_tokens if max_output_tokens is not None else claudeConfig.max_output_tokens,
             system=system_prompt
         ) as stream:

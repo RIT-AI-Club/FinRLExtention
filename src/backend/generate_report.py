@@ -60,6 +60,7 @@ async def generate_report(
     save_pdf: bool = True,
     advanced_chart: bool = False,
     output_dir: Path = Path("reports"),
+    allow_synthetic_prices: bool = False,
 ) -> dict[str, Path]:
     """
     Run the full pipeline: research → chart → format → save.
@@ -69,6 +70,9 @@ async def generate_report(
         save_pdf:       Whether to also save a PDF alongside the HTML
         advanced_chart: Pass advanced=True to generate_line_chart (adds SMA + annotation)
         output_dir:     Directory to write output files into
+        allow_synthetic_prices: Fall back to a random walk when real prices are
+                        unavailable. Off by default — a financial report should
+                        fail rather than quietly chart invented numbers.
 
     Returns:
         dict with keys "html" and optionally "pdf" mapping to saved file Paths
@@ -118,12 +122,29 @@ async def generate_report(
             chart_caption = f"{ticker.upper()} — 90-Day Closing Price (Real Data)"
             logger.info(f"Fetched {len(dates)} real price points for {ticker}")
         except Exception as e:
-            logger.warning(f"yfinance fetch failed ({e}), using dummy prices")
+            if not allow_synthetic_prices:
+                raise RuntimeError(
+                    f"Could not fetch real prices for {ticker}: {e}\n"
+                    "Refusing to chart invented numbers in a financial report. "
+                    "Install the market-data dependency (pip install yfinance) or "
+                    "re-run with --allow-synthetic-prices if you genuinely want a "
+                    "random walk for testing."
+                ) from e
+            logger.warning(
+                f"Real price fetch failed ({e}) — falling back to SYNTHETIC prices "
+                "because --allow-synthetic-prices was passed. This chart does not "
+                "show real market data."
+            )
             base = datetime.now()
             dates = [(base - timedelta(days=i)).strftime("%Y-%m-%d") for i in range(90)]
             dates.reverse()
             prices = _dummy_prices(start=150.0, n=90)
-            chart_caption = f"{ticker.upper()} — 90-Day Price History"
+            # Label it in the report itself, not just the log — this caption is
+            # passed through to the formatter and rendered under the chart.
+            chart_caption = (
+                f"{ticker.upper()} — SIMULATED price series (random walk). "
+                "Not real market data; for testing only."
+            )
 
         chart_result = await client.call_tool(
             "generate_line_chart",
@@ -201,6 +222,12 @@ def main() -> None:
         default="reports",
         help="Output directory (default: reports/)",
     )
+    parser.add_argument(
+        "--allow-synthetic-prices",
+        action="store_true",
+        help="If real price data is unavailable, chart a random walk instead of "
+             "failing. The chart is labelled as simulated. Testing only.",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -214,6 +241,7 @@ def main() -> None:
             save_pdf=not args.no_pdf,
             advanced_chart=args.advanced_chart,
             output_dir=Path(args.output_dir),
+            allow_synthetic_prices=args.allow_synthetic_prices,
         )
     )
 
