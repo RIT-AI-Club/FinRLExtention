@@ -94,13 +94,8 @@ cd src/frontend && npm install && cd ../..
 
 ## Configuration
 
-> **There are two config files, not one.** The formatting server runs as a
-> separate process with its own working directory and reads a config sitting
-> next to its own source. Filling in only the root one leaves the Claude server
-> without a key. Both are gitignored.
-
-**1. `config/config.yml`** — read by the orchestrating client and the research
-server:
+All three servers read one file: **`config/config.yml`**. It is gitignored —
+create it from this template:
 
 ```yaml
 gemini:
@@ -114,21 +109,18 @@ perplexity:
   model: "sonar"
   temperature: 0.7
   max_tokens: 4096
-```
 
-**2. `src/backend/mcp_servers/mcp_formatting/config.yml`** — read by the
-formatting server:
-
-```yaml
 claude:
   api_key: "YOUR_ANTHROPIC_API_KEY"
   model: "claude-sonnet-5"
-  temperature: 0.7
   max_output_tokens: 50000
 ```
 
+Each server resolves this path from its own `__file__`, not the working
+directory, because MCP launches them as subprocesses whose cwd isn't guaranteed.
+
 `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` in the environment take precedence
-over the Claude file, so deployments need not write secrets to disk.
+over the `claude:` section, so deployments need not write secrets to disk.
 
 ### Choosing a Claude model
 
@@ -136,6 +128,11 @@ over the Claude file, so deployments need not write secrets to disk.
 `claude-opus-5` if report design quality matters more than cost — it is the
 stronger model at roughly 2.5× the price. Use the exact IDs above; they carry no
 date suffix.
+
+**The `claude:` section takes no `temperature`.** The sampling parameters were
+removed from the request signatures in `anthropic` 1.x, and the current models
+reject them regardless — Sonnet 5 refuses non-default values and Opus 4.7+
+returns a 400 for any value at all. A stray `temperature:` key is ignored.
 
 Keep `max_output_tokens` generous. A full HTML report with embedded CSS runs
 long, and a low ceiling truncates the document mid-tag.
@@ -174,6 +171,11 @@ python src/backend/generate_report.py AAPL --advanced-chart
 python src/backend/generate_report.py AAPL --no-pdf --output-dir reports/drafts
 ```
 
+Real closing prices come from `yfinance`. If that fetch fails the run **stops**
+rather than charting invented numbers. Pass `--allow-synthetic-prices` to fall
+back to a random walk for testing; the chart is then captioned as simulated in
+the report itself, not just in the log.
+
 ### HTTP API
 
 | Method | Path | Purpose |
@@ -189,7 +191,7 @@ python src/backend/generate_report.py AAPL --no-pdf --output-dir reports/drafts
 ```
 FinRLExtention/
 ├── config/
-│   ├── config.yml          # Gemini + Perplexity keys (gitignored, you create)
+│   ├── config.yml          # all three API keys (gitignored, you create)
 │   └── mcpservers.yml      # MCP server launch definitions
 ├── reports/                # Generated PDFs (gitignored)
 ├── src/
@@ -205,7 +207,6 @@ FinRLExtention/
 │   │           ├── claude_client.py    # prompt assembly, streaming
 │   │           ├── prompts.py          # report design system prompt
 │   │           ├── pdf_converter.py    # Playwright HTML → PDF
-│   │           ├── config.yml          # Claude key (gitignored, you create)
 │   │           └── reference_images/   # layout inspiration sent to Claude
 │   └── frontend/           # React + Vite chat UI
 ├── test/

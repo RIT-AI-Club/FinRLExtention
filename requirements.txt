@@ -12,7 +12,7 @@ pydantic>=2.13,<3
 
 # AI APIs
 google-genai>=1.73,<2         # Gemini — orchestrating MCP client
-anthropic[aiohttp]>=0.96,<1   # Claude — formatting server (uses DefaultAioHttpClient)
+anthropic[aiohttp]>=1.4,<2    # Claude — formatting server (uses DefaultAioHttpClient)
 openai>=3.8,<4                # Perplexity speaks the OpenAI API dialect
 
 # MCP (Model Context Protocol)

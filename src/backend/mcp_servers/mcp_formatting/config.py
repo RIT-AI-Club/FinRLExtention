@@ -6,6 +6,13 @@ from pathlib import Path
 import logging
 from typing import Optional
 
+# This file lives at src/backend/mcp_servers/mcp_formatting/config.py, so the
+# project root is five levels up. Resolved from __file__ rather than the cwd
+# because MCP launches this server as a subprocess whose working directory is
+# not guaranteed. Same anchor the research server uses.
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
+CONFIG_PATH = PROJECT_ROOT / "config" / "config.yml"
+
 # Configure a basic logger for the application
 logging.basicConfig(
     level=logging.INFO, 
@@ -32,8 +39,8 @@ class ClaudeAppConfig:
         and setting sensible defaults.
         """
         self._logger = logging.getLogger(__name__)
-        config_path = Path(__file__).parent / "config.yml"
-        
+        config_path = CONFIG_PATH
+
         try:
             with open(config_path, "r", encoding="utf-8") as f:
                 self._config = yaml.safe_load(f)
@@ -51,8 +58,9 @@ class ClaudeAppConfig:
         # without writing a secret to disk.
         self.anthropic_api_key = os.getenv("ANTHROPIC_API_KEY") or claude_config.get("api_key")
 
-        # Set other Claude parameters with defaults
-        self.temperature: float = float(claude_config.get("temperature", 0.7))
+        # No temperature here on purpose: the models this project targets reject
+        # the sampling parameters, and anthropic 1.x dropped them from the
+        # request signatures. A `temperature:` key in config.yml is ignored.
         self.default_model: str = os.getenv("ANTHROPIC_MODEL") or claude_config.get("model", "claude-sonnet-5")
         self.max_output_tokens: int = int(claude_config.get("max_output_tokens", 8192))
 
